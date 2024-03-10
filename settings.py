@@ -1,0 +1,6 @@
+CONFIGFILE = "json/config.json"
+IMAGES_DIR = "data/images/"
+ASSETS_DATA = "json/assets_data.json"
+ASSETS_DATA_TXT = "json/assets_data.txt"
+CHARACTER_PROGRESS = "json/character_progress.json"
+TRANSFORMED_DATA = "json/transformed_data.txt"
