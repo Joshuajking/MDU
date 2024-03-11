@@ -4,7 +4,7 @@ import time
 
 import psutil
 import pynput
-from loguru import logger
+from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
 from models.models import ImageLocation

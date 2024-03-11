@@ -2,7 +2,7 @@ import os.path
 import datetime
 
 import pyautogui
-from loguru import logger
+from logs.logging_config import logger
 from sqlmodel import SQLModel, Session
 
 from models.models import SearchArea, Character, Image

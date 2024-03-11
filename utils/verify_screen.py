@@ -4,7 +4,7 @@ from typing import Union
 
 import pyautogui
 import pydirectinput
-from loguru import logger
+from logs.logging_config import logger
 from querysets.querysets import ImageQuerySet
 
 

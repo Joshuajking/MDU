@@ -1,7 +1,7 @@
 from time import perf_counter, sleep
 
 import pyautogui
-from loguru import logger
+from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
 from config.db_setup import DbConfig

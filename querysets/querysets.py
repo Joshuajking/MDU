@@ -4,7 +4,7 @@ import os
 import uuid
 from typing import Any, Tuple, Optional, Dict
 
-from loguru import logger
+from logs.logging_config import logger
 from sqlalchemy import create_engine
 from sqlmodel import Session, select
 

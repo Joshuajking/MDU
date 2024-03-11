@@ -2,7 +2,7 @@ from time import sleep, perf_counter
 
 import pyautogui
 import pydirectinput
-from loguru import logger
+from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
 from models.models import ImageLocation

@@ -1,7 +1,7 @@
 import json
 import os
 
-from loguru import logger
+from logs.logging_config import logger
 
 from path_router import DirectoryPaths
 

@@ -2,7 +2,7 @@ from time import sleep
 
 import pydirectinput
 import pyperclip
-from loguru import logger
+from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
 from models.models import SearchAreaLocation, ImageLocation

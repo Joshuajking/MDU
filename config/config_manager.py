@@ -2,7 +2,7 @@ import json
 import os
 import time
 
-from loguru import logger
+from logs.logging_config import logger
 
 from path_router import DirectoryPaths
 from utils.read_json import read_json
