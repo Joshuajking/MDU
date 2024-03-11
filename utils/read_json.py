@@ -12,7 +12,7 @@ def read_json(json_file) -> json:
 	:return:
 	"""
 
-	read_file_path = os.path.join(DirectoryPaths.JSON_DIR, json_file)
+	read_file_path = os.path.join(DirectoryPaths.DATA_DIR, json_file)
 	data = None
 
 	try:

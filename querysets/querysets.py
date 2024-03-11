@@ -320,6 +320,7 @@ class CharacterQuerySet:
 					setattr(character, key, value)
 				character.updated_at = datetime.datetime.now()
 				session.commit()
+				logger.success(f"Updated character: {character_id}")
 				return
 			else:
 				logger.debug("Character not found")

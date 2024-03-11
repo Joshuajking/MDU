@@ -1,18 +1,17 @@
 import random
 from time import sleep
-from typing import Union, Tuple, Any, Dict
+from typing import Union
 
 import pyautogui
 import pydirectinput
 from loguru import logger
-from pyscreeze import Box
-
 from querysets.querysets import ImageQuerySet
 
 
 class VerifyScreen:
 	def __init__(self):
 		success = False
+		self.region_str = None
 		pass
 
 	def screen(
@@ -61,6 +60,7 @@ class VerifyScreen:
 				minSearchTime=minSearchTime,
 				confidence=confidence,
 			)
+
 			if screen_coords is not None:
 				left, top, width, height = screen_coords
 				right = left + width
@@ -68,6 +68,9 @@ class VerifyScreen:
 				center_x = left + width // 2
 				center_y = top + height // 2
 				screen_coords = center_x, center_y
+
+				# Convert tuple to a string representation
+				self.region_str = f"({left}, {top}, {width}, {height})"
 
 				if not image_data.region:
 					image_data = ImageQuerySet.update_image_by_id(image_data.id, {
@@ -77,6 +80,7 @@ class VerifyScreen:
 						'bottom': int(bottom),
 						'center_x': int(center_x),
 						'center_y': int(center_y),
+						'region': self.region_str
 					})
 				if verify_screen:
 					pass
@@ -132,7 +136,7 @@ class VerifyScreen:
 				"verify_screen": verify_screen,
 				"skip_sleep": skip_sleep,
 				"mouse_click": mouse_click,
-				"region": region,
+				"region": self.region_str,
 				"esc": esc,
 				"screen_coords": screen_coords,
 			}
@@ -141,4 +145,5 @@ class VerifyScreen:
 
 
 if __name__ == "__main__":
-	self.verify.screen("test", "agg_hold", skip_sleep=True)
+	# self.verify.screen("test", "agg_hold", skip_sleep=True)
+	pass

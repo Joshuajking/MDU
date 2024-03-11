@@ -15,9 +15,7 @@ from utils.read_json import read_json
 class DbConfig:
 	def __init__(self, images_dir=None):
 		self.config_manager = ConfigManager()
-		self.images_dir = images_dir or os.path.join(DirectoryPaths.DU_IMAGES_DIR)
-		self.users = read_json(
-			os.path.join(DirectoryPaths.JSON_DIR, self.config_manager.get_value('config.character_list')))
+		self.images_dir = images_dir or os.path.relpath(DirectoryPaths.DU_IMAGES_DIR)
 
 	def load_search_areas_to_db(self):
 		# Define search areas
@@ -52,7 +50,7 @@ class DbConfig:
 				session.add(character)
 			session.commit()
 
-	def load_image_entries_to_db(self):  # todo: this needs to be moved somewhere for start-up
+	def load_image_entries_to_db(self):
 		count = 0
 		with Session(engine) as session:
 			for location in os.listdir(self.images_dir):
@@ -65,16 +63,22 @@ class DbConfig:
 							existing_image = session.query(Image).filter_by(image_name=image_name,
 							                                                image_location=location).first()
 							if not existing_image:
-								image_url = image_path  # Use the full path as the URL
+								# Update the image URL to the new path
+								image_url = image_path
 								new_image = Image(image_name=image_name, image_location=location, image_url=image_url)
 								session.add(new_image)
 								new_image.created_at = datetime.datetime.now()
 								count += 1
+							else:
+								# Update existing image URL if it has changed
+								if existing_image.image_url != image_path:
+									existing_image.image_url = image_path
+									count += 1
 			if count > 0:
-				logger.debug(f"Total images added: {count}")
+				logger.debug(f"Total images updated: {count}")
 				session.commit()
 			else:
-				logger.debug(f"No new images")
+				logger.debug("No new images or existing images updated")
 
 	@staticmethod
 	def create_db_and_tables():

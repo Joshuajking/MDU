@@ -3,8 +3,6 @@ from time import sleep, perf_counter
 from loguru import logger
 
 from config.config_manager import ConfigManager
-from core.DUCharacters import logout, login_character
-from core.DUMissions import char_check
 from utils.read_json import read_json, is_package
 
 config_manager = ConfigManager()

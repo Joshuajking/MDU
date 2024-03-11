@@ -56,7 +56,6 @@ class EngineLoop:
 		while self.active_character_count > 0 and trips < max_trips:
 			trip_time_start = perf_counter()
 			tt_char_time = 0
-			# self.active_package_count()
 			for character in self.all_active_characters:
 				character_time_start = perf_counter()
 				# Start login
@@ -68,7 +67,6 @@ class EngineLoop:
 					status = self.missions.retrieve_package(character)
 				else:
 					status = self.missions.deliver_package(character)
-				logger.info(f"{character.username}: has_package {status}")
 				CharacterQuerySet.update_character(character.id, {'has_package': status["has_package"]})
 
 				self.du_characters.logout()
@@ -83,12 +81,14 @@ class EngineLoop:
 			self.active_package_count()
 			logger.info(f"retrieve_mode: {self.retrieve_mode}")
 			logger.info(f"percentage of package taken: {self.percentage}")
-			# self.package_status_count()
+
+			logger.info(f"Logging into Pilot: {self.pilot}")
 			self.du_characters.login(self.pilot)
-			tt_flight_time = self.flight.mission_flight(self.retrieve_mode)
+			self.flight.mission_flight(self.retrieve_mode)
 			trips += 1
 			trip_time_stop = perf_counter()
-			logger.info(f"trip elapse: {trip_time_stop - trip_time_start/60:.2f} minutes")
+			tt_trip_time = trip_time_stop - trip_time_start
+			logger.info(f"trip elapse: {tt_trip_time/60:.2f} minutes")
 			continue
 
 
@@ -98,13 +98,19 @@ if __name__ == "__main__":
 	client_start = perf_counter()
 	while True:
 		start = EngineLoop()
-		start.engine()
+		try:
+			start.engine()
+		except Exception as e:
+			logger.error(f"Exception: {str(e)}")
+			start.client.stop_application()
+			sleep(20)
+			continue
 		start.client.stop_application()
-		sleep(60)
+		sleep(20)
 		client_stop = perf_counter()
 		client_runtime = client_stop - client_start
 		client_run += client_runtime
 		if client_run >= client_limit:
 			break
-		continue
+
 

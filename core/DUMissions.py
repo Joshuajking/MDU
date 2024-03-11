@@ -87,7 +87,6 @@ class DUMissions:
 			return self.ocr_RETRIEVE_DELIVERY_STATUS()
 
 	def deliver_package(self, character):
-		sleep(3)
 		pydirectinput.press("f8")
 		is_active_mission = self.ocr.ocr_missions(
 			search_area=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
@@ -109,7 +108,6 @@ class DUMissions:
 		return {"has_package": False}
 
 	def retrieve_package(self, character):
-		sleep(3)
 		pydirectinput.press("f8")
 		is_active_mission = self.ocr.ocr_missions(
 			search_area=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,

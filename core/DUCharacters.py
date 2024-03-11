@@ -16,7 +16,6 @@ class DUCharacters:
 
 	def login(self, character):
 
-		sleep(3)
 		response_du_login_screen_label = self.verify.screen(
 			screen_name=ImageLocation.LOGIN_SCREEN,
 			image_to_compare="du_login_screen_label",
@@ -120,7 +119,9 @@ class DUCharacters:
 			logout_btn_response = self.verify.screen(
 				screen_name=ImageLocation.LOGOUT_SCREEN,
 				image_to_compare="logout_btn",
-				skip_sleep=True
+				skip_sleep=True,
+				mouse_click=True,
+				mouse_clicks=2
 			)
 			if not logout_btn_response['success']:
 				count += 1
