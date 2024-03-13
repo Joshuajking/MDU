@@ -8,7 +8,7 @@ import numpy as np
 import pyautogui
 from PIL import Image, ImageGrab, ImageEnhance
 from pynput.mouse import Controller
-
+from logs.logging_config import logger
 from config.config_manager import ConfigManager
 from models.models import SearchAreaLocation
 from path_router import DirectoryPaths
@@ -166,7 +166,7 @@ class OCREngine:
 			pyautogui.moveTo(region.center_x, region.center_y)
 			self.get_mouse().scroll(dx=0, dy=20)
 		attempts = 0
-		max_attempts = 7
+		max_attempts = 9
 		while attempts <= max_attempts:
 			try:
 				# Capture a screenshot of the current cell
@@ -219,9 +219,6 @@ class OCREngine:
 					enhanced_image.save(enhanced_screenshot)
 					enhanced_image.close()
 
-				# if isinstance(search_text, str):
-				# 	search_text = [search_text]
-
 				cell_result = self.get_reader().readtext(image=enhanced_screenshot, **ocr_params)
 				if self.scrap:
 					if cell_result:
@@ -239,6 +236,7 @@ class OCREngine:
 							pyautogui.click(center_x, center_y)
 						self.coords = center_x, center_y
 
+						logger.success(f"OCR: search_text {search_text} --'success=True','TEXT_FOUND', {text}")
 						return ResponseData(
 							success=True,
 							message="TEXT_FOUND",
@@ -252,6 +250,7 @@ class OCREngine:
 			attempts += 1
 			continue
 
+		logger.warning(f"OCR: search_text {search_text} --'success=False','OCR_MAX_ATTEMPTS_EXCEEDED', 'text=None'")
 		return ResponseData(
 			success=False,
 			message="OCR_MAX_ATTEMPTS_EXCEEDED",
@@ -264,9 +263,9 @@ if __name__ == '__main__':
 	active_mission_name = config_manager.get_value('config.active_mission_name')
 	ocr = OCREngine()
 	ocr_scan = ocr.ocr_missions(
-		search_area=SearchAreaLocation.AVAILABLE_MISSIONS,
+		search_area=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
 		search_text=active_mission_name,
-		scroll=True,
+		# scroll=True,
 		click=True
 	)
 

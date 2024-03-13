@@ -75,10 +75,10 @@ class DbConfig:
 									existing_image.image_url = image_path
 									count += 1
 			if count > 0:
-				logger.debug(f"Total images updated: {count}")
+				logger.info(f"Total images updated: {count}")
 				session.commit()
 			else:
-				logger.debug("No new images or existing images updated")
+				logger.info("No new images or existing images updated")
 
 	@staticmethod
 	def create_db_and_tables():
@@ -139,8 +139,8 @@ if __name__ == '__main__':
 		},
 	}
 
-	# obj.get_image_bbox(region_name=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
-	#                image_path=r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ACTIVE_TAKEN_MISSIONS.png")
+	obj.get_image_bbox(region_name=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
+	                   image_path=r"C:\Repositories\Dual Universe\MDU\data\search_areas\ACTIVE_TAKEN_MISSIONS.png")
 	#
 	# obj.get_image_bbox(region_name=SearchAreaLocation.AVAILABLE_MISSIONS,
 	#                image_path=r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-02 091333.png")

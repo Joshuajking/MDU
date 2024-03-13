@@ -1,38 +1,37 @@
 import unittest
-from unittest import mock
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, Mock
 
-from sqlmodel import create_engine, SQLModel
-from utils.verify_screen import VerifyScreen
-from utils.special_mission_ocr import OCREngine
 from core.DUMissions import DUMissions
-import utils.verify_screen
-from querysets import querysets
-import time
-
-from utils.special_mission_ocr import ResponseData
+from models.models import SearchAreaLocation
 
 
 class TestProcessPackage(unittest.TestCase):
     def setUp(self):
-        self.character = MagicMock()
-        self.missions = DUMissions()
-        self.mock_verify_screen = MagicMock()
-        self.missions.verify.screen = self.mock_verify_screen
+        self.character = Mock()
+        self.du_missions = Mock()
 
-    def test_process_package_deliver_success(self):
-        self.mock_verify_screen.return_value = {'success': True}
-        result = self.missions.process_package(self.character, is_retrieve=False)
-        self.assertEqual(result, {'has_package': False})
+    def test_retrieve_package(self):
+        # Patch the functions with specific return values
+        with patch('utils.special_mission_ocr.OCREngine.ocr_missions') as mock_ocr_missions, \
+                patch('utils.verify_screen.VerifyScreen.screen') as mock_screen, \
+	            patch('core.DUMissions.ocr.OCREngine.ocr_missions') as mock_active_taken_missions:
+            # Set the return value for each function
+            mock_ocr_missions.return_value = {'success': True, 'message': 'TEXT_FOUND', 'TEXT': 'Correct Text'}
+            mock_screen.return_value = {'success': True, 'screen_coords': 'screen_coords=True'}
 
-    def test_process_package_retrieve_success(self):
-        self.mock_verify_screen.return_value = {'success': True}
-        result = self.missions.process_package(self.character, is_retrieve=False)
-        self.assertEqual(result, {'has_package': True})
+            result_setup_mission = self.du_missions.setup_mission()
+            result_ocr = self.du_missions.ocr.ocr_missions(
+			search_area=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
+			search_text='test_mission',
+			click=True,
+		)
+            # result_process_package = self.du_missions.process_package(self.character, is_retrieve=True)
 
-    def test_process_package_no_action(self):
-        result = self.missions.process_package(self.character, is_retrieve=None)
-        self.assertIsNone(result)
+            # Assert that the result is correct based on the specified arguments
+            # Add your assertions here based on the expected result
+            self.assertEqual(result_ocr, {'is_active_mission.success': True})
+            # self.assertIsNone()
+            # self.assertEqual(result_setup_mission, {"has_package": True})
 
 
 if __name__ == '__main__':

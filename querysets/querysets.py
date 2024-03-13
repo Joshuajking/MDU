@@ -44,7 +44,7 @@ class SearchAreaQuerySet:
 					search_area.center_y = (search_area.top + search_area.bottom) // 2
 					search_area.updated_at = datetime.datetime.now()
 					session.commit()
-					logger.debug(f'Search area updated in the database: {region_name}')
+					logger.success(f'Search area updated in the database: {region_name}')
 				else:
 					new_search_area = SearchArea(region_name=region_name, **updates)
 					new_search_area.center_x = (new_search_area.left + new_search_area.right) // 2
@@ -52,8 +52,9 @@ class SearchAreaQuerySet:
 					new_search_area.updated_at = datetime.datetime.now()
 					session.add(new_search_area)
 					session.commit()
-					logger.debug(f'New search area created in the database: {region_name}')
+					logger.success(f'New search area created in the database: {region_name}')
 		except Exception as ex:
+			logger.error(f"Could not update or create search area: {ex}")
 			raise ValueError(f"Could not update or create search area: {ex}")
 
 	@classmethod
@@ -108,7 +109,7 @@ class ImageQuerySet:
 			with Session(engine) as session:
 				image = session.query(Image).all()
 		except Exception as e:
-			logger.debug(f"{str(e)}")
+			logger.error(f"{str(e)}")
 		return image
 
 	@classmethod
@@ -312,18 +313,18 @@ class CharacterQuerySet:
 			return character
 
 	@classmethod
-	def update_character(cls, character_id: str, updates: Dict[str, Any]):
+	def update_character(cls, obj, updates: Dict[str, Any]):
 		with Session(engine) as session:
-			character = session.query(Character).filter_by(id=character_id).first()
+			character = session.query(Character).filter_by(id=obj.id).first()
 			if character:
 				for key, value in updates.items():
 					setattr(character, key, value)
 				character.updated_at = datetime.datetime.now()
 				session.commit()
-				logger.success(f"Updated character: {character_id}")
+				logger.success(f"Updated character: {obj.username}")
 				return
 			else:
-				logger.debug("Character not found")
+				logger.error("Character not found")
 				raise KeyError(f'Character not found')
 
 	@classmethod

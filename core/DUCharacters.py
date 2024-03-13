@@ -23,7 +23,6 @@ class DUCharacters:
 		)
 		if not response_du_login_screen_label['success']:
 			self.logout()
-			# todo: might need to logout here and get the first() character with has_package = 0 depending on retrieve_status
 		response_du_login_screen_label = self.verify.screen(
 			screen_name=ImageLocation.LOGIN_SCREEN,
 			image_to_compare="du_login_screen_label",
@@ -45,33 +44,46 @@ class DUCharacters:
 			response_email_login = self.verify.screen(
 				screen_name=ImageLocation.LOGIN_SCREEN,
 				image_to_compare="email_login",
-				mouse_click=1,
-				region=(155, 358, 480, 574)
+				mouse_click=True,
+				mouse_clicks=2
+				# region=(155, 358, 480, 574)
 			)
 
 			keyboard.write(character.email)
+			sleep(1)
 			pydirectinput.press("tab")
 
 			response_password_login = self.verify.screen(
 				screen_name=ImageLocation.LOGIN_SCREEN,
 				image_to_compare="password_login",
-				mouse_click=1, region=(155, 358, 480, 574)
+				mouse_click=True,
+				mouse_clicks=2
+				# region=(155, 358, 480, 574)
 			)
 
 			keyboard.write(character.password)
 
+			pydirectinput.press("enter")
+
+			internal_error = self.verify.screen(
+				screen_name=ImageLocation.LOGIN_SCREEN,
+				image_to_compare="internal_error",
+				confidence=0.8,
+				minSearchTime=2,
+				skip_sleep=True,
+			)
 			response_email_login = self.verify.screen(
 				screen_name=ImageLocation.LOGIN_SCREEN,
 				image_to_compare="email_login",
-				confidence=0.8,
-				skip_sleep=True,
+				mouse_click=True,
+				minSearchTime=2,
+				skip_sleep=True
+				# region=(155, 358, 480, 574)
 			)
 
-			if response_email_login['screen_coords'] is not None:
-				logger.debug({"success": False, "status": "email_field: failed"})
+			if internal_error['success'] and not response_email_login['success']:
+				logger.warning({"success": False, "status": "email_field: failed"})
 				continue
-
-			pydirectinput.press("enter")
 
 			response_gametime_error_lable = self.verify.screen(
 				screen_name=ImageLocation.LOGIN_SCREEN,
@@ -80,9 +92,9 @@ class DUCharacters:
 				skip_sleep=True,
 			)
 
-			if response_gametime_error_lable['screen_coords'] is not None:
-				logger.warning(f"No game time: {character.username}")
-				CharacterQuerySet.update_character(character.id, {'has_gametime': False, 'active': False})
+			if response_gametime_error_lable['success']:
+				logger.debug(f"No game time: {character.username}")
+				CharacterQuerySet.update_character(character, {'has_gametime': False, 'active': False})
 
 				return False
 
@@ -93,7 +105,7 @@ class DUCharacters:
 			)
 
 			logger.success(f"{character.username} Successfully loaded game")
-			CharacterQuerySet.update_character(character.id, {'has_gametime': True})
+			CharacterQuerySet.update_character(character, {'has_gametime': True})
 			self.welcome_reward()
 			return True
 
@@ -129,10 +141,10 @@ class DUCharacters:
 			elif logout_btn_response['success'] and respawn:
 				return
 			at_esc_menu = True
-			pyautogui.click(logout_btn_response['screen_coords'])
+			# pyautogui.click(logout_btn_response['screen_coords'])
 			return
 
-		logger.critical({"success": False, "message": "ESC Menu Not Found"})
+		logger.error({"success": False, "message": "ESC Menu Not Found"})
 		raise Exception("ESC Menu Not Found")
 
 	def check_location(self):  # TODO: Implement
@@ -169,7 +181,7 @@ class DUCharacters:
 				screen_name=ImageLocation.IN_GAME_SCREEN,
 				image_to_compare="selected_ok_btn",
 				skip_sleep=True,
-				mouse_click=1
+				mouse_click=True
 			)
 		return
 

@@ -10,6 +10,7 @@ from core.DUClientManager import DUClientManager
 from core.DUFlight import DUFlight
 from core.DUMissions import DUMissions
 from querysets.querysets import CharacterQuerySet
+from utils.transfer_money import TransferMoney
 
 
 class EngineLoop:
@@ -23,6 +24,7 @@ class EngineLoop:
 		self.flight = DUFlight()
 		self.client = DUClientManager()
 		self.client.start_application()
+		self.transfer = TransferMoney()
 		self.pilot = CharacterQuerySet.read_character_by_username(self.config_manager.get_value('config.pilot'))
 		self.screen_w, self.screen_h = pyautogui.size()
 		self.screen_size = (self.screen_w, self.screen_h)
@@ -63,17 +65,17 @@ class EngineLoop:
 
 				if not has_gametime:
 					continue
-				if self.retrieve_mode:
-					status = self.missions.retrieve_package(character)
-				else:
-					status = self.missions.deliver_package(character)
-				CharacterQuerySet.update_character(character.id, {'has_package': status["has_package"]})
+				status = self.missions.process_package()
+				logger.info(f"{character.username} package status: {status}")
+				CharacterQuerySet.update_character(character, {'has_package': status["has_package"]})
 
 				self.du_characters.logout()
 				character_time_stop = perf_counter()
 				char_time = character_time_stop - character_time_start
 				tt_char_time += char_time
-				logger.info(f"character elapse: {character_time_stop - character_time_start:.2f}")
+				logger.info(f"retrieve_mode: {self.retrieve_mode}")
+				logger.info(f"package_count: {self.package_count}")
+				logger.info(f"character elapse: {character_time_stop - character_time_start:.2f} seconds")
 				logger.info(f"total character elapse: {tt_char_time/60:.2f} minutes")
 				logger.info(f"trips: {trips}/max_trips:{max_trips}")
 				continue
@@ -82,7 +84,7 @@ class EngineLoop:
 			logger.info(f"retrieve_mode: {self.retrieve_mode}")
 			logger.info(f"percentage of package taken: {self.percentage}")
 
-			logger.info(f"Logging into Pilot: {self.pilot}")
+			logger.info(f"Logging into Pilot: {self.pilot.username}")
 			self.du_characters.login(self.pilot)
 			self.flight.mission_flight(self.retrieve_mode)
 			trips += 1
@@ -103,6 +105,7 @@ if __name__ == "__main__":
 		except Exception as e:
 			logger.error(f"Exception: {str(e)}")
 			start.client.stop_application()
+			DUCharacters().logout()
 			sleep(20)
 			continue
 		start.client.stop_application()

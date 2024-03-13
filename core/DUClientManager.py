@@ -98,6 +98,7 @@ class DUClientManager:
 					logger.error(f"Error while stopping the application: {e}")
 					raise EnvironmentError(f"Error while stopping the application:")
 			client_running = False
+			logger.success(f"Client shutdown successfully")
 
 
 if __name__ == '__main__':
