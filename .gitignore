@@ -296,3 +296,4 @@ pip-selfcheck.json
 /models/test.db
 /models/missions.db
 /missions.db
+/data/config.json
