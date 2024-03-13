@@ -1,7 +1,7 @@
 from time import perf_counter, sleep
 
 import pyautogui
-from loguru import logger
+from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
 from config.db_setup import DbConfig
@@ -10,6 +10,7 @@ from core.DUClientManager import DUClientManager
 from core.DUFlight import DUFlight
 from core.DUMissions import DUMissions
 from querysets.querysets import CharacterQuerySet
+from utils.transfer_money import TransferMoney
 
 
 class EngineLoop:
@@ -23,6 +24,7 @@ class EngineLoop:
 		self.flight = DUFlight()
 		self.client = DUClientManager()
 		self.client.start_application()
+		self.transfer = TransferMoney()
 		self.pilot = CharacterQuerySet.read_character_by_username(self.config_manager.get_value('config.pilot'))
 		self.screen_w, self.screen_h = pyautogui.size()
 		self.screen_size = (self.screen_w, self.screen_h)
@@ -56,7 +58,6 @@ class EngineLoop:
 		while self.active_character_count > 0 and trips < max_trips:
 			trip_time_start = perf_counter()
 			tt_char_time = 0
-			# self.active_package_count()
 			for character in self.all_active_characters:
 				character_time_start = perf_counter()
 				# Start login
@@ -64,18 +65,17 @@ class EngineLoop:
 
 				if not has_gametime:
 					continue
-				if self.retrieve_mode:
-					status = self.missions.retrieve_package(character)
-				else:
-					status = self.missions.deliver_package(character)
-				logger.info(f"{character.username}: has_package {status}")
-				CharacterQuerySet.update_character(character.id, {'has_package': status["has_package"]})
+				status = self.missions.process_package()
+				logger.info(f"{character.username} package status: {status}")
+				CharacterQuerySet.update_character(character, {'has_package': status["has_package"]})
 
 				self.du_characters.logout()
 				character_time_stop = perf_counter()
 				char_time = character_time_stop - character_time_start
 				tt_char_time += char_time
-				logger.info(f"character elapse: {character_time_stop - character_time_start:.2f}")
+				logger.info(f"retrieve_mode: {self.retrieve_mode}")
+				logger.info(f"package_count: {self.package_count}")
+				logger.info(f"character elapse: {character_time_stop - character_time_start:.2f} seconds")
 				logger.info(f"total character elapse: {tt_char_time/60:.2f} minutes")
 				logger.info(f"trips: {trips}/max_trips:{max_trips}")
 				continue
@@ -83,12 +83,14 @@ class EngineLoop:
 			self.active_package_count()
 			logger.info(f"retrieve_mode: {self.retrieve_mode}")
 			logger.info(f"percentage of package taken: {self.percentage}")
-			# self.package_status_count()
+
+			logger.info(f"Logging into Pilot: {self.pilot.username}")
 			self.du_characters.login(self.pilot)
-			tt_flight_time = self.flight.mission_flight(self.retrieve_mode)
+			self.flight.mission_flight(self.retrieve_mode)
 			trips += 1
 			trip_time_stop = perf_counter()
-			logger.info(f"trip elapse: {trip_time_stop - trip_time_start/60:.2f} minutes")
+			tt_trip_time = trip_time_stop - trip_time_start
+			logger.info(f"trip elapse: {tt_trip_time/60:.2f} minutes")
 			continue
 
 
@@ -98,13 +100,20 @@ if __name__ == "__main__":
 	client_start = perf_counter()
 	while True:
 		start = EngineLoop()
-		start.engine()
+		try:
+			start.engine()
+		except Exception as e:
+			logger.error(f"Exception: {str(e)}")
+			start.client.stop_application()
+			DUCharacters().logout()
+			sleep(20)
+			continue
 		start.client.stop_application()
-		sleep(60)
+		sleep(20)
 		client_stop = perf_counter()
 		client_runtime = client_stop - client_start
 		client_run += client_runtime
 		if client_run >= client_limit:
 			break
-		continue
+
 

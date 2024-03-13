@@ -2,7 +2,7 @@ import json
 import os
 import time
 
-from loguru import logger
+from logs.logging_config import logger
 
 from path_router import DirectoryPaths
 from utils.read_json import read_json
@@ -12,7 +12,7 @@ class ConfigManager:
 	# json_config_path = os.path.join(DirectoryPaths.JSON_DIR, 'config.json')
 
 	def __init__(self):
-		self.json_config_path = os.path.join(DirectoryPaths.JSON_DIR, "config.json")
+		self.json_config_path = os.path.join(DirectoryPaths.DATA_DIR, "config.json")
 		self.config_data = self.load_config()
 
 	def load_config(self):

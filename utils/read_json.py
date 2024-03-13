@@ -1,7 +1,7 @@
 import json
 import os
 
-from loguru import logger
+from logs.logging_config import logger
 
 from path_router import DirectoryPaths
 
@@ -12,7 +12,7 @@ def read_json(json_file) -> json:
 	:return:
 	"""
 
-	read_file_path = os.path.join(DirectoryPaths.JSON_DIR, json_file)
+	read_file_path = os.path.join(DirectoryPaths.DATA_DIR, json_file)
 	data = None
 
 	try:

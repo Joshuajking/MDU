@@ -1,5 +1,6 @@
 import datetime
 import os.path
+import tempfile
 
 import cv2
 import easyocr
@@ -7,7 +8,7 @@ import numpy as np
 import pyautogui
 from PIL import Image, ImageGrab, ImageEnhance
 from pynput.mouse import Controller
-
+from logs.logging_config import logger
 from config.config_manager import ConfigManager
 from models.models import SearchAreaLocation
 from path_router import DirectoryPaths
@@ -165,38 +166,39 @@ class OCREngine:
 			pyautogui.moveTo(region.center_x, region.center_y)
 			self.get_mouse().scroll(dx=0, dy=20)
 		attempts = 0
-		max_attempts = 7
+		max_attempts = 9
 		while attempts <= max_attempts:
-			# Capture a screenshot of the current cell
-			cell_screenshot = ImageGrab.grab(
-				bbox=(region.left, region.top, region.right, region.bottom)
-			)
-			# Convert the screenshot to a 32-bit image
-			screenshot = self.convert_screenshot_to_32bit(cell_screenshot)
+			try:
+				# Capture a screenshot of the current cell
+				cell_screenshot = ImageGrab.grab(
+					bbox=(region.left, region.top, region.right, region.bottom)
+				)
+				# Convert the screenshot to a 32-bit image
+				screenshot = self.convert_screenshot_to_32bit(cell_screenshot)
 
-			original_image = Image.open(screenshot)
-			enhancement_factors = {
-				"brightness": 0.6,  # Default 1.0
-				"sharpness": 1.5,  # Default 1.0
-				"color": 1.0,  # Default 1.0
-				"contrast": 1.0,  # Default 1.0
-				"grayscale": False,
-				"GaussianBlur": False,
-				"ksize": (1, 1),  # Default 3
-				"sigmaX": 0,  # Default 0
-			}
-			ocr_params = {
-				# 'image': enhanced_screenshot,
-				"workers": 0,
-				"decoder": "beamsearch",
-				"beamWidth": 5,
-				"width_ths": 0.5,
-				"contrast_ths": 0.1,
-				"adjust_contrast": 0.5,
-				"batch_size": 64,
-				"mag_ratio": 1,
-			}
-			"""
+				original_image = Image.open(screenshot)
+				enhancement_factors = {
+					"brightness": 0.6,  # Default 1.0
+					"sharpness": 1.5,  # Default 1.0
+					"color": 1.0,  # Default 1.0
+					"contrast": 1.0,  # Default 1.0
+					"grayscale": False,
+					"GaussianBlur": False,
+					"ksize": (1, 1),  # Default 3
+					"sigmaX": 0,  # Default 0
+				}
+				ocr_params = {
+					# 'image': enhanced_screenshot,
+					"workers": 0,
+					"decoder": "beamsearch",
+					"beamWidth": 5,
+					"width_ths": 0.5,
+					"contrast_ths": 0.1,
+					"adjust_contrast": 0.5,
+					"batch_size": 64,
+					"mag_ratio": 1,
+				}
+				"""
                 Text Layout Analysis:
                     paragraph: Set to True to enable paragraph analysis.
                     min_size: Minimum text size to recognize.
@@ -208,45 +210,47 @@ class OCREngine:
                     canvas_size (int, default = 2560) - Maximum image size. Image bigger than this value will be resized down.
                     mag_ratio (float, default = 1) - Image magnification ratio.
                 """
-			timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-			enhanced_image = self.image_enhancement(
-				original_image, factors=enhancement_factors
-			)
-			enhanced_screenshot = f"{DirectoryPaths.OCR_ENHANCED_DIR}ocr_enhanced_image_{search_text}_{timestamp}.png"
-			enhanced_image.save(enhanced_screenshot)
-			enhanced_image.close()
 
-			# if isinstance(search_text, str):
-			# 	search_text = [search_text]
-
-			cell_result = self.get_reader().readtext(image=enhanced_screenshot, **ocr_params)
-			if self.scrap:
-				if cell_result:
-					return cell_result[0][1]
-				else:
-					continue
-			for mission, (bounding_box, text, _) in enumerate(cell_result):
-				temp_img = search_text.replace("_", " ")
-				if temp_img in text:
-					ocr_text = temp_img
-					center_x, center_y = self.absolute_coords(bounding_box, region)
-
-					pyautogui.moveTo(center_x, center_y)
-					if self.click:
-						pyautogui.click(center_x, center_y)
-					self.coords = center_x, center_y
-
-					return ResponseData(
-						success=True,
-						message="TEXT_FOUND",
-						text=text
+				with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as temp_file:
+					enhanced_screenshot = temp_file.name
+					enhanced_image = self.image_enhancement(
+						original_image, factors=enhancement_factors
 					)
-			if self.scroll:
-				pyautogui.moveTo(region.center_x, region.center_y)
-				self.get_mouse().scroll(dx=0, dy=-2)
+					enhanced_image.save(enhanced_screenshot)
+					enhanced_image.close()
+
+				cell_result = self.get_reader().readtext(image=enhanced_screenshot, **ocr_params)
+				if self.scrap:
+					if cell_result:
+						return cell_result[0][1]
+					else:
+						continue
+				for mission, (bounding_box, text, _) in enumerate(cell_result):
+					temp_img = search_text.replace("_", " ")
+					if temp_img in text:
+						ocr_text = temp_img
+						center_x, center_y = self.absolute_coords(bounding_box, region)
+
+						pyautogui.moveTo(center_x, center_y)
+						if self.click:
+							pyautogui.click(center_x, center_y)
+						self.coords = center_x, center_y
+
+						logger.success(f"OCR: search_text {search_text} --'success=True','TEXT_FOUND', {text}")
+						return ResponseData(
+							success=True,
+							message="TEXT_FOUND",
+							text=text
+						)
+				if self.scroll:
+					pyautogui.moveTo(region.center_x, region.center_y)
+					self.get_mouse().scroll(dx=0, dy=-2)
+			finally:
+				os.unlink(enhanced_screenshot)
 			attempts += 1
 			continue
 
+		logger.warning(f"OCR: search_text {search_text} --'success=False','OCR_MAX_ATTEMPTS_EXCEEDED', 'text=None'")
 		return ResponseData(
 			success=False,
 			message="OCR_MAX_ATTEMPTS_EXCEEDED",
@@ -259,9 +263,9 @@ if __name__ == '__main__':
 	active_mission_name = config_manager.get_value('config.active_mission_name')
 	ocr = OCREngine()
 	ocr_scan = ocr.ocr_missions(
-		search_area=SearchAreaLocation.AVAILABLE_MISSIONS,
+		search_area=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
 		search_text=active_mission_name,
-		scroll=True,
+		# scroll=True,
 		click=True
 	)
 

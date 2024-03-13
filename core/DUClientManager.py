@@ -4,9 +4,10 @@ import time
 
 import psutil
 import pynput
-from loguru import logger
+from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
+from models.models import ImageLocation
 from utils.verify_screen import VerifyScreen
 
 
@@ -70,7 +71,11 @@ class DUClientManager:
 			except Exception as e:
 				logger.error(f"Error while starting the application: {e}, {self.app_path}")
 
-			self.verify.screen("login_screen", "du_login_screen_label", verify_screen=True)
+			self.verify.screen(
+				screen_name=ImageLocation.LOGIN_SCREEN,
+				image_to_compare="du_login_screen_label",
+				verify_screen=True
+			)
 			logger.success(f"game client started: {self.app_path}")
 
 	def stop_application(self):
@@ -93,6 +98,7 @@ class DUClientManager:
 					logger.error(f"Error while stopping the application: {e}")
 					raise EnvironmentError(f"Error while stopping the application:")
 			client_running = False
+			logger.success(f"Client shutdown successfully")
 
 
 if __name__ == '__main__':

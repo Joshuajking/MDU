@@ -3,7 +3,6 @@ import sys
 import threading
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtWidgets import QSizePolicy
 from sqlmodel import Session, select
 
 from config.db_setup import engine
@@ -275,8 +274,8 @@ class Ui_Dialog(object):
 
 
 if __name__ == "__main__":
-	# engine_thread = EngineThread()
-	# engine_thread.start()
+	# TODO: Database initial setup
+	# TODO: Initial File creation
 
 	app = QtWidgets.QApplication([])
 	Dialog = QtWidgets.QDialog()

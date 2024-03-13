@@ -3,7 +3,7 @@ import json
 import os
 
 import numpy as np
-from loguru import logger
+from logs.logging_config import logger
 
 from config import config_manager
 from path_router import DirectoryPaths

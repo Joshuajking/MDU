@@ -6,7 +6,7 @@ import cv2 as cv
 import mss
 import numpy as np
 import pyautogui
-from loguru import logger
+from logs.logging_config import logger
 
 from querysets.querysets import ImageQuerySet
 

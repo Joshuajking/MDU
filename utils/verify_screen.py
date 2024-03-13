@@ -1,18 +1,20 @@
 import random
 from time import sleep
-from typing import Union, Tuple, Any, Dict
+from typing import Union
 
 import pyautogui
 import pydirectinput
-from loguru import logger
-from pyscreeze import Box
 
+from logs.logging_config import logger
 from querysets.querysets import ImageQuerySet
 
 
 class VerifyScreen:
 	def __init__(self):
 		success = False
+		self.region_str = None
+		self.w, self.h = pyautogui.size()
+		self.screen_size = self.w//2, self.h//2
 		pass
 
 	def screen(
@@ -24,7 +26,7 @@ class VerifyScreen:
 			mouse_clicks: int = 1,
 			verify_screen: bool = False,
 			skip_sleep: bool = False,
-			mouse_click: int = 0,
+			mouse_click: bool = False,
 			region: Union[tuple, int] = None,
 			esc: bool = False,
 	):
@@ -61,6 +63,7 @@ class VerifyScreen:
 				minSearchTime=minSearchTime,
 				confidence=confidence,
 			)
+
 			if screen_coords is not None:
 				left, top, width, height = screen_coords
 				right = left + width
@@ -69,28 +72,48 @@ class VerifyScreen:
 				center_y = top + height // 2
 				screen_coords = center_x, center_y
 
-				if not image_data.region:
-					image_data = ImageQuerySet.update_image_by_id(image_data.id, {
-						'left': int(left),
-						'top': int(top),
-						'right': int(right),
-						'bottom': int(bottom),
-						'center_x': int(center_x),
-						'center_y': int(center_y),
-					})
+				# Convert tuple to a string representation
+				self.region_str = f"({left}, {top}, {width}, {height})"
+
+				# if not image_data.region:
+				# 	image_data = ImageQuerySet.update_image_by_id(image_data.id, {
+				# 		'left': int(left),
+				# 		'top': int(top),
+				# 		'right': int(right),
+				# 		'bottom': int(bottom),
+				# 		'center_x': int(center_x),
+				# 		'center_y': int(center_y),
+				# 		'region': self.region_str
+				# 	})
 				if verify_screen:
 					pass
 
-				elif skip_sleep and mouse_click == 1 and not esc:
+				elif skip_sleep and mouse_click is True and not esc:
 					pyautogui.click(screen_coords, clicks=mouse_clicks)
+					coords = True
+					while coords is not None:
+						pyautogui.moveTo(self.screen_size)
+						coords = pyautogui.locateOnScreen(image=image_data.image_url)
+						pyautogui.click(coords, clicks=1, interval=0.5)
+
 					pass
 
-				elif mouse_click == 1 and not skip_sleep and not esc:
+				elif mouse_click is True and not skip_sleep and not esc:
 					pyautogui.click(screen_coords, clicks=mouse_clicks)
+					# coords = True
+					# while coords is not None:
+					# 	pyautogui.moveTo(self.screen_size)
+					# 	coords = pyautogui.locateOnScreen(image=image_data.image_url)
+					# 	pyautogui.click(coords, clicks=1, interval=0.5)
 					pass
 
-				elif mouse_click == 1 and skip_sleep and esc:
+				elif mouse_click is True and skip_sleep and esc:
 					pyautogui.click(screen_coords, clicks=mouse_clicks)
+					coords = True
+					while coords is not None:
+						pyautogui.moveTo(self.screen_size)
+						coords = pyautogui.locateOnScreen(image=image_data.image_url)
+						pyautogui.click(coords, clicks=1, interval=0.5)
 					pass
 
 				elif skip_sleep:
@@ -132,7 +155,7 @@ class VerifyScreen:
 				"verify_screen": verify_screen,
 				"skip_sleep": skip_sleep,
 				"mouse_click": mouse_click,
-				"region": region,
+				"region": self.region_str,
 				"esc": esc,
 				"screen_coords": screen_coords,
 			}
@@ -141,4 +164,5 @@ class VerifyScreen:
 
 
 if __name__ == "__main__":
-	self.verify.screen("test", "agg_hold", skip_sleep=True)
+	# self.verify.screen("test", "agg_hold", skip_sleep=True)
+	pass
