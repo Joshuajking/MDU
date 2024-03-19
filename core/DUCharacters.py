@@ -1,3 +1,4 @@
+import random
 from time import sleep
 
 import keyboard
@@ -12,7 +13,6 @@ from utils.verify_screen import VerifyScreen
 class DUCharacters:
 	def __init__(self):
 		self.verify = VerifyScreen()
-		pass
 
 	def login(self, character):
 
@@ -26,8 +26,8 @@ class DUCharacters:
 		response_du_login_screen_label = self.verify.screen(
 			screen_name=ImageLocation.LOGIN_SCREEN,
 			image_to_compare="du_login_screen_label",
-			mouse_click=True,
-			mouse_clicks=2
+			# mouse_click=True,
+			# mouse_clicks=2
 		)
 		if not response_du_login_screen_label['success']:
 			raise Exception(f"screen not found")
@@ -46,11 +46,10 @@ class DUCharacters:
 				image_to_compare="email_login",
 				mouse_click=True,
 				mouse_clicks=2
-				# region=(155, 358, 480, 574)
 			)
 
 			keyboard.write(character.email)
-			sleep(1)
+			sleep(0.2)
 			pydirectinput.press("tab")
 
 			response_password_login = self.verify.screen(
@@ -58,11 +57,10 @@ class DUCharacters:
 				image_to_compare="password_login",
 				mouse_click=True,
 				mouse_clicks=2
-				# region=(155, 358, 480, 574)
 			)
 
 			keyboard.write(character.password)
-
+			sleep(random.uniform(0.1, 0.4))
 			pydirectinput.press("enter")
 
 			internal_error = self.verify.screen(
@@ -78,7 +76,6 @@ class DUCharacters:
 				mouse_click=True,
 				minSearchTime=2,
 				skip_sleep=True
-				# region=(155, 358, 480, 574)
 			)
 
 			if internal_error['success'] and not response_email_login['success']:
@@ -88,7 +85,6 @@ class DUCharacters:
 			response_gametime_error_lable = self.verify.screen(
 				screen_name=ImageLocation.LOGIN_SCREEN,
 				image_to_compare="gametime_error_lable",
-				region=(160, 686, 500, 770),
 				skip_sleep=True,
 			)
 
@@ -126,14 +122,15 @@ class DUCharacters:
 			if count >= max_count:
 				break
 
-			pydirectinput.press("esc")
-
+			# pydirectinput.press("esc")
+			# sleep(random.uniform(0.5, 2.0))
 			logout_btn_response = self.verify.screen(
 				screen_name=ImageLocation.LOGOUT_SCREEN,
 				image_to_compare="logout_btn",
 				skip_sleep=True,
+				esc=True,
 				mouse_click=True,
-				mouse_clicks=2
+				mouse_clicks=1,
 			)
 			if not logout_btn_response['success']:
 				count += 1
@@ -159,14 +156,12 @@ class DUCharacters:
 		# find planet info
 		planet_label = self.verify.screen(
 			screen_name=ImageLocation.MAP_SCREEN, image_to_compare="map_planet_label", confidence=0.8,
-			region=(1457, 135, 1561, 159)
 		)
 		# find Market icon
 		market_icon = self.verify.screen(screen_name=ImageLocation.MAP_SCREEN, image_to_compare="map_market_icon", confidence=0.8)
 		# VerifyScreen Market location
 		market_label = self.verify.screen(
 			screen_name=ImageLocation.MAP_SCREEN, image_to_compare="map_market_label", confidence=0.8,
-			region=(432, 607, 685, 640)
 		)
 		# close map (Esc)
 		pydirectinput.press("esc")

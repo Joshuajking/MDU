@@ -50,7 +50,7 @@ class EngineLoop:
 
 	def engine(self):
 		trips = 0
-		max_trips = 20
+		max_trips = 12
 
 		self.all_active_characters = CharacterQuerySet.get_active_characters()
 		self.active_character_count = CharacterQuerySet.count_active_characters()
@@ -65,7 +65,7 @@ class EngineLoop:
 
 				if not has_gametime:
 					continue
-				status = self.missions.process_package()
+				status = self.missions.process_package(character)
 				logger.info(f"{character.username} package status: {status}")
 				CharacterQuerySet.update_character(character, {'has_package': status["has_package"]})
 
@@ -73,11 +73,12 @@ class EngineLoop:
 				character_time_stop = perf_counter()
 				char_time = character_time_stop - character_time_start
 				tt_char_time += char_time
+				logger.info(f"trips: {trips}/max_trips:{max_trips}")
+				logger.info(f"total character elapse: {tt_char_time/60:.2f} minutes")
+				logger.info(f"character elapse: {character_time_stop - character_time_start:.2f} seconds")
 				logger.info(f"retrieve_mode: {self.retrieve_mode}")
 				logger.info(f"package_count: {self.package_count}")
-				logger.info(f"character elapse: {character_time_stop - character_time_start:.2f} seconds")
-				logger.info(f"total character elapse: {tt_char_time/60:.2f} minutes")
-				logger.info(f"trips: {trips}/max_trips:{max_trips}")
+
 				continue
 
 			self.active_package_count()
@@ -90,7 +91,7 @@ class EngineLoop:
 			trips += 1
 			trip_time_stop = perf_counter()
 			tt_trip_time = trip_time_stop - trip_time_start
-			logger.info(f"trip elapse: {tt_trip_time/60:.2f} minutes")
+			logger.info(f"trip elapse: {tt_trip_time:.2f}")
 			continue
 
 
@@ -105,15 +106,16 @@ if __name__ == "__main__":
 		except Exception as e:
 			logger.error(f"Exception: {str(e)}")
 			start.client.stop_application()
-			DUCharacters().logout()
+			# DUCharacters().logout()
 			sleep(20)
 			continue
-		start.client.stop_application()
-		sleep(20)
-		client_stop = perf_counter()
-		client_runtime = client_stop - client_start
-		client_run += client_runtime
-		if client_run >= client_limit:
-			break
+		else:
+			start.client.stop_application()
+			sleep(20)
+			client_stop = perf_counter()
+			client_runtime = client_stop - client_start
+			client_run += client_runtime
+			if client_run >= client_limit:
+				break
 
 
