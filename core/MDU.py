@@ -1,7 +1,6 @@
 from time import perf_counter, sleep
 
 import pyautogui
-from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
 from config.db_setup import DbConfig
@@ -9,6 +8,7 @@ from core.DUCharacters import DUCharacters
 from core.DUClientManager import DUClientManager
 from core.DUFlight import DUFlight
 from core.DUMissions import DUMissions
+from logs.logging_config import logger
 from querysets.querysets import CharacterQuerySet
 from utils.transfer_money import TransferMoney
 
@@ -106,7 +106,6 @@ if __name__ == "__main__":
 		except Exception as e:
 			logger.error(f"Exception: {str(e)}")
 			start.client.stop_application()
-			# DUCharacters().logout()
 			sleep(20)
 			continue
 		else:

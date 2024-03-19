@@ -3,9 +3,9 @@ from time import sleep
 
 import pydirectinput
 import pyperclip
-from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
+from logs.logging_config import logger
 from models.models import SearchAreaLocation, ImageLocation
 from querysets.querysets import CharacterQuerySet, SearchAreaQuerySet
 from utils.special_mission_ocr import OCREngine

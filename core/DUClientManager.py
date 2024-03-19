@@ -4,15 +4,11 @@ import time
 
 import psutil
 import pynput
-from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
+from logs.logging_config import logger
 from models.models import ImageLocation
 from utils.verify_screen import VerifyScreen
-
-
-# Set up a logger with the desired log file and log level
-# config_manager = ConfigManager()
 
 
 class DUClientManager:

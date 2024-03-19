@@ -4,6 +4,7 @@ from time import sleep
 import keyboard
 import pyautogui
 import pydirectinput
+
 from logs.logging_config import logger
 from models.models import ImageLocation
 from querysets.querysets import CharacterQuerySet

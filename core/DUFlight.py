@@ -2,9 +2,9 @@ from time import sleep, perf_counter
 
 import pyautogui
 import pydirectinput
-from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
+from logs.logging_config import logger
 from models.models import ImageLocation
 from querysets.querysets import ImageQuerySet, CharacterQuerySet
 from utils.special_mission_ocr import OCREngine
