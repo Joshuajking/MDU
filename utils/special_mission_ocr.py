@@ -1,5 +1,6 @@
 import datetime
 import os.path
+import random
 import tempfile
 
 import cv2
@@ -13,18 +14,13 @@ from config.config_manager import ConfigManager
 from models.models import SearchAreaLocation
 from path_router import DirectoryPaths
 from querysets.querysets import SearchAreaQuerySet
-
-
-class ResponseData:
-	def __init__(self, success: bool, message: str, text: str | None):
-		self.success = success
-		self.message = message
-		self.text = text
+from utils.verify_screen import VerifyScreen
 
 
 class OCREngine:
 
 	def __init__(self, coords=None):
+		self.verify = VerifyScreen()
 		self.screen_w, self.screen_h = pyautogui.size()
 		self.screen_size = (self.screen_w, self.screen_h)
 		self.coords = coords
@@ -140,7 +136,7 @@ class OCREngine:
 		center_y = (absolute_y1 + absolute_y2) // 2
 		return center_x, center_y
 
-	def ocr_missions(self, search_area, search_text=None, click=False, scroll=False, scrap=False) -> ResponseData:
+	def ocr_missions(self, search_area, search_text=None, click=False, scroll=False, scrap=False):
 		"""
 
 		:param search_area:
@@ -161,9 +157,9 @@ class OCREngine:
 			region_name=search_area
 		)
 
-		pyautogui.moveTo(region.center_x, region.center_y)
+		# self.verify.simulate_mouse(region.center_x, region.center_y, mouse_click=False, mouse_clicks=0)
 		if self.scroll:
-			pyautogui.moveTo(region.center_x, region.center_y)
+			self.verify.simulate_mouse(region.center_x, region.center_y, mouse_click=False, mouse_clicks=0)
 			self.get_mouse().scroll(dx=0, dy=20)
 		attempts = 0
 		max_attempts = 9
@@ -183,10 +179,13 @@ class OCREngine:
 					"color": 1.0,  # Default 1.0
 					"contrast": 1.0,  # Default 1.0
 					"grayscale": False,
-					"GaussianBlur": False,
-					"ksize": (1, 1),  # Default 3
-					"sigmaX": 0,  # Default 0
+					"GaussianBlur": {  # Nested dictionary for GaussianBlur parameters
+						"enabled": False,  # Default False
+						"ksize": (1, 1),  # Default (1, 1) odd numbers only
+						"sigmaX": 0,  # Default 0
+					},  # Default False
 				}
+
 				ocr_params = {
 					# 'image': enhanced_screenshot,
 					"workers": 0,
@@ -226,36 +225,39 @@ class OCREngine:
 					else:
 						continue
 				for mission, (bounding_box, text, _) in enumerate(cell_result):
+					if not text:
+						logger.warning(
+							f"OCR: 'search_text': {search_text}, 'success': False, 'message': 'EMPTY_TEXT', 'text': None")
+						return {"success": False, "message": "EMPTY_TEXT", "text": None}
+
 					temp_img = search_text.replace("_", " ")
 					if temp_img in text:
+						logger.debug(f"temp_img: {temp_img}, 'success': True, '")
 						ocr_text = temp_img
 						center_x, center_y = self.absolute_coords(bounding_box, region)
 
-						pyautogui.moveTo(center_x, center_y)
+						# self.verify.simulate_mouse(center_x, center_y, mouse_click=False, mouse_clicks=0)
 						if self.click:
-							pyautogui.click(center_x, center_y)
+							self.verify.simulate_mouse(center_x, center_y, mouse_click=True, mouse_clicks=1)
+							# pyautogui.click(center_x, center_y, interval=0.2)
 						self.coords = center_x, center_y
 
-						logger.success(f"OCR: search_text {search_text} --'success=True','TEXT_FOUND', {text}")
-						return ResponseData(
-							success=True,
-							message="TEXT_FOUND",
-							text=text
-						)
+						logger.success(
+							f"OCR: 'search_text': {search_text}, 'success': True, 'message': 'TEXT_FOUND', 'text': {text}")
+						return {"success": True, "message": "TEXT_FOUND", "text": text}
+
 				if self.scroll:
-					pyautogui.moveTo(region.center_x, region.center_y)
+					self.verify.simulate_mouse(region.center_x, region.center_y, mouse_click=False, mouse_clicks=0)
 					self.get_mouse().scroll(dx=0, dy=-2)
+					continue
+
+				logger.warning(
+					f"OCR: 'search_text': {search_text}, 'success': False, 'message': 'TEXT_NOT_FOUND', 'text': None")
+				return {"success": False, "message": "TEXT_NOT_FOUND", "text": None}
+
 			finally:
 				os.unlink(enhanced_screenshot)
-			attempts += 1
-			continue
-
-		logger.warning(f"OCR: search_text {search_text} --'success=False','OCR_MAX_ATTEMPTS_EXCEEDED', 'text=None'")
-		return ResponseData(
-			success=False,
-			message="OCR_MAX_ATTEMPTS_EXCEEDED",
-			text=None
-		)
+		attempts += 1
 
 
 if __name__ == '__main__':

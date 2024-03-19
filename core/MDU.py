@@ -65,7 +65,7 @@ class EngineLoop:
 
 				if not has_gametime:
 					continue
-				status = self.missions.process_package()
+				status = self.missions.process_package(character)
 				logger.info(f"{character.username} package status: {status}")
 				CharacterQuerySet.update_character(character, {'has_package': status["has_package"]})
 
@@ -73,11 +73,12 @@ class EngineLoop:
 				character_time_stop = perf_counter()
 				char_time = character_time_stop - character_time_start
 				tt_char_time += char_time
+				logger.info(f"trips: {trips}/max_trips:{max_trips}")
+				logger.info(f"total character elapse: {tt_char_time/60:.2f} minutes")
+				logger.info(f"character elapse: {character_time_stop - character_time_start:.2f} seconds")
 				logger.info(f"retrieve_mode: {self.retrieve_mode}")
 				logger.info(f"package_count: {self.package_count}")
-				logger.info(f"character elapse: {character_time_stop - character_time_start:.2f} seconds")
-				logger.info(f"total character elapse: {tt_char_time/60:.2f} minutes")
-				logger.info(f"trips: {trips}/max_trips:{max_trips}")
+
 				continue
 
 			self.active_package_count()
