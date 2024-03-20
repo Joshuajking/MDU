@@ -1,5 +1,7 @@
 import os.path
-import datetime
+import sqlite3
+import uuid
+from datetime import datetime
 
 import pyautogui
 from logs.logging_config import logger
@@ -9,7 +11,7 @@ from models.models import SearchArea, Character, Image
 from path_router import DirectoryPaths
 from config.config_manager import ConfigManager
 from querysets.querysets import engine
-from utils.read_json import read_json
+from utils.data_preprocessor import DataPreprocessor
 
 
 class DbConfig:
@@ -40,10 +42,27 @@ class DbConfig:
 				session.add(search_area)
 			session.commit()
 
+	def manual_load_character(self):
+		data = [
+			("username", "password", "email"),
+			("username", "password", "email"),
+			("username", "password", "email"),
+		]
+
+		characters = []
+		for username, password, email in data:
+			character = Character(username=username, email=email, password=password)
+			characters.append(character)
+
+		with Session(engine) as session:
+			for character in characters:
+				session.add(character)
+			session.commit()
+
 	def load_characters_to_db(self):
 		with Session(engine) as session:
 			Character.__table__.create(engine, checkfirst=True)
-			for character_name, character_data in self.users.get('characters', {}).items():
+			for character_name, character_data in var.items():
 				email = character_data.get("email")
 				pwd = character_data.get("pwd")
 				character = Character(username=character_name, email=email, password=pwd)
@@ -117,30 +136,30 @@ class DbConfig:
 if __name__ == '__main__':
 	obj = DbConfig()
 	# obj.create_db_and_tables()
-	# obj.load_characters_to_db()
+	obj.manual_load_character()
 	# obj.load_image_entries_to_db()
 
 	# obj.delete_image_from_db()
-
-	from models.models import SearchAreaLocation
-
-	area = {
-		"ACTIVE_TAKEN_MISSIONS": {
-			"region_name": SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
-			"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ACTIVE_TAKEN_MISSIONS.png"
-		},
-		"AVAILABLE_MISSIONS": {
-			"region_name": SearchAreaLocation.AVAILABLE_MISSIONS,
-			"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\AVAILABLE_MISSIONS.png"
-		},
-		"RETRIEVE_DELIVERY_STATUS": {
-			"region_name": SearchAreaLocation.RETRIEVE_DELIVERY_STATUS,
-			"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\unselected_deliver_package.png"
-		},
-	}
-
-	obj.get_image_bbox(region_name=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
-	                   image_path=r"C:\Repositories\Dual Universe\MDU\data\search_areas\ACTIVE_TAKEN_MISSIONS.png")
+	#
+	# from models.models import SearchAreaLocation
+	#
+	# area = {
+	# 	"ACTIVE_TAKEN_MISSIONS": {
+	# 		"region_name": SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
+	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ACTIVE_TAKEN_MISSIONS.png"
+	# 	},
+	# 	"AVAILABLE_MISSIONS": {
+	# 		"region_name": SearchAreaLocation.AVAILABLE_MISSIONS,
+	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\AVAILABLE_MISSIONS.png"
+	# 	},
+	# 	"RETRIEVE_DELIVERY_STATUS": {
+	# 		"region_name": SearchAreaLocation.RETRIEVE_DELIVERY_STATUS,
+	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\unselected_deliver_package.png"
+	# 	},
+	# }
+	#
+	# obj.get_image_bbox(region_name=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
+	#                    image_path=r"C:\Repositories\Dual Universe\MDU\data\search_areas\ACTIVE_TAKEN_MISSIONS.png")
 	#
 	# obj.get_image_bbox(region_name=SearchAreaLocation.AVAILABLE_MISSIONS,
 	#                image_path=r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-02 091333.png")
@@ -165,7 +184,7 @@ if __name__ == '__main__':
 	# obj.get_image_bbox(region_name=SearchAreaLocation.ATMO_FUEL,
 	#                    image_path=r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-02 093227.png")
 
-	region_dict = {
+	# region_dict = {
 
 		# "DEST_INFO": {
 		# 	"region_name": SearchAreaLocation.DEST_INFO,
@@ -215,15 +234,15 @@ if __name__ == '__main__':
 		# 	"region_name": SearchAreaLocation.DEST_POS,
 		# 	"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-03 020140.png"
 		# },
-		"ORBITAL_HUD_LANDED": {
-			"region_name": SearchAreaLocation.ORBITAL_HUD_LANDED,
-			"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ORBITAL_HUD_LANDED.png"
-		},
-	}
-
-	for key, value in region_dict.items():
-		region_name = value["region_name"]
-		image_path = value["image_path"]
-
-		obj.get_image_bbox(region_name=region_name,
-		                   image_path=image_path)
+	# 	"ORBITAL_HUD_LANDED": {
+	# 		"region_name": SearchAreaLocation.ORBITAL_HUD_LANDED,
+	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ORBITAL_HUD_LANDED.png"
+	# 	},
+	# }
+	#
+	# for key, value in region_dict.items():
+	# 	region_name = value["region_name"]
+	# 	image_path = value["image_path"]
+	#
+	# 	obj.get_image_bbox(region_name=region_name,
+	# 	                   image_path=image_path)

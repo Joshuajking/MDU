@@ -10,9 +10,10 @@ class DataPreprocessor:
 	"""
 	"""
 	allowed_extensions = ['csv', 'xlsx', 'json', 'tsv', 'ods', 'txt']
+	allowed_headers = ['username', 'password', 'email']
 
-	def __init__(self, file_path: str, allowed_headers: list[str] | dict, extension: str = None):
-		self.allowed_headers = allowed_headers
+	def __init__(self, file_path: str, extension: str = None):
+		# self.allowed_headers = allowed_headers
 		self.file_path = file_path
 		self.extension = extension
 		self.df = self.preprocess()
@@ -116,12 +117,12 @@ class DataPreprocessor:
 		# 	processing_method = getattr(self, method_name)
 		# 	return processing_method(df)
 		# raise NotImplementedError(f"Processing method for extension {ext} is not implemented.")
-		if not set(df.columns.str.lower()).issubset(set(header.lower() for header in self.allowed_headers)):
+		# if not set(df.columns.str.lower()).issubset(set(header.lower() for header in self.allowed_headers)):
 			# All DataFrame columns are present in the allowed headers
 			print("Some DataFrame columns are not allowed.")
 			raise ValueError(f"Some DataFrame columns are not allowed.")
 		print("All DataFrame columns are allowed.")
-		return df
+		return df.to_dict()
 
 
 
