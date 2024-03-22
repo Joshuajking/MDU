@@ -59,10 +59,11 @@ class DUMissions:
 				search_area=SearchAreaLocation.RETRIEVE_DELIVERY_STATUS,
 				search_text=text,
 			)
-			logger.debug(f"OCR-{text}: {mission_package_btn}")
 			if mission_package_btn["text"] == "RETRIEVE PACKAGE":
+				logger.debug(f"{self.character.username}: mission to far to {mission_package_btn['text']}")
 				return {"has_package": False}
 			elif mission_package_btn["text"] == "DELIVER PACKAGE":
+				logger.debug(f"{self.character.username}: mission to far to {mission_package_btn['text']}")
 				return {"has_package": True}
 			continue
 		raise Exception(f"No package found for {text}")
@@ -73,13 +74,6 @@ class DUMissions:
 			search_area=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
 			search_text=self.active_mission_name,
 			click=True,
-		)
-		logger.debug(f"OCR-is_active_mission:{is_active_mission}")
-		success = is_active_mission.get('success')
-		logger.debug(f"OCR-success:{success}")
-		logger.info(
-			f"{self.character.username}: has active package {success}"
-			if success else f"{self.character.username}: no active package"
 		)
 		return is_active_mission
 
@@ -94,8 +88,10 @@ class DUMissions:
 			)
 			if result.get('success'):
 				if image_name == "selected_deliver_pkg_btn":
+					logger.debug(f"Package delivered")
 					return {"has_package": False}
 				elif image_name == "selected_retrieve_pkg_btn":
+					logger.debug(f"Package retrieved")
 					return {"has_package": True}
 		return self.ocr_RETRIEVE_DELIVERY_STATUS()
 
@@ -134,17 +130,25 @@ class DUMissions:
 			skip_sleep=True,
 		)
 		if result.get("success"):
+			logger.debug(f"Package retrieved")
 			return {"has_package": True}
 		return self.ocr_RETRIEVE_DELIVERY_STATUS()
 
 	def process_package(self, character):
 		self.character = character
+		logger.debug(f"Opening mission menu")
 		pydirectinput.press("f8")
 
 		is_active_mission = self.is_active_mission()
+		logger.info(
+			f"{self.character.username}: mission status {is_active_mission.get('success')}"
+			if is_active_mission.get('success') else f"{self.character.username}: mission status"
+		)
 		if is_active_mission.get('success'):
+			logger.debug(f"Processing active mission")
 			return self.get_package()
 		else:
+			logger.debug(f"Aquiring mission")
 			return self.select_package()
 
 

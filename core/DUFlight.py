@@ -1,3 +1,4 @@
+import time
 from time import sleep, perf_counter
 
 import pyautogui
@@ -55,7 +56,7 @@ class DUFlight:
 				self.check_img_to_land()
 				flight_time_stop = perf_counter()
 				tt_flight_time = flight_time_stop - flight_time_start
-				logger.info(f"flightTime: {flight_time_stop - flight_time_start:.2f} minutes")
+				logger.info(f"flightTime: {tt_flight_time / 60:.2f} minutes")
 				pydirectinput.keyDown("f")
 				sleep(4)
 				pydirectinput.keyUp("f")
@@ -72,18 +73,20 @@ class DUFlight:
 		logger.info(f"waiting to land...")
 
 		time_in_flight = 0
-		max_flight_time = 1200
+		timeout_seconds = 1200
+		start_time = time.perf_counter()
 		screen_coords = None
 
-		while screen_coords is None or time_in_flight <= max_flight_time:
+		while screen_coords is None:
 			screen_coords = pyautogui.locateCenterOnScreen(
 				image=r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ORBITAL_HUD_LANDED.png",
 				minSearchTime=1,
 				confidence=0.8,
 			)
-			if screen_coords is not None:
+			elapsed_time = time.perf_counter() - start_time
+			if elapsed_time >= timeout_seconds:
 				break
-			time_in_flight += 1
+			sleep(3)
 		# Gives time for the ship to land before continuing
 		sleep(20)
 		return

@@ -227,12 +227,11 @@ class OCREngine:
 				for mission, (bounding_box, text, _) in enumerate(cell_result):
 					if not text:
 						logger.warning(
-							f"OCR: 'search_text': {search_text}, 'success': False, 'message': 'EMPTY_TEXT', 'text': None")
+							f"OCR: 'search_text': {search_text}, 'message': 'EMPTY_TEXT'")
 						return {"success": False, "message": "EMPTY_TEXT", "text": None}
 
 					temp_img = search_text.replace("_", " ")
 					if temp_img in text:
-						logger.debug(f"temp_img: {temp_img}, 'success': True, '")
 						ocr_text = temp_img
 						center_x, center_y = self.absolute_coords(bounding_box, region)
 
@@ -252,7 +251,7 @@ class OCREngine:
 					continue
 
 				logger.warning(
-					f"OCR: 'search_text': {search_text}, 'success': False, 'message': 'TEXT_NOT_FOUND', 'text': None")
+					f"OCR: 'search_text': {search_text}, 'message': 'TEXT_NOT_FOUND'")
 				return {"success": False, "message": "TEXT_NOT_FOUND", "text": None}
 
 			finally:
