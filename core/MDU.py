@@ -25,29 +25,27 @@ class EngineLoop:
 		self.client = DUClientManager()
 		self.client.start_application()
 		self.transfer = TransferMoney()
+		self.mission_meta = MissionMetaQuerySet()
 		self.pilot = CharacterQuerySet.read_character_by_username(self.config_manager.get_value('config.pilot'))
 		self.screen_w, self.screen_h = pyautogui.size()
 		self.screen_size = (self.screen_w, self.screen_h)
 		self.retrieve_mode = True
 		self.package_count = 0
-		self.percentage = 0
 		self.active_character_count = None
 		self.all_active_characters = None
 		self.flight_status = None
 		self.package_count = CharacterQuerySet.count_has_package_characters()
 
 	def active_package_count(self):
-		# is_active = CharacterQuerySet.count_active_characters()
-		self.package_count = CharacterQuerySet.count_has_package_characters()
+		package_count = CharacterQuerySet.count_has_package_characters()
+		active_character_count = CharacterQuerySet.count_active_characters()
 
-		if self.active_character_count > 0:
-			self.percentage = (self.package_count / self.active_character_count) * 100
-			if self.percentage >= 75:
+		if active_character_count > 0:
+			percentage = (package_count / active_character_count) * 100
+			if percentage >= 75:
 				self.retrieve_mode = False
 			else:
 				self.retrieve_mode = True
-		else:
-			self.percentage = 0
 
 	def engine(self):
 		trips = 0
@@ -74,6 +72,7 @@ class EngineLoop:
 				character_time_stop = perf_counter()
 				char_time = character_time_stop - character_time_start
 				tt_char_time += char_time
+				logger.info(f"round trips: {self.mission_meta.read_round_trips()}")
 				logger.info(f"trips: {trips}/max_trips:{max_trips}")
 				logger.info(f"total character elapse: {tt_char_time/60:.2f} minutes")
 				logger.info(f"character elapse: {character_time_stop - character_time_start:.2f} seconds")
@@ -97,6 +96,7 @@ class EngineLoop:
 
 
 if __name__ == "__main__":
+	from querysets.querysets import MissionMetaQuerySet
 	client_limit = 21600
 	client_run = 0
 	bulk_trip = 0
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 		else:
 			start.client.stop_application()
 			sleep(20)
-			bulk_trip += 1
+			MissionMetaQuerySet().create_or_update_round_trips(1)
 			logger.info(f"Bulk trips: {bulk_trip}")
 			client_stop = perf_counter()
 			client_runtime = client_stop - client_start
