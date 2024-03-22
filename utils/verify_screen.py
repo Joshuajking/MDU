@@ -100,7 +100,7 @@ class VerifyScreen:
 			minSearchTime = 5
 		is_on_screen = False
 		check_count = 0
-		max_checks = 30
+		max_checks = 60
 
 		image_data = ImageQuerySet.read_image_by_name(image_name=image_to_compare, image_location=screen_name)
 		region = image_data.region if image_data is not None else None

@@ -5,11 +5,11 @@ import os
 import uuid
 from typing import Any, Tuple, Optional, Dict
 
-from logs.logging_config import logger
 from sqlalchemy import create_engine
 from sqlmodel import Session, select
 
 from config.config_manager import ConfigManager
+from logs.logging_config import logger
 from models.models import SearchArea, Character, Mission, Image, ImageLocation
 from path_router import DirectoryPaths
 

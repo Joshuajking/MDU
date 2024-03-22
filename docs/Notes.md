@@ -1,43 +1,8 @@
-### Retrieve mission package
-* **login**
-  * check location
-* **open mission_menu**
-  * check active missions
-* open search_menu
-  * search for mission
-* **select mission**
-  * mission selection process
-* retreive mission package
-  * mission retreival process
-* **logout**
+"game_launcher": "dual-launcher.exe",
+"game_client": "Dual.exe",
+"app_path": "C:\\ProgramData\\Dual Universe\\Game\\DualUniverse.exe",
 
-### Deliver mission package
-* **login**
-* **open mission_menu**
-  * check active missions
-* **select mission**
-  * mission selection process
-* deliver mission package
-  * mission delivery process
-* **logout**
 
-### Mission flight
-* **login**
-  * check location
-* respawn
-* flight seat
-* select destination
-* engage flight
-* land
-* **logout**
-
-### CharacterManager:
-* Login
-  * check location
-* Logout
-
-### MissionMenuManager:
-* **open mission_menu**
-  * check active missions
-* **select mission**
-  * mission selection process
+"game_launcher": "GeForceNOW.exe",
+"game_client": "Dual Universe on GeForce NOW",
+"app_path": "C:\\Users\\joshu\\AppData\\Local\\NVIDIA Corporation\\GeForceNOW\\CEF\\GeForceNOW.exe",

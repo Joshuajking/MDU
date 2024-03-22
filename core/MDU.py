@@ -1,7 +1,6 @@
 from time import perf_counter, sleep
 
 import pyautogui
-from logs.logging_config import logger
 
 from config.config_manager import ConfigManager
 from config.db_setup import DbConfig
@@ -9,6 +8,7 @@ from core.DUCharacters import DUCharacters
 from core.DUClientManager import DUClientManager
 from core.DUFlight import DUFlight
 from core.DUMissions import DUMissions
+from logs.logging_config import logger
 from querysets.querysets import CharacterQuerySet
 from utils.transfer_money import TransferMoney
 
@@ -34,8 +34,9 @@ class EngineLoop:
 		self.active_character_count = None
 		self.all_active_characters = None
 		self.flight_status = None
+		self.package_count = CharacterQuerySet.count_has_package_characters()
 
-	def active_package_count(self, ):
+	def active_package_count(self):
 		# is_active = CharacterQuerySet.count_active_characters()
 		self.package_count = CharacterQuerySet.count_has_package_characters()
 
@@ -50,7 +51,7 @@ class EngineLoop:
 
 	def engine(self):
 		trips = 0
-		max_trips = 12
+		max_trips = 5
 
 		self.all_active_characters = CharacterQuerySet.get_active_characters()
 		self.active_character_count = CharacterQuerySet.count_active_characters()
@@ -91,13 +92,14 @@ class EngineLoop:
 			trips += 1
 			trip_time_stop = perf_counter()
 			tt_trip_time = trip_time_stop - trip_time_start
-			logger.info(f"trip elapse: {tt_trip_time:.2f}")
+			logger.info(f"trip elapse: {tt_trip_time / 60:.2f} minutes")
 			continue
 
 
 if __name__ == "__main__":
 	client_limit = 21600
 	client_run = 0
+	bulk_trip = 0
 	client_start = perf_counter()
 	while True:
 		start = EngineLoop()
@@ -106,15 +108,21 @@ if __name__ == "__main__":
 		except Exception as e:
 			logger.error(f"Exception: {str(e)}")
 			start.client.stop_application()
-			# DUCharacters().logout()
+			client_stop = perf_counter()
+			client_runtime = client_stop - client_start
+			client_run += client_runtime
+			logger.info(f"Client runtime: {client_run}")
 			sleep(20)
 			continue
 		else:
 			start.client.stop_application()
 			sleep(20)
+			bulk_trip += 1
+			logger.info(f"Bulk trips: {bulk_trip}")
 			client_stop = perf_counter()
 			client_runtime = client_stop - client_start
 			client_run += client_runtime
+			logger.info(f"Client runtime: {client_run}")
 			if client_run >= client_limit:
 				break
 
