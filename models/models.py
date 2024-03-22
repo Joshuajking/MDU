@@ -20,6 +20,12 @@ class BaseModelMixin(BaseModel):
 		from_attributes = True
 
 
+class MissionMetadata(BaseModelMixin, SQLModel, table=True):
+	round_trips: int = Field(default=0)
+	flight_time: float = Field(default=0.0)
+	package_percentage: float = Field(default=0.0)
+
+
 class SearchAreaLocation(str, Enum):
 	ACTIVE_TAKEN_MISSIONS = "activeTakenMissions"
 	AVAILABLE_MISSIONS = "availableMissions"
