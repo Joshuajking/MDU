@@ -5,7 +5,7 @@ import time
 import psutil
 import pynput
 
-from config.config_manager import ConfigManager
+from config.config_manager import ConfigManager, timing_decorator
 from logs.logging_config import logger
 from models.models import ImageLocation
 from utils.verify_screen import VerifyScreen
@@ -56,6 +56,7 @@ class DUClientManager:
 
 		return pid
 
+	@timing_decorator
 	def start_application(self):
 		"""Start the game_client application if not already running."""
 		client_pid = self.is_client_running()

@@ -4,7 +4,7 @@ from time import sleep
 import pydirectinput
 import pyperclip
 
-from config.config_manager import ConfigManager
+from config.config_manager import ConfigManager, timing_decorator
 from logs.logging_config import logger
 from models.models import SearchAreaLocation, ImageLocation
 from querysets.querysets import CharacterQuerySet, SearchAreaQuerySet
@@ -53,6 +53,7 @@ class DUMissions:
 
 		return origin_pos, dest_pos
 
+	@timing_decorator
 	def ocr_RETRIEVE_DELIVERY_STATUS(self):
 		for text in self.search_text_list:
 			mission_package_btn = self.ocr.ocr_missions(
@@ -68,6 +69,7 @@ class DUMissions:
 			continue
 		raise Exception(f"No package found for {text}")
 
+	@timing_decorator
 	def is_active_mission(self):
 		sleep(random.uniform(1, 2))
 		is_active_mission = self.ocr.ocr_missions(
@@ -77,6 +79,7 @@ class DUMissions:
 		)
 		return is_active_mission
 
+	@timing_decorator
 	def get_package(self):
 		for image_name in self.image_list:
 			result = self.verify.screen(
@@ -95,6 +98,7 @@ class DUMissions:
 					return {"has_package": True}
 		return self.ocr_RETRIEVE_DELIVERY_STATUS()
 
+	@timing_decorator
 	def select_package(self):
 		unselected_search_btn = self.verify.screen(
 			screen_name=ImageLocation.ACTIVE_TAKEN_MISSIONS_SCREEN,
