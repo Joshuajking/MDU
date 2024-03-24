@@ -4,7 +4,7 @@ from time import sleep, perf_counter
 import pyautogui
 import pydirectinput
 
-from config.config_manager import ConfigManager
+from config.config_manager import ConfigManager, timing_decorator
 from logs.logging_config import logger
 from models.models import ImageLocation
 from querysets.querysets import ImageQuerySet, CharacterQuerySet
@@ -21,6 +21,7 @@ class DUFlight:
 		self.character = CharacterQuerySet.read_character_by_username(self.config_manager.get_value('config.pilot'))
 		self.flight_images = ImageQuerySet.get_all_image_by_location(image_location=ImageLocation.FLIGHT_SCREEN)
 
+	@timing_decorator
 	def mission_flight(self, retrieve_mode):
 		self.respawn()
 
@@ -52,15 +53,11 @@ class DUFlight:
 				sleep(0.25)
 				pydirectinput.press("ctrl")
 				pydirectinput.middleClick()
-				flight_time_start = perf_counter()
 				self.check_img_to_land()
-				flight_time_stop = perf_counter()
-				tt_flight_time = flight_time_stop - flight_time_start
-				logger.info(f"flightTime: {tt_flight_time / 60:.2f} minutes")
 				pydirectinput.keyDown("f")
 				sleep(4)
 				pydirectinput.keyUp("f")
-				return tt_flight_time
+				return
 			else:
 				pydirectinput.keyDown("alt")
 				pydirectinput.press("2")
@@ -68,6 +65,7 @@ class DUFlight:
 				count += 1
 				continue
 
+	@timing_decorator
 	def check_img_to_land(self):
 		sleep(10)
 		logger.info(f"waiting to land...")
@@ -91,6 +89,7 @@ class DUFlight:
 		sleep(20)
 		return
 
+	@timing_decorator
 	def respawn(self):
 		sleep(1)
 		pydirectinput.press("esc")

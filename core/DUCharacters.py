@@ -5,6 +5,7 @@ import keyboard
 import pyautogui
 import pydirectinput
 
+from config.config_manager import timing_decorator
 from logs.logging_config import logger
 from models.models import ImageLocation
 from querysets.querysets import CharacterQuerySet
@@ -15,6 +16,7 @@ class DUCharacters:
 	def __init__(self):
 		self.verify = VerifyScreen()
 
+	@timing_decorator
 	def login(self, character):
 
 		response_du_login_screen_label = self.verify.screen(
@@ -106,6 +108,7 @@ class DUCharacters:
 			self.welcome_reward()
 			return True
 
+	@timing_decorator
 	def logout(self, respawn=False):
 
 		loading_complete_response = self.verify.screen(
@@ -167,6 +170,7 @@ class DUCharacters:
 		# close map (Esc)
 		pydirectinput.press("esc")
 
+	@timing_decorator
 	def welcome_reward(self):
 		"""Checks for Daily reward"""
 		welcome_screen = self.verify.screen(
