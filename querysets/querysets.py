@@ -10,12 +10,36 @@ from sqlmodel import Session, select
 
 from config.config_manager import ConfigManager
 from logs.logging_config import logger
-from models.models import SearchArea, Character, Mission, Image, ImageLocation
+from models.models import SearchArea, Character, Mission, Image, ImageLocation, MissionMetadata
 from path_router import DirectoryPaths
 
 config_manager = ConfigManager()
 engine = create_engine(
 	f"sqlite:///{os.path.join(DirectoryPaths.ROOT_DIR, config_manager.get_value('config.database'))}", echo=False)
+
+
+class MissionMetaQuerySet:
+
+	@classmethod
+	def create_or_update_round_trips(cls, round_trip: int):
+		with Session(engine) as session:
+			metadata = session.query(MissionMetadata).filter_by(round_trips=round_trip).first()
+			if metadata:
+				session.query(MissionMetadata).filter_by(id=metadata.id).update(
+					{"round_trips": metadata.round_trips + 1}
+				)
+			else:
+				session.add(MissionMetadata(round_trips=1))
+
+			session.commit()
+
+	@classmethod
+	def read_round_trips(cls) -> int:
+		with Session(engine) as session:
+			metadata = session.query(MissionMetadata).first()
+			if metadata:
+				return metadata.round_trips
+			return 0  # Default value if no metadata is found
 
 
 class SearchAreaQuerySet:
