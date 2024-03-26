@@ -86,7 +86,7 @@ class DbConfig:
 								image_url = image_path
 								new_image = Image(image_name=image_name, image_location=location, image_url=image_url)
 								session.add(new_image)
-								new_image.created_at = datetime.datetime.now()
+								new_image.created_at = datetime.now()
 								count += 1
 							else:
 								# Update existing image URL if it has changed

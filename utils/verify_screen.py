@@ -110,7 +110,7 @@ class VerifyScreen:
 		while max_checks >= check_count:
 			if (screen_coords := pyautogui.locateOnScreen(
 					image=image_data.image_url,
-					region=region,
+					# region=region,
 					minSearchTime=minSearchTime,
 					confidence=confidence,
 			)) is not None:

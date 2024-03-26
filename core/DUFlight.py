@@ -91,7 +91,8 @@ class DUFlight:
 
 	@timing_decorator
 	def respawn(self):
-		sleep(1)
+		logger.info(f"Sleeping for 30 seconds while game loads before respawn")
+		sleep(30)
 		pydirectinput.press("esc")
 		respawn_btn = self.verify.screen(
 			screen_name=ImageLocation.LOGOUT_SCREEN,
