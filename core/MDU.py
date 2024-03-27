@@ -83,8 +83,8 @@ class EngineLoop:
 				char_time = character_time_stop - character_time_start
 				tt_char_time += char_time
 
-				round_trips.read_round_trips()
-				logger.info(f"round trips: {round_trips}")
+				count = round_trips.read_round_trips()
+				logger.info(f"round trips: {count}")
 
 				logger.info(f"trips: {trips}/max_trips:{max_trips}")
 				logger.info(f"total character elapse: {tt_char_time / 60:.2f} minutes")
@@ -121,8 +121,8 @@ if __name__ == "__main__":
 	bulk_trip = 0
 	client_start = perf_counter()
 	client = DUClientManager()
+	start = EngineLoop()
 	while True:
-		start = EngineLoop()
 		client.start_application()
 		try:
 			start.engine()

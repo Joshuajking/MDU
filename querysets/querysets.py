@@ -205,21 +205,24 @@ class ImageQuerySet:
 
 	@classmethod
 	def read_image_by_name(cls, image_name: str, image_location: Optional[ImageLocation]) -> Optional['Image']:
-		parts = image_name.split(".")
-		if len(parts) > 1:
-			extension = parts[-1]
-			if extension != "png":
-				raise ValueError("File must have a .png extension")
-		else:
-			image_name += ".png"
-		with Session(engine) as session:
-			image = session.query(Image).filter_by(image_name=image_name, image_location=image_location).first()
-			if image:
-				region = image.region
-				if region is not None:
-					region = tuple(map(int, ast.literal_eval(region)))
-					image.region = region
-			return image
+		try:
+			parts = image_name.split(".")
+			if len(parts) > 1:
+				extension = parts[-1]
+				if extension != "png":
+					raise ValueError("File must have a .png extension")
+			else:
+				image_name += ".png"
+			with Session(engine) as session:
+				image = session.query(Image).filter_by(image_name=image_name, image_location=image_location).first()
+				if image:
+					region = image.region
+					if region is not None:
+						region = tuple(map(int, ast.literal_eval(region)))
+						image.region = region
+		except Exception as e:
+			logger.error(e)
+		return image
 
 	@classmethod
 	def update_image_by_id(cls, id: uuid.uuid4, updates: Dict[str, Any]):

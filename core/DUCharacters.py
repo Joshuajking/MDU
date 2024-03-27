@@ -105,6 +105,7 @@ class DUCharacters:
 
 			logger.success(f"{character.username} Successfully loaded game")
 			CharacterQuerySet.update_character(character, {'has_gametime': True})
+			self.survey()
 			self.welcome_reward()
 			return True
 
@@ -169,6 +170,20 @@ class DUCharacters:
 		)
 		# close map (Esc)
 		pydirectinput.press("esc")
+
+	@timing_decorator
+	def survey(self):
+		survey = self.verify.screen(
+			screen_name=ImageLocation.IN_GAME_SCREEN, image_to_compare="survey", skip_sleep=True
+		)
+		if survey['screen_coords'] is not None:
+			self.verify.screen(
+				screen_name=ImageLocation.IN_GAME_SCREEN,
+				image_to_compare="survey_skip_btn",
+				skip_sleep=True,
+				mouse_click=True
+			)
+		return
 
 	@timing_decorator
 	def welcome_reward(self):
