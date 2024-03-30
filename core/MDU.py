@@ -1,8 +1,6 @@
 import random
 from time import perf_counter, sleep
 
-import pyautogui
-
 from config.config_manager import ConfigManager
 from config.db_setup import DbConfig
 from core.DUCharacters import DUCharacters
@@ -11,7 +9,6 @@ from core.DUFlight import DUFlight
 from core.DUMissions import DUMissions
 from logs.logging_config import logger
 from querysets.querysets import CharacterQuerySet
-from utils.transfer_money import TransferMoney
 
 
 class EngineLoop:
