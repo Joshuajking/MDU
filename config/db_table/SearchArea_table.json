@@ -1,0 +1,212 @@
+[
+    {
+        "region_name": "destInfo",
+        "left": 1272,
+        "right": 1356,
+        "center_x": 1314,
+        "region": null,
+        "top": 579,
+        "bottom": 601,
+        "center_y": 590
+    },
+    {
+        "region_name": "safeZone",
+        "left": 773,
+        "right": 820,
+        "center_x": 796,
+        "region": null,
+        "top": 631,
+        "bottom": 652,
+        "center_y": 641
+    },
+    {
+        "region_name": "ride",
+        "left": 779,
+        "right": 807,
+        "center_x": 793,
+        "region": null,
+        "top": 679,
+        "bottom": 700,
+        "center_y": 689
+    },
+    {
+        "region_name": "distance",
+        "left": 777,
+        "right": 809,
+        "center_x": 793,
+        "region": null,
+        "top": 653,
+        "bottom": 678,
+        "center_y": 665
+    },
+    {
+        "region_name": "status",
+        "left": 777,
+        "right": 881,
+        "center_x": 829,
+        "region": null,
+        "top": 728,
+        "bottom": 749,
+        "center_y": 738
+    },
+    {
+        "region_name": "originInfo",
+        "left": 1347,
+        "right": 1424,
+        "center_x": 1385,
+        "region": null,
+        "top": 296,
+        "bottom": 314,
+        "center_y": 305
+    },
+    {
+        "region_name": "mass",
+        "left": 1434,
+        "right": 1498,
+        "center_x": 1466,
+        "region": null,
+        "top": 465,
+        "bottom": 494,
+        "center_y": 479
+    },
+    {
+        "region_name": "volume",
+        "left": 1460,
+        "right": 1491,
+        "center_x": 1475,
+        "region": null,
+        "top": 502,
+        "bottom": 521,
+        "center_y": 511
+    },
+    {
+        "region_name": "rewardInfo",
+        "left": 1450,
+        "right": 1516,
+        "center_x": 1483,
+        "region": null,
+        "top": 637,
+        "bottom": 658,
+        "center_y": 647
+    },
+    {
+        "region_name": "titleInfo",
+        "left": 777,
+        "right": 977,
+        "center_x": 877,
+        "region": null,
+        "top": 289,
+        "bottom": 322,
+        "center_y": 305
+    },
+    {
+        "region_name": "activeTakenMissions",
+        "left": 524,
+        "right": 671,
+        "center_x": 597,
+        "region": null,
+        "top": 831,
+        "bottom": 1017,
+        "center_y": 924
+    },
+    {
+        "region_name": "availableMissions",
+        "left": 891,
+        "right": 1041,
+        "center_x": 966,
+        "region": null,
+        "top": 275,
+        "bottom": 501,
+        "center_y": 388
+    },
+    {
+        "region_name": "retrieveDeliveryStatus",
+        "left": 1146,
+        "right": 1535,
+        "center_x": 1340,
+        "region": null,
+        "top": 709,
+        "bottom": 768,
+        "center_y": 738
+    },
+    {
+        "region_name": "abandonMission",
+        "left": 887,
+        "right": 1051,
+        "center_x": 969,
+        "region": null,
+        "top": 724,
+        "bottom": 786,
+        "center_y": 755
+    },
+    {
+        "region_name": "warpTargetDestination",
+        "left": 1676,
+        "right": 1900,
+        "center_x": 1788,
+        "region": null,
+        "top": 652,
+        "bottom": 1005,
+        "center_y": 828
+    },
+    {
+        "region_name": "orbitalHudLanded",
+        "left": 747,
+        "right": 1176,
+        "center_x": 961,
+        "region": null,
+        "top": 840,
+        "bottom": 865,
+        "center_y": 852
+    },
+    {
+        "region_name": "spaceFuel",
+        "left": 89,
+        "right": 108,
+        "center_x": 98,
+        "region": null,
+        "top": 652,
+        "bottom": 671,
+        "center_y": 661
+    },
+    {
+        "region_name": "atmoFuel",
+        "left": 87,
+        "right": 104,
+        "center_x": 95,
+        "region": null,
+        "top": 680,
+        "bottom": 697,
+        "center_y": 688
+    },
+    {
+        "region_name": "originPos",
+        "left": 1493,
+        "right": 1513,
+        "center_x": 1503,
+        "region": null,
+        "top": 292,
+        "bottom": 321,
+        "center_y": 306
+    },
+    {
+        "region_name": "destPos",
+        "left": 1490,
+        "right": 1515,
+        "center_x": 1502,
+        "region": null,
+        "top": 574,
+        "bottom": 601,
+        "center_y": 587
+    },
+    {
+        "region_name": "fullActiveMissionArea",
+        "left": 532,
+        "right": 1643,
+        "center_x": 1087,
+        "region": null,
+        "top": 826,
+        "bottom": 1014,
+        "center_y": 920
+    }
+]
