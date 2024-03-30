@@ -47,6 +47,11 @@ class EngineLoop:
 			trip_time_start = perf_counter()
 			tt_char_time = 0
 			for character in all_active_characters:
+				if self.retrieve_mode and character.has_package:
+					continue
+				elif not self.retrieve_mode and not character.has_package:
+					continue
+
 				character_time_start = perf_counter()
 				has_gametime = du_characters.login(character)
 				if not has_gametime:
@@ -63,19 +68,15 @@ class EngineLoop:
 				char_time = character_time_stop - character_time_start
 				tt_char_time += char_time
 
-				# count = round_trips.read_round_trips()
-				# logger.info(f"round trips: {count}")
-
-				logger.info(f"trips: {trips}/max_trips:{max_trips}")
-				logger.info(f"total character elapse: {tt_char_time / 60:.2f} minutes")
-				logger.info(f"character elapse: {character_time_stop - character_time_start:.2f} seconds")
-				logger.info(f"retrieve_mode: {self.retrieve_mode}")
-				# logger.info(f"package_count: {self.package_count}")
+				logger.info(f"Summary"
+				            f"trips: {trips}/max_trips:{max_trips} \n"
+				            f"total character elapse: {tt_char_time / 60:.2f} minutes \n"
+				            f"character elapse: {character_time_stop - character_time_start:.2f} seconds \n"
+				            f"retrieve_mode: {self.retrieve_mode} \n")
 
 				continue
 
 			self.active_package_count()
-			logger.info(f"retrieve_mode: {self.retrieve_mode}")
 
 			pilot = CharacterQuerySet.read_character_by_username(config_manager.get_value('config.pilot'))
 			logger.info(f"Logging into Pilot: {pilot.username}")
