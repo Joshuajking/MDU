@@ -32,6 +32,7 @@ class SearchAreaLocation(str, Enum):
 	RETRIEVE_DELIVERY_STATUS = "retrieveDeliveryStatus"
 
 	WARP_TARGET_DEST = "warpTargetDestination"
+	GAME_CONSOLE_WINDOW = "gameConsoleWindow"
 	ORBITAL_HUD_LANDED = "orbitalHudLanded"
 	SPACE_FUEL = "spaceFuel"
 	ATMO_FUEL = "atmoFuel"

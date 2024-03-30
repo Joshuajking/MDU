@@ -157,7 +157,16 @@ class DUMissions:
 
 
 if __name__ == "__main__":
+	RETRIEVE_PACKAGE = 0
+	DELIVER_PACKAGE = 0
 	retrieve_status = True
 	all_active_characters = CharacterQuerySet.get_active_characters()
 	obj = DUMissions()
-	obj.process_package()
+	status, ocr_RETRIEVE_DELIVERY_STATUS = obj.ocr_RETRIEVE_DELIVERY_STATUS()
+	if ocr_RETRIEVE_DELIVERY_STATUS is not None:
+		if ocr_RETRIEVE_DELIVERY_STATUS == "RETRIEVE PACKAGE":
+			RETRIEVE_PACKAGE += 1
+		else:
+			DELIVER_PACKAGE += 1
+		if DELIVER_PACKAGE > RETRIEVE_PACKAGE:
+			print("break")

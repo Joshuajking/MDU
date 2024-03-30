@@ -97,7 +97,7 @@ class VerifyScreen:
         :return: {'success': True, 'screen_coords': screen_coords, 'bbox': (left, top, width, height), 'minSearchTime': minSearchTime} or False return {'success': False, 'screen_coords': None, 'minSearchTime': minSearchTime}
         """
 		if skip_sleep:
-			minSearchTime = 5
+			minSearchTime = 3
 		is_on_screen = False
 		check_count = 0
 		max_checks = 60

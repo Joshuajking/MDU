@@ -323,6 +323,13 @@ class CharacterQuerySet:
 			return characters
 
 	@classmethod
+	def count_has_package_and_active_characters(cls):
+		with Session(engine) as session:
+			# Query to count active characters that have a package
+			count = session.query(Character).filter(Character.active == True, Character.has_package == True).count()
+		return count
+
+	@classmethod
 	def get_has_package_characters(cls):
 		with Session(engine) as session:
 			characters = session.query(Character).filter(Character.has_package == True).all()

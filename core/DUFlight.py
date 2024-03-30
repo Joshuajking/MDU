@@ -1,3 +1,5 @@
+import multiprocessing
+import os.path
 import time
 from time import sleep, perf_counter
 
@@ -7,10 +9,17 @@ import pydirectinput
 from config.config_manager import ConfigManager, timing_decorator
 from config.db_setup import DbConfig
 from logs.logging_config import logger
-from models.models import ImageLocation
+from models.models import ImageLocation, SearchAreaLocation
+from path_router import DirectoryPaths
 from querysets.querysets import ImageQuerySet, CharacterQuerySet
 from utils.special_mission_ocr import OCREngine
 from utils.verify_screen import VerifyScreen
+
+
+class PilotSeatNotFoundError(Exception):
+	""" PilotSeatNotFound. """
+	def __init__(self, *args, **kwargs):  # real signature unknown
+		pass
 
 
 class DUFlight:
@@ -27,23 +36,46 @@ class DUFlight:
 		pydirectinput.keyDown("f")
 		sleep(4)
 		pydirectinput.keyUp("f")
+		# image_list = ["pilot_seat_lable", "pilot_seat"]
+		# for image_name in image_list:
+		# 	pilot = self.verify.screen(
+		# 		screen_name=ImageLocation.IN_GAME_SCREEN,
+		# 		image_to_compare=image_name,
+		# 		skip_sleep=True,
+		# 	)
+		# 	if pilot.get('success'):
+		# 		sleep(0.5)
+		# 		pydirectinput.keyDown("f")
+		# 		sleep(4)
+		# 		pydirectinput.keyUp("f")
+		# 		return
+		# raise PilotSeatNotFoundError(f"Pilot seat not found: {image_name}")
+
+	def flight_locations(self, retrieve_mode):
+		# pre_sites = ImageQuerySet.read_image_by_name(image_name="pre_site_origin",
+		#                                              image_location=ImageLocation.FLIGHT_SCREEN) if retrieve_mode else ImageQuerySet.read_image_by_name(
+		# 	image_name="pre_site_dest", image_location=ImageLocation.FLIGHT_SCREEN)
+		# pre_site = pre_sites.image_name
+
+		image_to_compare = self.config_manager.get_value(
+			"config.mission_retrieve_loc") if retrieve_mode else self.config_manager.get_value(
+			"config.mission_delivery_loc")
+
+		if retrieve_mode:
+			images = [image_to_compare]
+			return images
+			# images = [pre_site, image_to_compare]
+			# return images
+		else:
+			images = [image_to_compare]
+			return images
 
 	@timing_decorator
 	def mission_flight(self, retrieve_mode):
 		self.respawn()
 		self.get_pilot_seat()
 
-		pre_site_origin = ImageQuerySet.read_image_by_name(image_name="pre_site_origin",
-		                                                   image_location=ImageLocation.FLIGHT_SCREEN)
-		pre_site_origin = pre_site_origin.image_name
-		image_to_compare = self.config_manager.get_value(
-			"config.mission_retrieve_loc") if retrieve_mode else self.config_manager.get_value(
-			"config.mission_delivery_loc")
-
-		if retrieve_mode:
-			images = [pre_site_origin, image_to_compare]
-		else:
-			images = [image_to_compare]
+		images = self.flight_locations(retrieve_mode)
 
 		for image in images:
 			attempts = 60
@@ -77,6 +109,13 @@ class DUFlight:
 				logger.error("No match found for image:", image)
 		self.get_pilot_seat()
 
+	def check_ship_landed(self, img=(os.path.join(DirectoryPaths.SEARCH_AREA_DIR, 'ORBITAL_HUD_LANDED.png'))):
+		return pyautogui.locateCenterOnScreen(
+			image=img,
+			minSearchTime=1,
+			confidence=0.8,
+		)
+
 	@timing_decorator
 	def check_img_to_land(self):
 		sleep(10)
@@ -88,11 +127,7 @@ class DUFlight:
 		screen_coords = None
 
 		while screen_coords is None:
-			screen_coords = pyautogui.locateCenterOnScreen(
-				image=r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ORBITAL_HUD_LANDED.png",
-				minSearchTime=1,
-				confidence=0.8,
-			)
+			screen_coords = self.check_ship_landed()
 			elapsed_time = time.perf_counter() - start_time
 			if elapsed_time >= timeout_seconds:
 				break
@@ -131,4 +166,5 @@ if __name__ == "__main__":
 	pre_load = DbConfig()
 	pre_load.load_image_entries_to_db()
 	obj = DUFlight()
-	obj.mission_flight(retrieve_mode=True)
+	var = obj.check_ship_landed()
+	print(var)

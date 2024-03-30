@@ -136,12 +136,13 @@ class DbConfig:
 if __name__ == '__main__':
 	obj = DbConfig()
 	# obj.create_db_and_tables()
-	obj.manual_load_character()
+	# obj.manual_load_character()
 	# obj.load_image_entries_to_db()
 
 	# obj.delete_image_from_db()
 	#
-	# from models.models import SearchAreaLocation
+	from models.models import SearchAreaLocation
+
 	#
 	# area = {
 	# 	"ACTIVE_TAKEN_MISSIONS": {
@@ -184,7 +185,7 @@ if __name__ == '__main__':
 	# obj.get_image_bbox(region_name=SearchAreaLocation.ATMO_FUEL,
 	#                    image_path=r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-02 093227.png")
 
-	# region_dict = {
+	region_dict = {
 
 		# "DEST_INFO": {
 		# 	"region_name": SearchAreaLocation.DEST_INFO,
@@ -234,15 +235,20 @@ if __name__ == '__main__':
 		# 	"region_name": SearchAreaLocation.DEST_POS,
 		# 	"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-03 020140.png"
 		# },
-	# 	"ORBITAL_HUD_LANDED": {
-	# 		"region_name": SearchAreaLocation.ORBITAL_HUD_LANDED,
-	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ORBITAL_HUD_LANDED.png"
-	# 	},
-	# }
+		# 	"ORBITAL_HUD_LANDED": {
+		# 		"region_name": SearchAreaLocation.ORBITAL_HUD_LANDED,
+		# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ORBITAL_HUD_LANDED.png"
+		# 	},
+		# }
+		"GAME_CONSOLE_WINDOW": {
+			"region_name": SearchAreaLocation.GAME_CONSOLE_WINDOW,
+			"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-28 180709.png"
+		},
+	}
 	#
-	# for key, value in region_dict.items():
-	# 	region_name = value["region_name"]
-	# 	image_path = value["image_path"]
-	#
-	# 	obj.get_image_bbox(region_name=region_name,
-	# 	                   image_path=image_path)
+	for key, value in region_dict.items():
+		region_name = value["region_name"]
+		image_path = value["image_path"]
+
+		obj.get_image_bbox(region_name=region_name,
+		                   image_path=image_path)
