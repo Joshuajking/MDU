@@ -22,3 +22,5 @@ class DirectoryPaths:
 	UTILS_DIR = ROOT_DIR / 'utils'
 	DU_IMAGES_DIR = DATA_DIR / 'du_images'
 	SEARCH_AREA_DIR = DATA_DIR / 'search_areas'
+	DB_DUMP_DIR = CONFIG_DIR / 'db_table'
+

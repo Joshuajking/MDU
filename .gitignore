@@ -3,6 +3,7 @@
 
 ### Custom Exclusions
 data/json/*
+database/*
 utils/**/image_cache/
 temp/*
 templates/invalid_images/*
