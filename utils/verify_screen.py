@@ -4,6 +4,7 @@ from typing import Union
 
 import pyautogui
 import pydirectinput
+import pytweening
 
 from logs.logging_config import logger
 from querysets.querysets import ImageQuerySet
@@ -17,6 +18,55 @@ class VerifyScreen:
 		self.screen_size = self.w//2, self.h//2
 		pass
 
+	def simulate_mouse(self, dest_x, dest_y, mouse_click, mouse_clicks):
+		# Get screen size
+		screen_width, screen_height = pyautogui.size()
+		EASING_FUNCTIONS = {
+			# "linear": pytweening.linear,
+			"easeInQuad": pytweening.easeInQuad,
+			"easeOutQuad": pytweening.easeOutQuad,
+			"easeInOutQuad": pytweening.easeInOutQuad,
+			"easeInCubic": pytweening.easeInCubic,
+			"easeOutCubic": pytweening.easeOutCubic,
+			"easeInOutCubic": pytweening.easeInOutCubic,
+			"easeInQuart": pytweening.easeInQuart,
+			"easeOutQuart": pytweening.easeOutQuart,
+			"easeInOutQuart": pytweening.easeInOutQuart,
+			"easeInQuint": pytweening.easeInQuint,
+			"easeOutQuint": pytweening.easeOutQuint,
+			"easeInOutQuint": pytweening.easeInOutQuint,
+			"easeInSine": pytweening.easeInSine,
+			"easeOutSine": pytweening.easeOutSine,
+			"easeInOutSine": pytweening.easeInOutSine,
+			"easeInExpo": pytweening.easeInExpo,
+			"easeOutExpo": pytweening.easeOutExpo,
+			"easeInOutExpo": pytweening.easeInOutExpo,
+			"easeInCirc": pytweening.easeInCirc,
+			"easeOutCirc": pytweening.easeOutCirc,
+			"easeInOutCirc": pytweening.easeInOutCirc,
+		}
+
+		# Generate a random key
+		easing_key = random.choice(list(EASING_FUNCTIONS.keys()))
+
+		# Get the selected easing function object
+		selected_easing_function = EASING_FUNCTIONS[easing_key]
+
+		x = random.randint(-23, 27)
+		x += dest_x
+
+		y = random.randint(-32, 44)
+		y += dest_y
+
+		pyautogui.moveTo(x, y, duration=random.uniform(0.1, 2.2), tween=selected_easing_function, _pause=True)
+
+		# Use the selected easing function in pyautogui.moveTo
+		pyautogui.moveTo(dest_x, dest_y, duration=random.uniform(0.1, 1.2), tween=selected_easing_function, _pause=True)
+		if mouse_click:
+			# pyautogui.click(clicks=mouse_clicks, duration=random.uniform(0.2, 0.4))
+			pydirectinput.click(clicks=mouse_clicks, interval=0.2)
+		return
+
 	def screen(
 			self,
 			screen_name: str = None,
@@ -27,7 +77,7 @@ class VerifyScreen:
 			verify_screen: bool = False,
 			skip_sleep: bool = False,
 			mouse_click: bool = False,
-			region: Union[tuple, int] = None,
+			# region: Union[tuple, int] = None,
 			esc: bool = False,
 	):
 		"""
@@ -47,24 +97,23 @@ class VerifyScreen:
         :return: {'success': True, 'screen_coords': screen_coords, 'bbox': (left, top, width, height), 'minSearchTime': minSearchTime} or False return {'success': False, 'screen_coords': None, 'minSearchTime': minSearchTime}
         """
 		if skip_sleep:
-			minSearchTime = 5
+			minSearchTime = 3
 		is_on_screen = False
 		check_count = 0
-		max_checks = 30
+		max_checks = 60
 
 		image_data = ImageQuerySet.read_image_by_name(image_name=image_to_compare, image_location=screen_name)
+		region = image_data.region if image_data is not None else None
 		if not image_data.image_location == screen_name:
 			raise ValueError(
 				f"Error: screen passed {screen_name}, but image_location for {image_to_compare} is {image_data.image_location}")
 		while max_checks >= check_count:
-			screen_coords = pyautogui.locateOnScreen(
-				image=image_data.image_url,
-				region=region,
-				minSearchTime=minSearchTime,
-				confidence=confidence,
-			)
-
-			if screen_coords is not None:
+			if (screen_coords := pyautogui.locateOnScreen(
+					image=image_data.image_url,
+					# region=region,
+					minSearchTime=minSearchTime,
+					confidence=confidence,
+			)) is not None:
 				left, top, width, height = screen_coords
 				right = left + width
 				bottom = top + height
@@ -89,31 +138,18 @@ class VerifyScreen:
 					pass
 
 				elif skip_sleep and mouse_click is True and not esc:
-					pyautogui.click(screen_coords, clicks=mouse_clicks)
-					coords = True
-					while coords is not None:
-						pyautogui.moveTo(self.screen_size)
-						coords = pyautogui.locateOnScreen(image=image_data.image_url)
-						pyautogui.click(coords, clicks=1, interval=0.5)
-
+					x, y, = screen_coords
+					self.simulate_mouse(x, y, mouse_click, mouse_clicks)
 					pass
 
 				elif mouse_click is True and not skip_sleep and not esc:
-					pyautogui.click(screen_coords, clicks=mouse_clicks)
-					# coords = True
-					# while coords is not None:
-					# 	pyautogui.moveTo(self.screen_size)
-					# 	coords = pyautogui.locateOnScreen(image=image_data.image_url)
-					# 	pyautogui.click(coords, clicks=1, interval=0.5)
+					x, y, = screen_coords
+					self.simulate_mouse(x, y, mouse_click, mouse_clicks)
 					pass
 
 				elif mouse_click is True and skip_sleep and esc:
-					pyautogui.click(screen_coords, clicks=mouse_clicks)
-					coords = True
-					while coords is not None:
-						pyautogui.moveTo(self.screen_size)
-						coords = pyautogui.locateOnScreen(image=image_data.image_url)
-						pyautogui.click(coords, clicks=1, interval=0.5)
+					x, y, = screen_coords
+					self.simulate_mouse(x, y, mouse_click, mouse_clicks)
 					pass
 
 				elif skip_sleep:
@@ -155,7 +191,7 @@ class VerifyScreen:
 				"verify_screen": verify_screen,
 				"skip_sleep": skip_sleep,
 				"mouse_click": mouse_click,
-				"region": self.region_str,
+				"region": region,
 				"esc": esc,
 				"screen_coords": screen_coords,
 			}

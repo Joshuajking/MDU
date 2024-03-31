@@ -1,20 +1,45 @@
+import ast
 import datetime
 import enum
 import os
 import uuid
 from typing import Any, Tuple, Optional, Dict
 
-from logs.logging_config import logger
 from sqlalchemy import create_engine
 from sqlmodel import Session, select
 
 from config.config_manager import ConfigManager
-from models.models import SearchArea, Character, Mission, Image, ImageLocation
+from logs.logging_config import logger
+from models.models import SearchArea, Character, Mission, Image, ImageLocation, MissionMetadata
 from path_router import DirectoryPaths
 
 config_manager = ConfigManager()
 engine = create_engine(
 	f"sqlite:///{os.path.join(DirectoryPaths.ROOT_DIR, config_manager.get_value('config.database'))}", echo=False)
+
+
+class MissionMetaQuerySet:
+
+	@classmethod
+	def create_or_update_round_trips(cls, round_trip: int):
+		with Session(engine) as session:
+			metadata = session.query(MissionMetadata).filter_by(round_trips=round_trip).first()
+			if metadata:
+				session.query(MissionMetadata).filter_by(id=metadata.id).update(
+					{"round_trips": metadata.round_trips + 1}
+				)
+			else:
+				session.add(MissionMetadata(round_trips=1))
+
+			session.commit()
+
+	@classmethod
+	def read_round_trips(cls) -> int:
+		with Session(engine) as session:
+			metadata = session.query(MissionMetadata).first()
+			if metadata:
+				return metadata.round_trips
+			return 0  # Default value if no metadata is found
 
 
 class SearchAreaQuerySet:
@@ -28,7 +53,6 @@ class SearchAreaQuerySet:
 	def get_searcharea_by_name(cls, name: str):
 		with Session(engine) as session:
 			searcharea = session.exec(select(SearchArea).where(SearchArea.region_name == name)).first()
-		region = (searcharea.left, searcharea.top, searcharea.right, searcharea.bottom)
 		searcharea.region = region
 		return region
 
@@ -75,7 +99,7 @@ class SearchAreaQuerySet:
 			if search_area is not None:
 				return search_area
 			else:
-				print(f"Search area with name '{region_name}' not found.")
+				logger.info(f"Search area with name '{region_name}' not found.")
 				return None
 
 	@classmethod
@@ -181,47 +205,45 @@ class ImageQuerySet:
 
 	@classmethod
 	def read_image_by_name(cls, image_name: str, image_location: Optional[ImageLocation]) -> Optional['Image']:
-		parts = image_name.split(".")
-		if len(parts) > 1:
-			extension = parts[-1]
-			if extension != "png":
-				raise ValueError("File must have a .png extension")
-		else:
-			image_name += ".png"
-		with Session(engine) as session:
-			image = session.query(Image).filter_by(image_name=image_name, image_location=image_location).first()
-			region = (image.left, image.top, image.right, image.bottom)
-			image.region = region
-			return image
+		try:
+			parts = image_name.split(".")
+			if len(parts) > 1:
+				extension = parts[-1]
+				if extension != "png":
+					raise ValueError("File must have a .png extension")
+			else:
+				image_name += ".png"
+			with Session(engine) as session:
+				image = session.query(Image).filter_by(image_name=image_name, image_location=image_location).first()
+				if image:
+					region = image.region
+					if region is not None:
+						region = tuple(map(int, ast.literal_eval(region)))
+						image.region = region
+		except Exception as e:
+			logger.error(e)
+		return image
 
 	@classmethod
 	def update_image_by_id(cls, id: uuid.uuid4, updates: Dict[str, Any]):
-		"""
-		Image.update_image("example.png", {"image_location": "new_location"})
 
-		:param id:
-		:param image_name:
-		:param updates: Dict
-		:return:
-		"""
-		# parts = image_name.split(".")
-		# if len(parts) > 1:
-		# 	extension = parts[-1]
-		# 	if extension != "png":
-		# 		raise ValueError("File must have a .png extension")
-		# else:
-		# 	image_name += ".png"
 		with Session(engine) as session:
 			image = session.query(Image).filter_by(id=id).first()
 			if image:
-				for field, value in updates.items():
-					setattr(image, field, value)
-				image.updated_at = datetime.datetime.now()  # Set updated_at field
-				session.commit()
-				print(f'Image updated in the database: {id}')
-				return True
+				try:
+					for field, value in updates.items():
+						setattr(image, field, value)
+					image.updated_at = datetime.datetime.now()  # Set updated_at field
+					session.commit()
+					print(f'Image updated in the database: {id}')
+					return True
+				except Exception as e:
+					session.rollback()  # Rollback changes if an error occurs
+					print(f'Error updating image: {e}')
 			else:
 				print("Image not found")
+
+		return False
 
 	@classmethod
 	def delete_image_by_name(cls, image_name: str):
@@ -301,6 +323,13 @@ class CharacterQuerySet:
 			return characters
 
 	@classmethod
+	def count_has_package_and_active_characters(cls):
+		with Session(engine) as session:
+			# Query to count active characters that have a package
+			count = session.query(Character).filter(Character.active == True, Character.has_package == True).count()
+		return count
+
+	@classmethod
 	def get_has_package_characters(cls):
 		with Session(engine) as session:
 			characters = session.query(Character).filter(Character.has_package == True).all()
@@ -321,7 +350,7 @@ class CharacterQuerySet:
 					setattr(character, key, value)
 				character.updated_at = datetime.datetime.now()
 				session.commit()
-				logger.success(f"Updated character: {obj.username}")
+				logger.success(f"Updated character: {obj.username} - {updates}")
 				return
 			else:
 				logger.error("Character not found")
@@ -395,12 +424,12 @@ class MissionQuerySet:
 				new_mission = Mission(title=title, **update_dict)
 				session.add(new_mission)
 				session.commit()
-				print(f'New mission added to the database: {title}')
+				logger.info(f'New mission added to the database: {title}')
 			else:
 				for key, value in update_dict.items():
 					setattr(existing_mission, key, value)
 				session.commit()
-				print(f'Mission updated in the database: {title}')
+				logger.info(f'Mission updated in the database: {title}')
 
 
 if __name__ == '__main__':
