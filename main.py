@@ -1,25 +1,117 @@
 import csv
+import random
 import sys
 import threading
+from time import perf_counter, sleep
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from sqlmodel import Session, select
 
-from config.db_setup import engine
+from config.config_manager import ConfigManager
+from core.DUCharacters import DUCharacters
+from core.DUFlight import DUFlight
+from core.DUMissions import DUMissions
+from logs.logging_config import logger
+from config.db_setup import engine, DbConfig
+from core.DUClientManager import DUClientManager
 from core.MDU import EngineLoop
 from models.models import Character
+from querysets.querysets import CharacterQuerySet
+
+
+class CharacterNotFoundError(Exception):
+	def __init__(self, message=None, errors=None):
+		logger.error(f"{message}: {errors}")
+		# Call the base class constructor with the parameters it needs
+		super().__init__(message)
 
 
 class EngineThread(threading.Thread):
 	def __init__(self):
 		super().__init__()
+		self.daemon = True
+		self.retrieve_mode = True
 		self._running = threading.Event()
 		self._running.set()  # Set the event to true initially
 
+	def active_package_count(self):
+		package_count = CharacterQuerySet.count_has_package_and_active_characters()
+		logger.info(f"package_count: {package_count}")
+		active_character_count = CharacterQuerySet.count_active_characters()
+
+		if active_character_count > 0:
+			percentage = (package_count / active_character_count) * 100
+			logger.info(f"packages taken: {percentage}")
+			if percentage >= 75:
+				self.retrieve_mode = False
+			else:
+				self.retrieve_mode = True
+			logger.info(f"retrieve_mode: {self.retrieve_mode}")
+		else:
+			raise CharacterNotFoundError(message="Error no active characters")
+
 	def run(self):
-		engine_loop = EngineLoop()
-		engine_loop.engine()
-		print("Engine running...")
+		du_characters = DUCharacters()
+		flight = DUFlight()
+		missions = DUMissions()
+		config_manager = ConfigManager()
+
+		all_active_characters = CharacterQuerySet.get_active_characters()
+		active_character_count = CharacterQuerySet.count_active_characters()
+		self.active_package_count()
+
+		while active_character_count > 0 and self._running:
+			for character in all_active_characters:
+				has_gametime = du_characters.login(character)
+				if not has_gametime:
+					continue
+				status = missions.process_package(character)
+				logger.info(f"{character.username} package status: {status}")
+				CharacterQuerySet.update_character(character, {'has_package': status["has_package"]})
+				du_characters.logout()
+				continue
+
+			self.active_package_count()
+
+			pilot = CharacterQuerySet.read_character_by_username(config_manager.get_value('config.pilot'))
+			logger.info(f"Logging into Pilot: {pilot.username}")
+			du_characters.login(pilot)
+			flight.mission_flight(self.retrieve_mode)
+			continue
+
+		pre_load = DbConfig()
+		pre_load.load_image_entries_to_db()
+		client_limit = 43200
+		client_run = 0
+		bulk_trip = 0
+		client_start = perf_counter()
+		client = DUClientManager()
+		start = EngineLoop()
+		while self._running:
+			client.start_application()
+			try:
+				start.engine()
+			except Exception as e:
+				logger.error(f"Exception: {str(e)}")
+				client.stop_application()
+				client_stop = perf_counter()
+				client_runtime = client_stop - client_start
+				client_run += client_runtime
+				logger.info(f"Client runtime: {client_run}")
+				sleep(random.uniform(10, 30))
+				continue
+			else:
+				sleep(random.uniform(10, 30))
+				client.stop_application()
+				sleep(random.uniform(10, 30))
+				# MissionMetaQuerySet().create_or_update_round_trips(1)
+				logger.info(f"Bulk trips: {bulk_trip}")
+				client_stop = perf_counter()
+				client_runtime = client_stop - client_start
+				client_run += client_runtime
+				logger.info(f"Client runtime: {client_run}")
+				if client_run >= client_limit:
+					break
 
 	def stop(self):
 		self._running.clear()
