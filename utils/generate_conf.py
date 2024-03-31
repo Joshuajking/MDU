@@ -532,7 +532,7 @@ def see_image():
 
 
 if __name__ == "__main__":
-	from models.models import SearchAreaLocation
+	from model.models import SearchAreaLocation
 
 	origin_dict = {
 		"ACTIVE_TAKEN_MISSIONS": {

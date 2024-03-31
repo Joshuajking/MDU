@@ -8,8 +8,8 @@ import pydirectinput
 
 from config.config_manager import ConfigManager, timing_decorator
 from logs.logging_config import logger
-from models.models import ImageLocation, SearchAreaLocation
-from models.sqlalchemy_db import DbConfig
+from model.models import ImageLocation, SearchAreaLocation
+from model.sqlalchemy_db import DbConfig
 from path_router import DirectoryPaths
 from querysets.querysets import ImageQuerySet, CharacterQuerySet
 from utils.special_mission_ocr import OCREngine

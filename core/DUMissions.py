@@ -6,7 +6,7 @@ import pyperclip
 
 from config.config_manager import ConfigManager, timing_decorator
 from logs.logging_config import logger
-from models.models import SearchAreaLocation, ImageLocation
+from model.models import SearchAreaLocation, ImageLocation
 from querysets.querysets import CharacterQuerySet, SearchAreaQuerySet
 from utils.special_mission_ocr import OCREngine
 from utils.verify_screen import VerifyScreen

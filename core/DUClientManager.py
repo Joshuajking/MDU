@@ -7,7 +7,7 @@ import pynput
 
 from config.config_manager import ConfigManager, timing_decorator
 from logs.logging_config import logger
-from models.models import ImageLocation
+from model.models import ImageLocation
 from utils.verify_screen import VerifyScreen
 
 

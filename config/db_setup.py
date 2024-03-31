@@ -7,7 +7,7 @@
 # from logs.logging_config import logger
 # from sqlmodel import SQLModel, Session
 #
-# from models.models import SearchArea, Character, Image
+# from model.model import SearchArea, Character, Image
 # from path_router import DirectoryPaths
 # from config.config_manager import ConfigManager
 # from querysets.querysets import engine
@@ -142,7 +142,7 @@
 #
 # # obj.delete_image_from_db()
 # #
-# # from models.models import SearchAreaLocation
+# # from model.model import SearchAreaLocation
 # #
 # # area = {
 # # 	"ACTIVE_TAKEN_MISSIONS": {

@@ -7,7 +7,7 @@ import pydirectinput
 
 from config.config_manager import timing_decorator
 from logs.logging_config import logger
-from models.models import ImageLocation
+from model.models import ImageLocation
 from querysets.querysets import CharacterQuerySet
 from utils.verify_screen import VerifyScreen
 

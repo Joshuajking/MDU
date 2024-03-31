@@ -1,4 +1,5 @@
 import csv
+import os
 import sys
 import threading
 from time import perf_counter, sleep
@@ -12,8 +13,8 @@ from core.DUCharacters import DUCharacters
 from core.DUClientManager import DUClientManager
 from core.DUFlight import DUFlight
 from core.DUMissions import DUMissions
-from models.models import Character
-from models.sqlalchemy_db import DbConfig
+from model.models import Character
+from model.sqlalchemy_db import DbConfig
 from querysets.querysets import CharacterQuerySet, engine
 
 
@@ -306,7 +307,7 @@ class Ui_Dialog(object):
 			password = character.password
 			has_package = character.has_package
 			has_gametime = character.has_gametime
-			active = character.active  # Assuming you have an 'active' attribute in your Character models
+			active = character.active  # Assuming you have an 'active' attribute in your Character model
 			character_info = {
 				"email": email,
 				"password": password,
@@ -409,11 +410,26 @@ class Ui_Dialog(object):
 		self.save_selection()
 
 
+def delete_large_files(directory, max_size_mb):
+	max_size_bytes = max_size_mb * 1024 * 1024  # Convert MB to bytes
+	for filename in os.listdir(directory):
+		filepath = os.path.join(directory, filename)
+		if os.path.isfile(filepath) and os.path.getsize(filepath) > max_size_bytes:
+			# os.remove(filepath)
+			print(f"Deleted: {filepath}")
+
+
 if __name__ == "__main__":
 	# Database initial setup
 	pre_load = DbConfig()
 	pre_load.load_image_entries_to_db()
 	# TODO: Initial File creation
+
+	# TODO: delete over-size-limit dir
+	# Example usage
+	# directory_path = ["/utils"]
+	# max_file_size_mb = 500  # Specify the maximum file size in megabytes
+	# delete_large_files(directory_path, max_file_size_mb)
 
 	app = QtWidgets.QApplication([])
 	Dialog = QtWidgets.QDialog()

@@ -1,14 +1,14 @@
 import json
 import os
 import uuid
+from collections import OrderedDict
 from datetime import datetime
 
-from sqlalchemy import create_engine
 from sqlmodel import SQLModel, Session, select
 
 from config.config_manager import ConfigManager
 from logs.logging_config import logger
-from models.models import SearchArea, Image, Mission
+from model.models import SearchArea, Image, Mission
 from path_router import DirectoryPaths
 from querysets.querysets import engine
 
@@ -26,9 +26,9 @@ class DbConfig:
 	def __init__(self, images_dir=None):
 		self.config_manager = ConfigManager()
 		self.images_dir = images_dir or os.path.relpath(DirectoryPaths.DU_IMAGES_DIR)
+		self.__dump_table_Mission()
 		self.__dump_table_SearchArea()
 		self.__dump_table_Image()
-		self.__dump_table_Mission()
 		self.__create_db_and_tables()
 		self.__load_Image_table()
 		self.__load_SearchArea_table()
@@ -41,15 +41,24 @@ class DbConfig:
 				excluded_fields = {'updated_at', 'created_at'}
 
 			# Extract only the required fields for SearchArea
+			# filtered_data = []
+			# for data in query:
+			# 	filtered_data.append(
+			# 		{
+			# 			field_name: getattr(data, field_name)
+			# 			for field_name in data.model_dump().keys()
+			# 			if field_name not in excluded_fields
+			# 		}
+			# 	)
+
+			# Extract only the required fields for SearchArea
 			filtered_data = []
 			for data in query:
-				filtered_data.append(
-					{
-						field_name: getattr(data, field_name)
-						for field_name in data.model_dump().keys()
-						if field_name not in excluded_fields
-					}
-				)
+				ordered_data = OrderedDict()
+				for field_name in data.model_dump().keys():
+					if field_name not in excluded_fields:
+						ordered_data[field_name] = getattr(data, field_name)
+				filtered_data.append(ordered_data)
 
 			# Dump the data to a JSON file
 			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'Mission_table.json')
@@ -64,16 +73,25 @@ class DbConfig:
 				query = session.exec(select(Image)).all()
 				excluded_fields = {'updated_at', 'created_at'}
 
+			# # Extract only the required fields for SearchArea
+			# filtered_data = []
+			# for data in query:
+			# 	filtered_data.append(
+			# 		{
+			# 			field_name: getattr(data, field_name)
+			# 			for field_name in data.model_dump().keys()
+			# 			if field_name not in excluded_fields
+			# 		}
+			# 	)
+
 			# Extract only the required fields for SearchArea
 			filtered_data = []
 			for data in query:
-				filtered_data.append(
-					{
-						field_name: getattr(data, field_name)
-						for field_name in data.model_dump().keys()
-						if field_name not in excluded_fields
-					}
-				)
+				ordered_data = OrderedDict()
+				for field_name in data.model_dump().keys():
+					if field_name not in excluded_fields:
+						ordered_data[field_name] = getattr(data, field_name)
+				filtered_data.append(ordered_data)
 
 			# Dump the data to a JSON file
 			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'Image_table.json')
@@ -88,16 +106,25 @@ class DbConfig:
 				query = session.exec(select(SearchArea)).all()
 				excluded_fields = {'updated_at', 'created_at'}
 
+			# # Extract only the required fields for SearchArea
+			# filtered_data = []
+			# for data in query:
+			# 	filtered_data.append(
+			# 		{
+			# 			field_name: getattr(data, field_name)
+			# 			for field_name in data.model_dump().keys()
+			# 			if field_name not in excluded_fields
+			# 		}
+			# 	)
+
 			# Extract only the required fields for SearchArea
 			filtered_data = []
 			for data in query:
-				filtered_data.append(
-					{
-						field_name: getattr(data, field_name)
-						for field_name in data.model_dump().keys()
-						if field_name not in excluded_fields
-					}
-				)
+				ordered_data = OrderedDict()
+				for field_name in data.model_dump().keys():
+					if field_name not in excluded_fields:
+						ordered_data[field_name] = getattr(data, field_name)
+				filtered_data.append(ordered_data)
 
 			# Dump the data to a JSON file
 			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'SearchArea_table.json')
@@ -226,10 +253,10 @@ class DbConfig:
 
 if __name__ == "__main__":
 	config = DbConfig()
-	config.dump_table_SearchArea()
-	config.dump_table_Image()
-	config.dump_table_Mission()
-	config.create_db_and_tables()
-	config.load_Image_table()
-	config.load_SearchArea_table()
-	config.load_Mission_table()
+	# config.__dump_table_SearchArea()
+	# config.__dump_table_Image()
+	# config.__dump_table_Mission()
+	# config.__create_db_and_tables()
+	# config.__load_Image_table()
+	# config.__load_SearchArea_table()
+	# config.__load_Mission_table()

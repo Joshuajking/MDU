@@ -11,7 +11,7 @@ from PIL import Image, ImageGrab, ImageEnhance
 from pynput.mouse import Controller
 from logs.logging_config import logger
 from config.config_manager import ConfigManager
-from models.models import SearchAreaLocation
+from model.models import SearchAreaLocation
 from path_router import DirectoryPaths
 from querysets.querysets import SearchAreaQuerySet
 from utils.verify_screen import VerifyScreen

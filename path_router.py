@@ -11,7 +11,7 @@ class DirectoryPaths:
 	CORES_DIR = ROOT_DIR / 'core'
 	DOCS_DIR = ROOT_DIR / 'docs'
 	GUI_DIR = ROOT_DIR / 'ui'
-	MODEL_DIR = ROOT_DIR / 'models'
+	MODEL_DIR = ROOT_DIR / 'model'
 	BACKUP_DB_DIR = ROOT_DIR / 'db_backup'
 	TEMP_DIR = ROOT_DIR / 'temp'
 	OCR_ENHANCED_DIR = TEMP_DIR / 'ocr_enhanced_images'
