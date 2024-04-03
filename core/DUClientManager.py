@@ -56,6 +56,23 @@ class DUClientManager:
 
 		return pid
 
+	def geforce_client(self):
+		self.verify.screen(
+			screen_name=ImageLocation.GEFORCE_SCREEN,
+			image_to_compare="geforce_select_game",
+			verify_screen=True
+		)
+		self.verify.screen(
+			screen_name=ImageLocation.GEFORCE_SCREEN,
+			image_to_compare="geforce_select_game",
+			mouse_click=True
+		)
+		self.verify.screen(
+			screen_name=ImageLocation.GEFORCE_SCREEN,
+			image_to_compare="geforce_play_btn",
+			mouse_click=True
+		)
+
 	@timing_decorator
 	def start_application(self):
 		"""Start the game_client application if not already running."""
@@ -67,7 +84,8 @@ class DUClientManager:
 				logger.debug(f'Started game client: {self.app_path}')
 			except Exception as e:
 				logger.error(f"Error while starting the application: {e}, {self.app_path}")
-
+			if self.game_client == "Dual Universe on GeForce NOW":
+				self.geforce_client()
 			self.verify.screen(
 				screen_name=ImageLocation.LOGIN_SCREEN,
 				image_to_compare="du_login_screen_label",

@@ -82,6 +82,7 @@ class ImageLocation(str, Enum):
 	NOTIFICATIONS_SCREEN = "notifications_screen"
 	SEARCH_FOR_MISSIONS_SCREEN = "search_for_missions_screen"
 	WALLET_SCREEN = "wallet_screen"
+	GEFORCE_SCREEN = "geforce_screen"
 
 
 class Image(SQLModel, BaseModelMixin, table=True):

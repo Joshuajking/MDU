@@ -32,7 +32,7 @@ class EngineLoop:
 
 	def engine(self):
 		trips = 0
-		max_trips = 2
+		max_trips = 4
 
 		du_characters = DUCharacters()
 		flight = DUFlight()

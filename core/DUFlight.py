@@ -4,6 +4,7 @@ from time import sleep
 
 import pyautogui
 import pydirectinput
+from pynput.mouse import Controller
 
 from config.config_manager import ConfigManager, timing_decorator
 from logs.logging_config import logger
@@ -28,6 +29,7 @@ class DUFlight:
 		self.config_manager = ConfigManager()
 		self.verify = VerifyScreen()
 		self.ocr = OCREngine()
+		self.controller = Controller()
 		self.character = CharacterQuerySet.read_character_by_username(self.config_manager.get_value('config.pilot'))
 		self.flight_images = ImageQuerySet.get_all_image_by_location(image_location=ImageLocation.FLIGHT_SCREEN)
 
@@ -78,10 +80,10 @@ class DUFlight:
 		if retrieve_mode:
 			images = [image_to_compare]
 			# images = [pre_site, image_to_compare]
-			return images
+			return image_to_compare
 		else:
 			images = [image_to_compare]
-			return images
+			return image_to_compare
 
 	@timing_decorator
 	def mission_flight(self, retrieve_mode):
@@ -90,43 +92,44 @@ class DUFlight:
 
 		images = self.flight_locations(retrieve_mode)
 
-		for image in images:
-			attempts = 60
-			count = 0
-			while count < attempts:
-				logger.info(f"Looking for image {image}")
-				response_image_to_compare = self.verify.screen(
-					screen_name=ImageLocation.FLIGHT_SCREEN,
-					image_to_compare=image,
-					skip_sleep=True
-				)
-				if response_image_to_compare['screen_coords'] is not None:
-					logger.info(f"Procceding to {image} location")
-					pydirectinput.keyDown("alt")
-					pydirectinput.press("4")
-					sleep(0.1)
-					pydirectinput.keyUp("alt")
-					sleep(20)
-					pydirectinput.press("ctrl")
-					sleep(0.25)
-					pydirectinput.middleClick()
-					self.check_img_to_land()
-					break
-				else:
-					pydirectinput.keyDown("alt")
-					pydirectinput.press("2")
-					pydirectinput.keyUp("alt")
-					count += 1
+		# for image in images:
+		attempts = 60
+		count = 0
+		while count < attempts:
+			logger.info(f"Looking for image {images}")
+			response_image_to_compare = self.verify.screen(
+				screen_name=ImageLocation.FLIGHT_SCREEN,
+				image_to_compare=images,
+				skip_sleep=True
+			)
+			if response_image_to_compare['screen_coords'] is not None:
+				logger.info(f"Procceding to {images} location")
+				pydirectinput.keyDown("alt")
+				pydirectinput.press("4")
+				sleep(0.1)
+				pydirectinput.keyUp("alt")
+				sleep(20)
+				pydirectinput.press("ctrl")
+				sleep(0.25)
+				# pydirectinput.middleClick()
+				self.controller.scroll(dx=0, dy=240)
+				self.check_img_to_land()
+				break
 			else:
-				# If no match found after all attempts
-				logger.error("No match found for image:", image)
+				pydirectinput.keyDown("alt")
+				pydirectinput.press("2")
+				pydirectinput.keyUp("alt")
+				count += 1
+		else:
+			# If no match found after all attempts
+			logger.error("No match found for image:", images)
 		self.get_pilot_seat()
 
 	def check_ship_landed(self, img=(os.path.join(DirectoryPaths.SEARCH_AREA_DIR, 'ORBITAL_HUD_LANDED.png'))):
 		return pyautogui.locateCenterOnScreen(
 			image=img,
 			minSearchTime=1,
-			confidence=0.8,
+			confidence=0.75,
 		)
 
 	@timing_decorator
