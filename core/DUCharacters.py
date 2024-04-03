@@ -1,9 +1,9 @@
 import random
 from time import sleep
 
-import keyboard
 import pyautogui
 import pydirectinput
+from ahk import AHK
 
 from config.config_manager import timing_decorator
 from logs.logging_config import logger
@@ -13,6 +13,8 @@ from utils.verify_screen import VerifyScreen
 
 
 class DUCharacters:
+	ahk = AHK()
+
 	def __init__(self):
 		self.verify = VerifyScreen()
 
@@ -51,7 +53,7 @@ class DUCharacters:
 				mouse_clicks=2
 			)
 
-			keyboard.write(character.email)
+			self.ahk.send_raw(character.email)
 			sleep(0.2)
 			pydirectinput.press("tab")
 
@@ -62,7 +64,7 @@ class DUCharacters:
 				mouse_clicks=2
 			)
 
-			keyboard.write(character.password)
+			self.ahk.send_raw(character.password)
 			sleep(random.uniform(0.1, 0.4))
 			pydirectinput.press("enter")
 

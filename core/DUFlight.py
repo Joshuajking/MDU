@@ -1,15 +1,13 @@
-import multiprocessing
 import os.path
 import time
-from time import sleep, perf_counter
+from time import sleep
 
 import pyautogui
 import pydirectinput
 
 from config.config_manager import ConfigManager, timing_decorator
-from config.db_setup import DbConfig
 from logs.logging_config import logger
-from models.models import ImageLocation, SearchAreaLocation
+from models.models import ImageLocation
 from path_router import DirectoryPaths
 from querysets.querysets import ImageQuerySet, CharacterQuerySet
 from utils.special_mission_ocr import OCREngine
@@ -18,6 +16,7 @@ from utils.verify_screen import VerifyScreen
 
 class PilotSeatNotFoundError(Exception):
 	""" PilotSeatNotFound. """
+
 	def __init__(self, message=None, errors=None):
 		# Call the base class constructor with the parameters it needs
 		super().__init__(message)
@@ -37,25 +36,39 @@ class DUFlight:
 		pydirectinput.keyDown("f")
 		sleep(4)
 		pydirectinput.keyUp("f")
-		# image_list = ["pilot_seat_lable", "pilot_seat"]
-		# for image_name in image_list:
-		# 	pilot = self.verify.screen(
-		# 		screen_name=ImageLocation.IN_GAME_SCREEN,
-		# 		image_to_compare=image_name,
-		# 		skip_sleep=True,
-		# 	)
-		# 	if pilot.get('success'):
-		# 		sleep(0.5)
-		# 		pydirectinput.keyDown("f")
-		# 		sleep(4)
-		# 		pydirectinput.keyUp("f")
-		# 		return
-		# raise PilotSeatNotFoundError(f"Pilot seat not found: {image_name}")
+
+	# image_list = ["pilot_seat_lable", "pilot_seat"]
+	# for image_name in image_list:
+	# 	pilot = self.verify.screen(
+	# 		screen_name=ImageLocation.IN_GAME_SCREEN,
+	# 		image_to_compare=image_name,
+	# 		skip_sleep=True,
+	# 	)
+	# 	if pilot.get('success'):
+	# 		sleep(0.5)
+	# 		pydirectinput.keyDown("f")
+	# 		sleep(4)
+	# 		pydirectinput.keyUp("f")
+	# 		return
+	# raise PilotSeatNotFoundError(f"Pilot seat not found: {image_name}")
+
+	def get_fuel_level(self):
+		var = self.verify.screen(
+			screen_name=ImageLocation.FLIGHT_SCREEN,
+			image_to_compare="atmo_fuel_20",
+			confidence=0.70,
+			skip_sleep=True
+		)
+		# pyautogui.moveTo(var["screen_coords"])
+		print(var)
 
 	def flight_locations(self, retrieve_mode):
-		# pre_sites = ImageQuerySet.read_image_by_name(image_name="pre_site_origin",
-		#                                              image_location=ImageLocation.FLIGHT_SCREEN) if retrieve_mode else ImageQuerySet.read_image_by_name(
-		# 	image_name="pre_site_dest", image_location=ImageLocation.FLIGHT_SCREEN)
+		# pre_sites = ImageQuerySet.read_image_by_name(
+		# 	image_name="pre_site_origin",
+		# 	image_location=ImageLocation.FLIGHT_SCREEN) if retrieve_mode else \
+		# 	ImageQuerySet.read_image_by_name(
+		# 		image_name="pre_site_dest", image_location=ImageLocation.FLIGHT_SCREEN)
+		#
 		# pre_site = pre_sites.image_name
 
 		image_to_compare = self.config_manager.get_value(
@@ -64,9 +77,8 @@ class DUFlight:
 
 		if retrieve_mode:
 			images = [image_to_compare]
-			return images
 			# images = [pre_site, image_to_compare]
-			# return images
+			return images
 		else:
 			images = [image_to_compare]
 			return images
@@ -92,9 +104,9 @@ class DUFlight:
 					logger.info(f"Procceding to {image} location")
 					pydirectinput.keyDown("alt")
 					pydirectinput.press("4")
-					sleep(0.25)
+					sleep(0.1)
 					pydirectinput.keyUp("alt")
-					sleep(0.25)
+					sleep(20)
 					pydirectinput.press("ctrl")
 					sleep(0.25)
 					pydirectinput.middleClick()
@@ -122,7 +134,6 @@ class DUFlight:
 		sleep(10)
 		logger.info(f"waiting to land...")
 
-		time_in_flight = 0
 		timeout_seconds = 900
 		start_time = time.perf_counter()
 		screen_coords = None
@@ -164,8 +175,7 @@ class DUFlight:
 
 
 if __name__ == "__main__":
-	pre_load = DbConfig()
-	pre_load.load_image_entries_to_db()
+	# pre_load = DbConfig()
+	# pre_load.load_image_entries_to_db()
 	obj = DUFlight()
-	var = obj.check_ship_landed()
-	print(var)
+	obj.get_fuel_level()

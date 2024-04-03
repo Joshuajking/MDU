@@ -1,6 +1,4 @@
-import datetime
 import os.path
-import random
 import tempfile
 
 import cv2
@@ -9,8 +7,9 @@ import numpy as np
 import pyautogui
 from PIL import Image, ImageGrab, ImageEnhance
 from pynput.mouse import Controller
-from logs.logging_config import logger
+
 from config.config_manager import ConfigManager
+from logs.logging_config import logger
 from models.models import SearchAreaLocation
 from path_router import DirectoryPaths
 from querysets.querysets import SearchAreaQuerySet
@@ -156,7 +155,7 @@ class OCREngine:
 		region = SearchAreaQuerySet.read_search_area_by_name(
 			region_name=search_area
 		)
-
+		print(region.left, region.top, region.right, region.bottom, search_area)
 		# self.verify.simulate_mouse(region.center_x, region.center_y, mouse_click=False, mouse_clicks=0)
 		if self.scroll:
 			self.verify.simulate_mouse(region.center_x, region.center_y, mouse_click=False, mouse_clicks=0)
@@ -197,6 +196,30 @@ class OCREngine:
 					"batch_size": 64,
 					"mag_ratio": 1,
 				}
+				# enhancement_factors = {
+				# 	"brightness": 0.6,  # Default 1.0
+				# 	"sharpness": 2,  # Default 1.0
+				# 	"color": 1.0,  # Default 1.0
+				# 	"contrast": 1.0,  # Default 1.0
+				# 	"grayscale": False,
+				# 	"GaussianBlur": {  # Nested dictionary for GaussianBlur parameters
+				# 		"enabled": False,  # Default False
+				# 		"ksize": (1, 1),  # Default (1, 1) odd numbers only
+				# 		"sigmaX": 0,  # Default 0
+				# 	},  # Default False
+				# }
+				#
+				# ocr_params = {
+				# 	# 'image': enhanced_screenshot,
+				# 	"workers": 0,
+				# 	"decoder": "beamsearch",
+				# 	"beamWidth": 5,
+				# 	"width_ths": 0.5,
+				# 	"contrast_ths": 0.1,
+				# 	"adjust_contrast": 0.5,
+				# 	"batch_size": 64,
+				# 	"mag_ratio": 1,
+				# }
 				"""
                 Text Layout Analysis:
                     paragraph: Set to True to enable paragraph analysis.

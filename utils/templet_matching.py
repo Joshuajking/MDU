@@ -5,7 +5,6 @@ import pyautogui
 from PIL import ImageGrab, Image
 
 from config.config_manager import ConfigManager
-from querysets.querysets import ImageQuerySet
 from utils.read_json import read_json
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -18,7 +17,7 @@ assets_data = read_json(config_manager.get_value('config.assets_data'))
 
 def convert_to_32_bit():
 	# Set the path to your directory containing PNG files
-	directory = r"../temp/ocr_enhanced_images"
+	directory = r"../temp/"
 
 	# Loop through all files in the directory
 	for filename in os.listdir(directory):
@@ -45,15 +44,17 @@ def template_matching(image_to_compare):
 	screenshot = r"../temp/template_match_screenshot.png"
 	cell_screenshot.save(screenshot)
 	image1 = screenshot
-	image_data = ImageQuerySet().read_image_by_name(image_name=image_to_compare)
+	# image_data = ImageQuerySet().read_image_by_name(image_name=image_to_compare)
+	image_data = image_to_compare
 
 	# Set the path to your directory containing PNG files
 	haystack_img = cv.imread(image1, cv.IMREAD_UNCHANGED)
 
-	needle_img = cv.imread(image_data.image_url, cv.IMREAD_UNCHANGED)
-
-	result = cv.matchTemplate(haystack_img, needle_img, cv.TM_CCOEFF_NORMED)
-
+	needle_img = cv.imread(image_data, cv.IMREAD_UNCHANGED)
+	try:
+		result = cv.matchTemplate(haystack_img, needle_img, cv.TM_CCOEFF_NORMED)
+	except Exception as e:
+		print(e)
 	# get the best match position
 	min_val, max_val, min_loc, max_loc = cv.minMaxLoc(result)
 
@@ -62,7 +63,7 @@ def template_matching(image_to_compare):
 
 	threshold = 0.80
 	if max_val >= threshold:
-		print(f"Found needle: {image_data.image_name} - {max_val} match | threshold: {threshold}")
+		print(f"Found needle: {image_data} - {max_val} match | threshold: {threshold}")
 		# get dimensions of the needle image
 		needle_w = needle_img.shape[1]
 		needle_h = needle_img.shape[0]
@@ -78,12 +79,13 @@ def template_matching(image_to_compare):
 			thickness=2,
 			lineType=cv.LINE_4,
 		)
-		cv.imshow(f"{image_data.image_name}", haystack_img)
-		cv.waitKey()
+		cv.imshow(f"{image_data}", haystack_img)
+		cv.waitKey(1)
 
 	else:
-		print(f"Needle not found: {image_data.image_name} - {max_val} match | threshold: {threshold}")
+		print(f"Needle not found: {image_data} - {max_val} match | threshold: {threshold}")
 
 
 if __name__ == '__main__':
-	template_matching(image_to_compare='password_login')
+	convert_to_32_bit()
+	template_matching(image_to_compare=r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 232946.png")

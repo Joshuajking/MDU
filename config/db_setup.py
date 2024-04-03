@@ -1,17 +1,14 @@
 import os.path
-import sqlite3
-import uuid
 from datetime import datetime
 
 import pyautogui
-from logs.logging_config import logger
 from sqlmodel import SQLModel, Session
 
+from config.config_manager import ConfigManager
+from logs.logging_config import logger
 from models.models import SearchArea, Character, Image
 from path_router import DirectoryPaths
-from config.config_manager import ConfigManager
 from querysets.querysets import engine
-from utils.data_preprocessor import DataPreprocessor
 
 
 class DbConfig:
@@ -240,12 +237,33 @@ if __name__ == '__main__':
 		# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ORBITAL_HUD_LANDED.png"
 		# 	},
 		# }
-		"GAME_CONSOLE_WINDOW": {
-			"region_name": SearchAreaLocation.GAME_CONSOLE_WINDOW,
-			"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-28 180709.png"
+		# 	"GAME_CONSOLE_WINDOW": {
+		# 		"region_name": SearchAreaLocation.GAME_CONSOLE_WINDOW,
+		# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-28 180709.png"
+		# 	},
+		# }
+		"ATMO_FUEL": {
+			"region_name": SearchAreaLocation.ATMO_FUEL,
+			"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-02 000644.png"
 		},
 	}
+	# 	"WALLET_CURRENCY": {
+	# 		"region_name": SearchAreaLocation.WALLET_CURRENCY,
+	# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 200353.png"
+	# 	},
+	# }
+	# 	"WALLET_RECIPIENT_LIST": {
+	# 		"region_name": SearchAreaLocation.WALLET_RECIPIENT_LIST,
+	# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 162042.png"
+	# 	},
+	# }
+	# 	"RECIPIENT_SEARCH_AREA": {
+	# 		"region_name": SearchAreaLocation.RECIPIENT_SEARCH_AREA,
+	# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 162512.png"
+	# 	},
+	# }
 	#
+
 	for key, value in region_dict.items():
 		region_name = value["region_name"]
 		image_path = value["image_path"]

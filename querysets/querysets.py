@@ -53,8 +53,7 @@ class SearchAreaQuerySet:
 	def get_searcharea_by_name(cls, name: str):
 		with Session(engine) as session:
 			searcharea = session.exec(select(SearchArea).where(SearchArea.region_name == name)).first()
-		searcharea.region = region
-		return region
+		return searcharea
 
 	@classmethod
 	def create_or_update_search_area(cls, region_name: str, updates: Dict[str, int]):

@@ -28,6 +28,7 @@ class EngineLoop:
 				self.retrieve_mode = False
 			else:
 				self.retrieve_mode = True
+			logger.info(f"Retrieve mode: {self.retrieve_mode}")
 
 	def engine(self):
 		trips = 0
@@ -43,53 +44,44 @@ class EngineLoop:
 		active_character_count = CharacterQuerySet.count_active_characters()
 		self.active_package_count()
 
+		tt_char_time = 0
 		while active_character_count > 0 and trips < max_trips:
-			trip_time_start = perf_counter()
-			tt_char_time = 0
+			character_cycle_start = perf_counter()
+			character_solo_start = perf_counter()
 			for character in all_active_characters:
 				if self.retrieve_mode and character.has_package:
 					continue
 				elif not self.retrieve_mode and not character.has_package:
 					continue
 
-				character_time_start = perf_counter()
 				has_gametime = du_characters.login(character)
 				if not has_gametime:
 					continue
-				sleep(3)
 
 				status = missions.process_package(character)
-
 				logger.info(f"{character.username} package status: {status}")
 				CharacterQuerySet.update_character(character, {'has_package': status["has_package"]})
 
 				du_characters.logout()
-				character_time_stop = perf_counter()
-				char_time = character_time_stop - character_time_start
-				tt_char_time += char_time
+				character_solo_stop = perf_counter()
+				character_solo_time = character_solo_stop - character_solo_start
+				tt_char_time += character_solo_time
 
-				logger.info(f"Summary"
+				logger.info(f"\nSummary\n"
 				            f"trips: {trips}/max_trips:{max_trips} \n"
 				            f"total character elapse: {tt_char_time / 60:.2f} minutes \n"
-				            f"character elapse: {character_time_stop - character_time_start:.2f} seconds \n"
+				            f"character elapse: {character_solo_time:.2f} seconds \n"
 				            f"retrieve_mode: {self.retrieve_mode} \n")
 
-				continue
-
 			self.active_package_count()
-
 			pilot = CharacterQuerySet.read_character_by_username(config_manager.get_value('config.pilot'))
 			logger.info(f"Logging into Pilot: {pilot.username}")
-
 			du_characters.login(pilot)
-
 			flight.mission_flight(self.retrieve_mode)
-
 			trips += 1
-			trip_time_stop = perf_counter()
-			tt_trip_time = trip_time_stop - trip_time_start
-			logger.info(f"trip elapse: {tt_trip_time / 60:.2f} minutes")
-			continue
+			character_cycle_stop = perf_counter()
+			tt_character_cycle_time = character_cycle_stop - character_cycle_start
+			logger.info(f"trip elapse: {tt_character_cycle_time / 60:.2f} minutes")
 
 
 if __name__ == "__main__":

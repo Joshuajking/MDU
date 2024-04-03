@@ -31,6 +31,10 @@ class SearchAreaLocation(str, Enum):
 	AVAILABLE_MISSIONS = "availableMissions"
 	RETRIEVE_DELIVERY_STATUS = "retrieveDeliveryStatus"
 
+	WALLET_CURRENCY = "walletCurrency"
+	WALLET_RECIPIENT_LIST = "walletRecipientList"
+	RECIPIENT_SEARCH_AREA = "recipeSearchArea"
+
 	WARP_TARGET_DEST = "warpTargetDestination"
 	GAME_CONSOLE_WINDOW = "gameConsoleWindow"
 	ORBITAL_HUD_LANDED = "orbitalHudLanded"
@@ -77,6 +81,7 @@ class ImageLocation(str, Enum):
 	RETRIEVE_DELIVER_DETAILS_SCREEN = "retrieve_deliver_mission_details_screen"
 	NOTIFICATIONS_SCREEN = "notifications_screen"
 	SEARCH_FOR_MISSIONS_SCREEN = "search_for_missions_screen"
+	WALLET_SCREEN = "wallet_screen"
 
 
 class Image(SQLModel, BaseModelMixin, table=True):
