@@ -9,12 +9,12 @@ from loguru import logger
 from sqlmodel import Session, select
 
 from config.config_manager import ConfigManager
+from config.db_setup import DbConfig
 from core.DUCharacters import DUCharacters
 from core.DUClientManager import DUClientManager
 from core.DUFlight import DUFlight
 from core.DUMissions import DUMissions
 from model.models import Character
-from model.sqlalchemy_db import DbConfig
 from querysets.querysets import CharacterQuerySet, engine
 
 
