@@ -1,9 +1,9 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional, Any
 
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from sqlmodel import SQLModel, Field
 
 
@@ -30,6 +30,7 @@ class SearchAreaLocation(str, Enum):
 	ACTIVE_TAKEN_MISSIONS = "activeTakenMissions"
 	AVAILABLE_MISSIONS = "availableMissions"
 	RETRIEVE_DELIVERY_STATUS = "retrieveDeliveryStatus"
+	FULL_ACTIVE_MISSION_AREA = "fullActiveMissionArea"
 
 	WALLET_CURRENCY = "walletCurrency"
 	WALLET_RECIPIENT_LIST = "walletRecipientList"
@@ -67,6 +68,11 @@ class SearchArea(BaseModelMixin, SQLModel, table=True):
 	center_x: int = Field(default=None, nullable=False)
 	center_y: int = Field(default=None, nullable=False)
 	region: str = Field(default=None, nullable=True)
+
+	# @model_validator(mode='after')
+	# @classmethod
+	# def validate(cls: type[Model], value: Any) -> Model:
+	# 	pass
 
 
 class ImageLocation(str, Enum):

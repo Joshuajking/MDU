@@ -10,7 +10,7 @@ from sqlmodel import Session, select
 
 from config.config_manager import ConfigManager
 from logs.logging_config import logger
-from models.models import SearchArea, Character, Mission, Image, ImageLocation, MissionMetadata
+from model.models import SearchArea, Character, Mission, Image, ImageLocation, MissionMetadata
 from path_router import DirectoryPaths
 
 config_manager = ConfigManager()

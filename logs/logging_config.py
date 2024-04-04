@@ -6,7 +6,7 @@ from loguru import logger
 cwd = os.getcwd()
 
 # Define the relative path to the logs directory
-log_dir = os.path.join(cwd, '../logs')
+log_dir = os.path.join(cwd, '..')
 
 # Ensure the log directory exists
 os.makedirs(log_dir, exist_ok=True)

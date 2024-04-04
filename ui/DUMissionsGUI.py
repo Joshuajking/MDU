@@ -6,7 +6,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from sqlmodel import Session, select
 
 from config.db_setup import engine
-from models.models import Character
+from model.models import Character
 
 
 class EngineThread(threading.Thread):
@@ -185,7 +185,7 @@ class Ui_Dialog(object):
             password = character.password
             has_package = character.has_package
             has_gametime = character.has_gametime
-            active = character.active  # Assuming you have an 'active' attribute in your Character models
+            active = character.active  # Assuming you have an 'active' attribute in your Character model
             character_info = {
                 "email": email,
                 "password": password,

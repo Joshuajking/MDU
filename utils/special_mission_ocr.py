@@ -1,4 +1,6 @@
+import datetime
 import os.path
+import random
 import tempfile
 
 import cv2
@@ -7,10 +9,9 @@ import numpy as np
 import pyautogui
 from PIL import Image, ImageGrab, ImageEnhance
 from pynput.mouse import Controller
-
-from config.config_manager import ConfigManager
 from logs.logging_config import logger
-from models.models import SearchAreaLocation
+from config.config_manager import ConfigManager
+from model.models import SearchAreaLocation
 from path_router import DirectoryPaths
 from querysets.querysets import SearchAreaQuerySet
 from utils.verify_screen import VerifyScreen
@@ -155,7 +156,7 @@ class OCREngine:
 		region = SearchAreaQuerySet.read_search_area_by_name(
 			region_name=search_area
 		)
-		print(region.left, region.top, region.right, region.bottom, search_area)
+
 		# self.verify.simulate_mouse(region.center_x, region.center_y, mouse_click=False, mouse_clicks=0)
 		if self.scroll:
 			self.verify.simulate_mouse(region.center_x, region.center_y, mouse_click=False, mouse_clicks=0)

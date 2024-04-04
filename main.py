@@ -1,125 +1,111 @@
 import csv
-import random
+import os
 import sys
 import threading
 from time import perf_counter, sleep
 
 from PyQt6 import QtCore, QtGui, QtWidgets
+from loguru import logger
 from sqlmodel import Session, select
 
 from config.config_manager import ConfigManager
+from config.db_setup import DbConfig
 from core.DUCharacters import DUCharacters
+from core.DUClientManager import DUClientManager
 from core.DUFlight import DUFlight
 from core.DUMissions import DUMissions
-from logs.logging_config import logger
-from config.db_setup import engine, DbConfig
-from core.DUClientManager import DUClientManager
-from core.MDU import EngineLoop
-from models.models import Character
-from querysets.querysets import CharacterQuerySet
-
-
-class CharacterNotFoundError(Exception):
-	def __init__(self, message=None, errors=None):
-		logger.error(f"{message}: {errors}")
-		# Call the base class constructor with the parameters it needs
-		super().__init__(message)
+from model.models import Character
+from querysets.querysets import CharacterQuerySet, engine
 
 
 class EngineThread(threading.Thread):
 	def __init__(self):
 		super().__init__()
-		self.daemon = True
-		self.retrieve_mode = True
+		self.client = DUClientManager()
 		self._running = threading.Event()
 		self._running.set()  # Set the event to true initially
+		self.retrieve_mode = True
 
 	def active_package_count(self):
-		package_count = CharacterQuerySet.count_has_package_and_active_characters()
+		package_count = CharacterQuerySet.count_has_package_characters()
 		logger.info(f"package_count: {package_count}")
 		active_character_count = CharacterQuerySet.count_active_characters()
 
 		if active_character_count > 0:
 			percentage = (package_count / active_character_count) * 100
-			logger.info(f"packages taken: {percentage}")
+			logger.info(f"percentage of package taken: {percentage}")
 			if percentage >= 75:
 				self.retrieve_mode = False
 			else:
 				self.retrieve_mode = True
-			logger.info(f"retrieve_mode: {self.retrieve_mode}")
-		else:
-			raise CharacterNotFoundError(message="Error no active characters")
 
 	def run(self):
-		du_characters = DUCharacters()
-		flight = DUFlight()
-		missions = DUMissions()
-		config_manager = ConfigManager()
 
-		all_active_characters = CharacterQuerySet.get_active_characters()
-		active_character_count = CharacterQuerySet.count_active_characters()
-		self.active_package_count()
-
-		while active_character_count > 0 and self._running:
-			for character in all_active_characters:
-				has_gametime = du_characters.login(character)
-				if not has_gametime:
-					continue
-				status = missions.process_package(character)
-				logger.info(f"{character.username} package status: {status}")
-				CharacterQuerySet.update_character(character, {'has_package': status["has_package"]})
-				du_characters.logout()
-				continue
-
-			self.active_package_count()
-
-			pilot = CharacterQuerySet.read_character_by_username(config_manager.get_value('config.pilot'))
-			logger.info(f"Logging into Pilot: {pilot.username}")
-			du_characters.login(pilot)
-			flight.mission_flight(self.retrieve_mode)
-			continue
-
-		pre_load = DbConfig()
-		pre_load.load_image_entries_to_db()
-		client_limit = 43200
+		client_limit = 21600
 		client_run = 0
-		bulk_trip = 0
-		client_start = perf_counter()
-		client = DUClientManager()
-		start = EngineLoop()
-		while self._running:
-			client.start_application()
+		start_time = perf_counter()
+		while self._running.is_set():
+			logger.info(f"is running {self._running}")
+			client_start = perf_counter()
 			try:
-				start.engine()
+				self.client.start_application()
+				du_characters = DUCharacters()
+				flight = DUFlight()
+				missions = DUMissions()
+				config_manager = ConfigManager()
+				all_active_characters = CharacterQuerySet.get_active_characters()
+				active_character_count = CharacterQuerySet.count_active_characters()
+				for character in all_active_characters:
+					if not self._running.is_set():
+						break
+					has_gametime = du_characters.login(character)
+					if not has_gametime:
+						continue
+					status = missions.process_package(character)
+					logger.info(f"{character.username} package status: {status}")
+					CharacterQuerySet.update_character(character, {'has_package': status["has_package"]})
+					du_characters.logout()
+					logger.info(f"retrieve_mode: {self.retrieve_mode}")
+
+				self.active_package_count()
+				logger.info(f"retrieve_mode: {self.retrieve_mode}")
+
+				pilot = CharacterQuerySet.read_character_by_username(config_manager.get_value('config.pilot'))
+				logger.info(f"Logging into Pilot: {pilot.username}")
+				du_characters.login(pilot)
+				flight.mission_flight(self.retrieve_mode)
+
 			except Exception as e:
 				logger.error(f"Exception: {str(e)}")
-				client.stop_application()
+				self.client.stop_application()
 				client_stop = perf_counter()
 				client_runtime = client_stop - client_start
 				client_run += client_runtime
 				logger.info(f"Client runtime: {client_run}")
-				sleep(random.uniform(10, 30))
+				sleep(20)
 				continue
+
 			else:
-				sleep(random.uniform(10, 30))
-				client.stop_application()
-				sleep(random.uniform(10, 30))
-				# MissionMetaQuerySet().create_or_update_round_trips(1)
-				logger.info(f"Bulk trips: {bulk_trip}")
+				self.client.stop_application()
 				client_stop = perf_counter()
 				client_runtime = client_stop - client_start
 				client_run += client_runtime
 				logger.info(f"Client runtime: {client_run}")
-				if client_run >= client_limit:
+				elapsed_time = perf_counter() - start_time
+				if elapsed_time >= 6 * 60 * 60:  # 6 hours in seconds
 					break
 
 	def stop(self):
 		self._running.clear()
+		logger.warning(f"Stopping {self}")
 
 
 class Ui_Dialog(object):
 	def __init__(self):
 		self.start_engine = EngineThread()
+		self.delete_character_btn = None
+		self.add_character_btn = None
+		self.engine_thread = None
 		self.verticalLayout = None
 		self.verticalLayoutWidget = None
 		self.deselectAll_btn = None
@@ -128,9 +114,9 @@ class Ui_Dialog(object):
 		self.password_lable = None
 		self.email_lable = None
 		self.username_lable = None
-		self.textEdit_3 = None
-		self.textEdit_2 = None
-		self.textEdit = None
+		self.passwordtextEdit = None
+		self.emailtextEdit = None
+		self.usernametextEdit = None
 		self.tableView = None
 		self.save_Button = None
 		self.start_Button = None
@@ -144,31 +130,31 @@ class Ui_Dialog(object):
 		self.tableView.setGeometry(QtCore.QRect(10, 10, 361, 661))
 		self.tableView.setObjectName("tableView")
 		self.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-
-		self.textEdit = QtWidgets.QTextEdit(Dialog)
-		self.textEdit.setGeometry(QtCore.QRect(510, 20, 261, 21))
-		self.textEdit.setObjectName("textEdit")
-
-		self.textEdit_2 = QtWidgets.QTextEdit(Dialog)
-		self.textEdit_2.setGeometry(QtCore.QRect(510, 60, 261, 21))
-		self.textEdit_2.setObjectName("textEdit_2")
-
-		self.textEdit_3 = QtWidgets.QTextEdit(Dialog)
-		self.textEdit_3.setGeometry(QtCore.QRect(510, 110, 261, 21))
-		self.textEdit_3.setObjectName("textEdit_3")
+		##############
+		self.usernametextEdit = QtWidgets.QTextEdit(Dialog)
+		self.usernametextEdit.setGeometry(QtCore.QRect(510, 20, 261, 21))
+		self.usernametextEdit.setObjectName("usernametextEdit")
 
 		self.username_lable = QtWidgets.QLabel(Dialog)
-		self.username_lable.setGeometry(QtCore.QRect(400, 20, 61, 75))
+		self.username_lable.setGeometry(QtCore.QRect(400, 20, 101, 21))  # Adjusted height to match text edit
 		self.username_lable.setObjectName("username_lable")
-		# self.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+		##############
+		self.emailtextEdit = QtWidgets.QTextEdit(Dialog)
+		self.emailtextEdit.setGeometry(QtCore.QRect(510, 60, 261, 21))
+		self.emailtextEdit.setObjectName("emailtextEdit")
 
 		self.email_lable = QtWidgets.QLabel(Dialog)
-		self.email_lable.setGeometry(QtCore.QRect(400, 60, 49, 75))
+		self.email_lable.setGeometry(QtCore.QRect(400, 60, 101, 21))  # Adjusted height to match text edit
 		self.email_lable.setObjectName("email_lable")
+		##############
+		self.passwordtextEdit = QtWidgets.QTextEdit(Dialog)
+		self.passwordtextEdit.setGeometry(QtCore.QRect(510, 110, 261, 21))
+		self.passwordtextEdit.setObjectName("passwordtextEdit")
 
 		self.password_lable = QtWidgets.QLabel(Dialog)
-		self.password_lable.setGeometry(QtCore.QRect(400, 110, 49, 75))
+		self.password_lable.setGeometry(QtCore.QRect(400, 110, 101, 21))  # Adjusted height to match text edit
 		self.password_lable.setObjectName("password_lable")
+		##############
 
 		self.fileupload_btn = QtWidgets.QPushButton(Dialog)
 		self.fileupload_btn.setGeometry(QtCore.QRect(410, 650, 75, 24))
@@ -179,6 +165,16 @@ class Ui_Dialog(object):
 		self.selectAll_btn.setGeometry(QtCore.QRect(690, 150, 75, 24))
 		self.selectAll_btn.setObjectName("selectAll_btn")
 		self.selectAll_btn.clicked.connect(self.select_all)  # Connect Select All button to function
+
+		self.add_character_btn = QtWidgets.QPushButton(Dialog)
+		self.add_character_btn.setGeometry(QtCore.QRect(600, 200, 75, 24))
+		self.add_character_btn.setObjectName("add_character_btn")
+		self.add_character_btn.clicked.connect(self.add_character)
+
+		self.delete_character_btn = QtWidgets.QPushButton(Dialog)
+		self.delete_character_btn.setGeometry(QtCore.QRect(600, 150, 75, 24))
+		self.delete_character_btn.setObjectName("delete_character_btn")
+		self.delete_character_btn.clicked.connect(self.delete_character)
 
 		self.deselectAll_btn = QtWidgets.QPushButton(Dialog)
 		self.deselectAll_btn.setGeometry(QtCore.QRect(520, 150, 75, 24))
@@ -213,6 +209,7 @@ class Ui_Dialog(object):
 
 	def start_engine_thread(self):
 		self.engine_thread = EngineThread()
+		logger.info(f"start engine initiated")
 		self.engine_thread.start()
 
 	def retranslateUi(self, Dialog):
@@ -227,9 +224,12 @@ class Ui_Dialog(object):
 		self.save_Button.setText(_translate("Dialog", "Save"))
 		self.start_Button.setText(_translate("Dialog", "Start Engine"))
 		self.stop_Button.setText(_translate("Dialog", "Stop Engine"))
+		self.add_character_btn.setText(_translate("Dialog", "Add/Update"))
+		self.delete_character_btn.setText(_translate("Dialog", "Delete"))
 
 	def stop_engine(self):
 		self.start_engine.stop()
+		logger.info(f"stop engine initiated")
 
 	def upload_file(self):
 		file_dialog = QtWidgets.QFileDialog()
@@ -307,7 +307,7 @@ class Ui_Dialog(object):
 			password = character.password
 			has_package = character.has_package
 			has_gametime = character.has_gametime
-			active = character.active  # Assuming you have an 'active' attribute in your Character models
+			active = character.active  # Assuming you have an 'active' attribute in your Character model
 			character_info = {
 				"email": email,
 				"password": password,
@@ -364,10 +364,72 @@ class Ui_Dialog(object):
 				username = username_item.text()
 				self.selected_usernames.add(username)
 
+	def add_character(self):
+		username = self.usernametextEdit.toPlainText().strip().capitalize()
+		email = self.emailtextEdit.toPlainText().strip()
+		password = self.passwordtextEdit.toPlainText().strip()
+
+		try:
+			with Session(engine) as session:
+				# Check if the user already exists in the database
+				character = session.query(Character).filter_by(username=username).first()
+				if character:
+					# Update the existing user's email and password
+					Character.username = username
+					character.email = email
+					character.password = password
+					logger.info(f"Updated user: {character}")
+					session.commit()
+				else:
+					# Create a new user
+					new_character = Character(username=username, email=email, password=password)
+					session.add(new_character)
+					logger.info(f"Created new character: {new_character}")
+					session.commit()
+		except Exception as e:
+			logger.error(f"{str(e)}")
+		# Refresh the display of characters
+		self.refresh_display()
+		self.save_selection()
+
+	def delete_character(self):
+		username = self.usernametextEdit.toPlainText().strip()
+		try:
+			with Session(engine) as session:
+				character = session.query(Character).filter_by(username=username).first()
+				if character:
+					session.delete(character)
+					session.commit()
+					print(f'Character deleted: {character}')
+				else:
+					print("Character not found")
+		except Exception as e:
+			logger.error(f"{str(e)}")
+		# Refresh the display of characters
+		self.refresh_display()
+		self.save_selection()
+
+
+def delete_large_files(directory, max_size_mb):
+	max_size_bytes = max_size_mb * 1024 * 1024  # Convert MB to bytes
+	for filename in os.listdir(directory):
+		filepath = os.path.join(directory, filename)
+		if os.path.isfile(filepath) and os.path.getsize(filepath) > max_size_bytes:
+			# os.remove(filepath)
+			print(f"Deleted: {filepath}")
+
 
 if __name__ == "__main__":
-	# TODO: Database initial setup
+	# Database initial setup
+	pre_load = DbConfig()
+	pre_load.load_image_entries_to_db()
 	# TODO: Initial File creation
+
+	# TODO: delete over-size-limit dir
+	# Example usage
+	# directory_path = ["/utils"]
+	# max_file_size_mb = 500  # Specify the maximum file size in megabytes
+	# delete_large_files(directory_path, max_file_size_mb)
 
 	app = QtWidgets.QApplication([])
 	Dialog = QtWidgets.QDialog()

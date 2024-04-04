@@ -7,8 +7,9 @@ import pydirectinput
 from pynput.mouse import Controller
 
 from config.config_manager import ConfigManager, timing_decorator
+from config.db_setup import DbConfig
 from logs.logging_config import logger
-from models.models import ImageLocation
+from model.models import ImageLocation
 from path_router import DirectoryPaths
 from querysets.querysets import ImageQuerySet, CharacterQuerySet
 from utils.special_mission_ocr import OCREngine
@@ -17,7 +18,6 @@ from utils.verify_screen import VerifyScreen
 
 class PilotSeatNotFoundError(Exception):
 	""" PilotSeatNotFound. """
-
 	def __init__(self, message=None, errors=None):
 		# Call the base class constructor with the parameters it needs
 		super().__init__(message)

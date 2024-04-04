@@ -3,6 +3,7 @@
 
 ### Custom Exclusions
 data/json/*
+database/*
 utils/**/image_cache/
 temp/*
 templates/invalid_images/*
@@ -286,14 +287,14 @@ pip-selfcheck.json
 /du.db
 /file_structure.txt
 /du-missions.db
-/models/du-missions.db
-/models/missions.db
-/models/missions.db-journal
+/model/du-missions.db
+/model/missions.db
+/model/missions.db-journal
 /db_backup/*
-/models/missions.sqbpro
+/model/missions.sqbpro
 /alembic/versions/
 /alembic/
-/models/test.db
-/models/missions.db
+/model/test.db
+/model/missions.db
 /missions.db
 /data/config.json

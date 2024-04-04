@@ -6,8 +6,8 @@ import pyperclip
 
 from config.config_manager import ConfigManager, timing_decorator
 from logs.logging_config import logger
-from models.models import SearchAreaLocation, ImageLocation
-from querysets.querysets import CharacterQuerySet
+from model.models import SearchAreaLocation, ImageLocation
+from querysets.querysets import CharacterQuerySet, SearchAreaQuerySet
 from utils.special_mission_ocr import OCREngine
 from utils.verify_screen import VerifyScreen
 
@@ -24,6 +24,8 @@ class DUMissions:
 		self.character = None
 
 	def get_package_coords(self):
+		orign = SearchAreaQuerySet.get_searcharea_by_name(name=SearchAreaLocation.ORIGIN_POS)
+
 		origin_coords = self.verify.screen(
 			screen_name=ImageLocation.MISSION_DETAILS_SCREEN,
 			image_to_compare="copy_coords",

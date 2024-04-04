@@ -1,74 +1,121 @@
+import json
+import os
 import os.path
+import uuid
 from datetime import datetime
 
 import pyautogui
-from sqlmodel import SQLModel, Session
+from sqlmodel import SQLModel, Session, select
 
 from config.config_manager import ConfigManager
 from logs.logging_config import logger
-from models.models import SearchArea, Character, Image
+from model.models import SearchArea, Image, Mission
 from path_router import DirectoryPaths
 from querysets.querysets import engine
 
 
 class DbConfig:
+	config_manager = ConfigManager()
+	engine = engine
+
 	def __init__(self, images_dir=None):
 		self.config_manager = ConfigManager()
 		self.images_dir = images_dir or os.path.relpath(DirectoryPaths.DU_IMAGES_DIR)
+		self.__create_db_and_tables()
+		self.__load_Image_table()
+		self.__load_SearchArea_table()
+		self.__load_Mission_table()
 
-	def load_search_areas_to_db(self):
-		# Define search areas
-		search_areas = [
-			SearchArea(region_name="active_missions", left=530, top=830, right=909,
-			           bottom=1017),
+	def __create_db_and_tables(self):
+		SQLModel.metadata.create_all(self.engine)
 
-			SearchArea(region_name="mission_package_area", left=1221, top=724,
-			           right=1470, bottom=756),
+	def __load_SearchArea_table(self):
+		try:
+			# Load the JSON data from the file
+			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'SearchArea_table.json')
+			with open(file_path, "r") as json_file:
+				json_data = json.load(json_file)
 
-			SearchArea(region_name="scrollable_area", left=890, top=275, right=1040,
-			           bottom=505),
+			with Session(self.engine) as session:
+				for item in json_data:
+					# item_dict = item.dict()
+					existing_search_area = session.exec(select(SearchArea).filter_by(**item)).first()
+					if existing_search_area:
+						# logger.info(f"SearchArea already exists: {existing_search_area}")
+						pass
+					else:
+						# Create a new Image instance with the data from the JSON
+						search_area = SearchArea(**item)
+						search_area.id = str(uuid.uuid4())
+						# image.updated_at = datetime.now()
+						search_area.created_at = datetime.now()
+						search_area.updated_at = datetime.now()
+						# Insert the Image instance into the table
+						session.add(search_area)
 
-		]
+				# Commit the transaction
+				session.commit()
+		except Exception as e:
+			logger.error(f"Error loading table SearchArea_table.json: {e}")
 
-		# Create tables
-		SQLModel.metadata.create_all(engine)
+	def __load_Image_table(self):
+		try:
+			# Load the JSON data from the file
+			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'Image_table.json')
+			with open(file_path, "r") as json_file:
+				json_data = json.load(json_file)
 
-		# Insert search areas into database
-		with Session(engine) as session:
-			for search_area in search_areas:
-				session.add(search_area)
-			session.commit()
+			with Session(self.engine) as session:
+				for item in json_data:
+					# Check if an Image instance with the same data already exists
+					existing_image = session.exec(select(Image).filter_by(**item)).first()
+					if existing_image:
+						# logger.info(f"Image already exists: {existing_image}")
+						pass
+					else:
+						# Create a new Image instance with the data from the JSON
+						image = Image(**item)
+						image.id = str(uuid.uuid4())
+						image.created_at = datetime.now()
+						image.updated_at = datetime.now()
+						# Insert the Image instance into the table
+						session.add(image)
 
-	def manual_load_character(self):
-		data = [
-			("username", "password", "email"),
-			("username", "password", "email"),
-			("username", "password", "email"),
-		]
+				# Commit the transaction
+				session.commit()
+		except Exception as e:
+			logger.error(f"Error loading table Image_table.json: {e}")
 
-		characters = []
-		for username, password, email in data:
-			character = Character(username=username, email=email, password=password)
-			characters.append(character)
+	def __load_Mission_table(self):
+		try:
+			# Load the JSON data from the file
+			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'Mission_table.json')
+			with open(file_path, "r") as json_file:
+				json_data = json.load(json_file)
 
-		with Session(engine) as session:
-			for character in characters:
-				session.add(character)
-			session.commit()
+			with Session(self.engine) as session:
+				for item in json_data:
+					# Check if an Image instance with the same data already exists
+					existing_mission = session.exec(select(Mission).filter_by(**item)).first()
+					if existing_mission:
+						logger.info(f"Image already exists: {existing_mission}")
+					else:
+						# Create a new Image instance with the data from the JSON
+						mission = Mission(**item)
+						mission.id = str(uuid.uuid4())
+						mission.created_at = datetime.now()
+						mission.updated_at = datetime.now()
+						# Insert the Image instance into the table
+						session.add(mission)
 
-	def load_characters_to_db(self):
-		with Session(engine) as session:
-			Character.__table__.create(engine, checkfirst=True)
-			for character_name, character_data in var.items():
-				email = character_data.get("email")
-				pwd = character_data.get("pwd")
-				character = Character(username=character_name, email=email, password=pwd)
-				session.add(character)
-			session.commit()
+				# Commit the transaction
+				session.commit()
+		except Exception as e:
+			logger.error(f"Error loading table Mission_table.json: {e}")
 
 	def load_image_entries_to_db(self):
 		count = 0
-		with Session(engine) as session:
+		with Session(self.engine) as session:
 			for location in os.listdir(self.images_dir):
 				location_dir = os.path.join(self.images_dir, location)
 				if os.path.isdir(location_dir):
@@ -97,15 +144,6 @@ class DbConfig:
 				logger.info("No new images or existing images updated")
 
 	@staticmethod
-	def create_db_and_tables():
-		SQLModel.metadata.create_all(engine)
-
-	@staticmethod
-	def delete_image_from_db():
-		from querysets.querysets import ImageQuerySet
-		ImageQuerySet.delete_image_by_id(id='0b1d2e01141d4590bfe3e5c5a560c849')
-
-	@staticmethod
 	def get_image_bbox(image_path, region_name, confidence=0.7):
 		from querysets.querysets import SearchAreaQuerySet
 		screen_coords = pyautogui.locateOnScreen(image_path, minSearchTime=3, confidence=confidence)
@@ -132,14 +170,11 @@ class DbConfig:
 
 if __name__ == '__main__':
 	obj = DbConfig()
-	# obj.create_db_and_tables()
-	# obj.manual_load_character()
 	# obj.load_image_entries_to_db()
 
 	# obj.delete_image_from_db()
 	#
-	from models.models import SearchAreaLocation
-
+	# from model.model import SearchAreaLocation
 	#
 	# area = {
 	# 	"ACTIVE_TAKEN_MISSIONS": {
@@ -242,27 +277,26 @@ if __name__ == '__main__':
 		# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-28 180709.png"
 		# 	},
 		# }
-		"ATMO_FUEL": {
-			"region_name": SearchAreaLocation.ATMO_FUEL,
-			"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-02 000644.png"
-		},
+		# 	"ATMO_FUEL": {
+		# 		"region_name": SearchAreaLocation.ATMO_FUEL,
+		# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-02 000644.png"
+		# 	},
+		# }
+		# 	"WALLET_CURRENCY": {
+		# 		"region_name": SearchAreaLocation.WALLET_CURRENCY,
+		# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 200353.png"
+		# 	},
+		# }
+		# 	"WALLET_RECIPIENT_LIST": {
+		# 		"region_name": SearchAreaLocation.WALLET_RECIPIENT_LIST,
+		# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 162042.png"
+		# 	},
+		# }
+		# 	"RECIPIENT_SEARCH_AREA": {
+		# 		"region_name": SearchAreaLocation.RECIPIENT_SEARCH_AREA,
+		# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 162512.png"
+		# 	},
 	}
-	# 	"WALLET_CURRENCY": {
-	# 		"region_name": SearchAreaLocation.WALLET_CURRENCY,
-	# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 200353.png"
-	# 	},
-	# }
-	# 	"WALLET_RECIPIENT_LIST": {
-	# 		"region_name": SearchAreaLocation.WALLET_RECIPIENT_LIST,
-	# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 162042.png"
-	# 	},
-	# }
-	# 	"RECIPIENT_SEARCH_AREA": {
-	# 		"region_name": SearchAreaLocation.RECIPIENT_SEARCH_AREA,
-	# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 162512.png"
-	# 	},
-	# }
-	#
 
 	for key, value in region_dict.items():
 		region_name = value["region_name"]
