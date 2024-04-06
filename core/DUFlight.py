@@ -7,7 +7,6 @@ import pydirectinput
 from pynput.mouse import Controller
 
 from config.config_manager import ConfigManager, timing_decorator
-from config.db_setup import DbConfig
 from logs.logging_config import logger
 from model.models import ImageLocation
 from path_router import DirectoryPaths
@@ -18,6 +17,7 @@ from utils.verify_screen import VerifyScreen
 
 class PilotSeatNotFoundError(Exception):
 	""" PilotSeatNotFound. """
+
 	def __init__(self, message=None, errors=None):
 		# Call the base class constructor with the parameters it needs
 		super().__init__(message)
@@ -53,17 +53,25 @@ class DUFlight:
 	# 		pydirectinput.keyUp("f")
 	# 		return
 	# raise PilotSeatNotFoundError(f"Pilot seat not found: {image_name}")
-
+	@timing_decorator
 	def get_fuel_level(self):
-		var = self.verify.screen(
-			screen_name=ImageLocation.FLIGHT_SCREEN,
-			image_to_compare="atmo_fuel_20",
-			confidence=0.70,
-			skip_sleep=True
-		)
-		# pyautogui.moveTo(var["screen_coords"])
-		print(var)
+		timeout_seconds = 900
+		start_time = time.perf_counter()
+		fuel_success = True  # Start with True to enter the loop
+		while fuel_success:
+			fuel_level = self.verify.screen(
+				screen_name=ImageLocation.FLIGHT_SCREEN,
+				image_to_compare="atmo_fuel_20",
+				confidence=0.70,
+				skip_sleep=True
+			)
+			fuel_success = fuel_level['success']
+			elapsed_time = time.perf_counter() - start_time
+			if elapsed_time >= timeout_seconds:
+				logger.debug(f"Fuel level: Timeo-out")
+				break
 
+	@timing_decorator
 	def flight_locations(self, retrieve_mode):
 		# pre_sites = ImageQuerySet.read_image_by_name(
 		# 	image_name="pre_site_origin",
@@ -110,9 +118,9 @@ class DUFlight:
 				pydirectinput.keyUp("alt")
 				sleep(20)
 				pydirectinput.press("ctrl")
-				sleep(0.25)
-				# pydirectinput.middleClick()
-				self.controller.scroll(dx=0, dy=240)
+				sleep(0.5)
+				pydirectinput.middleClick()
+				# self.controller.scroll(dx=0, dy=240)
 				self.check_img_to_land()
 				break
 			else:
@@ -145,6 +153,7 @@ class DUFlight:
 			screen_coords = self.check_ship_landed()
 			elapsed_time = time.perf_counter() - start_time
 			if elapsed_time >= timeout_seconds:
+				logger.debug(f"check_img_to_land: Timeo-out")
 				break
 			sleep(3)
 		# Gives time for the ship to land before continuing
@@ -178,7 +187,6 @@ class DUFlight:
 
 
 if __name__ == "__main__":
-	# pre_load = DbConfig()
 	# pre_load.load_image_entries_to_db()
 	obj = DUFlight()
 	obj.get_fuel_level()

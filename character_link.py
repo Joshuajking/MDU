@@ -2,22 +2,22 @@ from time import sleep
 
 import keyboard
 import pyautogui
-import pydirectinput
 from ahk import AHK
 
 from core.DUCharacters import DUCharacters
 from logs.logging_config import logger
-from models.models import ImageLocation, SearchAreaLocation
+from model.models import ImageLocation, SearchAreaLocation
 from querysets.querysets import CharacterQuerySet
 from utils.special_mission_ocr import OCREngine
 from utils.verify_screen import VerifyScreen
 
 
 class CharacterLink:
-	ahk = AHK()
+
 	# self.ahk.send_raw(character.email)
 
 	def __init__(self):
+		self.ahk = AHK()
 		self.ocr = OCREngine()
 		self.verify = VerifyScreen()
 		self.characters = DUCharacters()
@@ -110,32 +110,29 @@ class CharacterLink:
 		# loop over all the accounts
 		for character in all_active_characters:
 			self.character = character
+			# var = pyautogui.locateOnScreen(
+			# 	image=r'..\data\du_images\login_screen\du_login_screen_label.png',
+			# 	minSearchTime=3,
+			# 	confidence=0.8
+			# )
 
-			has_gametime = self.characters.login(character)
+			has_gametime = self.characters.login(self.character)
 
 			if not has_gametime:
 				continue
 			sleep(15)
 			# Open wallet screen
-			pydirectinput.press('o')
-			sleep(3)
-			self.get_wallet_currency()
-			self.get_recipient_searchEdit()
-			self.get_recipient_searchArea()
-			self.get_amount()
-			self.complete_transfer()
+			# pydirectinput.press('o')
+			# sleep(3)
+			# self.get_wallet_currency()
+			# self.get_recipient_searchEdit()
+			# self.get_recipient_searchArea()
+			# self.get_amount()
+			# self.complete_transfer()
 
 		self.characters.logout()
 
 
 if __name__ == "__main__":
-	# name = 'CYT Transportation'
-	#
-	# RECIPIENT_SEARCH_AREA = OCREngine().ocr_missions(
-	# 	search_area=SearchAreaLocation.RECIPIENT_SEARCH_AREA,
-	# 	search_text=name,
-	# 	# scroll=True,
-	# 	# click=True
-	# )
 	obj = CharacterLink()
 	obj.character_link()

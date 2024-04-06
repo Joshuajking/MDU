@@ -1,6 +1,5 @@
 import random
 from time import sleep
-from typing import Union
 
 import pyautogui
 import pydirectinput
@@ -16,7 +15,6 @@ class VerifyScreen:
 		self.region_str = None
 		self.w, self.h = pyautogui.size()
 		self.screen_size = self.w//2, self.h//2
-		pass
 
 	def simulate_mouse(self, dest_x, dest_y, mouse_click, mouse_clicks):
 		# Get screen size
@@ -103,7 +101,7 @@ class VerifyScreen:
 		max_checks = 60
 
 		image_data = ImageQuerySet.read_image_by_name(image_name=image_to_compare, image_location=screen_name)
-		region = image_data.region if image_data is not None else None
+		# region = image_data.region if image_data is not None else None
 		if not image_data.image_location == screen_name:
 			raise ValueError(
 				f"Error: screen passed {screen_name}, but image_location for {image_to_compare} is {image_data.image_location}")
@@ -191,7 +189,7 @@ class VerifyScreen:
 				"verify_screen": verify_screen,
 				"skip_sleep": skip_sleep,
 				"mouse_click": mouse_click,
-				"region": region,
+				# "region": region,
 				"esc": esc,
 				"screen_coords": screen_coords,
 			}

@@ -21,10 +21,10 @@ class DbConfig:
 	def __init__(self, images_dir=None):
 		self.config_manager = ConfigManager()
 		self.images_dir = images_dir or os.path.relpath(DirectoryPaths.DU_IMAGES_DIR)
-		self.__create_db_and_tables()
-		self.__load_Image_table()
-		self.__load_SearchArea_table()
-		self.__load_Mission_table()
+		# self.__create_db_and_tables()
+		# self.__load_Image_table()
+		# self.__load_SearchArea_table()
+		# self.__load_Mission_table()
 
 	def __create_db_and_tables(self):
 		SQLModel.metadata.create_all(self.engine)
@@ -113,7 +113,7 @@ class DbConfig:
 		except Exception as e:
 			logger.error(f"Error loading table Mission_table.json: {e}")
 
-	def load_image_entries_to_db(self):
+	def load_image_entries_to_db(self):  # TODO: alters file path (main.py - data\du_images...) & (character_link.py - ..\data\du_images...) and keeps creating files in db
 		count = 0
 		with Session(self.engine) as session:
 			for location in os.listdir(self.images_dir):
@@ -136,6 +136,36 @@ class DbConfig:
 								# Update existing image URL if it has changed
 								if existing_image.image_url != image_path:
 									existing_image.image_url = image_path
+									count += 1
+			if count > 0:
+				logger.info(f"Total images updated: {count}")
+				session.commit()
+			else:
+				logger.info("No new images or existing images updated")
+
+	def alt_load_image_entries_to_db(self):
+		count = 0
+		with Session(self.engine) as session:
+			for location in os.listdir(self.images_dir):
+				location_dir = os.path.join(self.images_dir, location)
+				if os.path.isdir(location_dir):
+					for image_name in os.listdir(location_dir):
+						image_path = os.path.join(location_dir, image_name)
+						if os.path.isfile(image_path):
+							# Check if the image already exists in the database
+							existing_image = session.query(Image).filter_by(image_name=image_name,
+							                                                image_location=location).first()
+							if not existing_image:
+								# Update the image URL to the new path
+								image_url = os.path.join('data', 'du_images', location, image_name)
+								new_image = Image(image_name=image_name, image_location=location, image_url=image_url)
+								session.add(new_image)
+								new_image.created_at = datetime.now()
+								count += 1
+							else:
+								# Update existing image URL if it has changed
+								if existing_image.image_url != image_path:
+									existing_image.image_url = os.path.join('data', 'du_images', location, image_name)
 									count += 1
 			if count > 0:
 				logger.info(f"Total images updated: {count}")
@@ -170,6 +200,8 @@ class DbConfig:
 
 if __name__ == '__main__':
 	obj = DbConfig()
+	# obj.load_image_entries_to_db()
+	obj.alt_load_image_entries_to_db()
 	# obj.load_image_entries_to_db()
 
 	# obj.delete_image_from_db()
@@ -217,7 +249,7 @@ if __name__ == '__main__':
 	# obj.get_image_bbox(region_name=SearchAreaLocation.ATMO_FUEL,
 	#                    image_path=r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-02 093227.png")
 
-	region_dict = {
+	# region_dict = {
 
 		# "DEST_INFO": {
 		# 	"region_name": SearchAreaLocation.DEST_INFO,
@@ -296,11 +328,11 @@ if __name__ == '__main__':
 		# 		"region_name": SearchAreaLocation.RECIPIENT_SEARCH_AREA,
 		# 		"image_path": r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-01 162512.png"
 		# 	},
-	}
+	# }
 
-	for key, value in region_dict.items():
-		region_name = value["region_name"]
-		image_path = value["image_path"]
-
-		obj.get_image_bbox(region_name=region_name,
-		                   image_path=image_path)
+	# for key, value in region_dict.items():
+	# 	region_name = value["region_name"]
+	# 	image_path = value["image_path"]
+	#
+	# 	obj.get_image_bbox(region_name=region_name,
+	# 	                   image_path=image_path)

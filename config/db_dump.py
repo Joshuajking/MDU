@@ -90,3 +90,7 @@ class DumpDataBase:
 				json.dump(filtered_data, json_file, indent=4)
 		except Exception as e:
 			logger.error(f"Error dumping table SearchArea_table: {e}")
+
+
+if __name__ == '__main__':
+	obj = DumpDataBase()

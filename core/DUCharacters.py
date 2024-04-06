@@ -13,9 +13,9 @@ from utils.verify_screen import VerifyScreen
 
 
 class DUCharacters:
-	ahk = AHK()
 
 	def __init__(self):
+		self.ahk = AHK()
 		self.verify = VerifyScreen()
 
 	@timing_decorator
@@ -31,6 +31,7 @@ class DUCharacters:
 		response_du_login_screen_label = self.verify.screen(
 			screen_name=ImageLocation.LOGIN_SCREEN,
 			image_to_compare="du_login_screen_label",
+			skip_sleep=True,
 			# mouse_click=True,
 			# mouse_clicks=2
 		)
@@ -157,7 +158,8 @@ class DUCharacters:
 		# Press F4(map)
 		pydirectinput.press("f4")
 		# wait for map loading
-		my_marker = self.verify.screen(screen_name=ImageLocation.MAP_SCREEN, image_to_compare="my_map_marker", confidence=0.8)
+		my_marker = self.verify.screen(screen_name=ImageLocation.MAP_SCREEN, image_to_compare="my_map_marker",
+		                               confidence=0.8)
 		# scroll-in(zoom)
 		pyautogui.scroll(step_scroll, my_marker)
 		# find planet info
@@ -165,7 +167,8 @@ class DUCharacters:
 			screen_name=ImageLocation.MAP_SCREEN, image_to_compare="map_planet_label", confidence=0.8,
 		)
 		# find Market icon
-		market_icon = self.verify.screen(screen_name=ImageLocation.MAP_SCREEN, image_to_compare="map_market_icon", confidence=0.8)
+		market_icon = self.verify.screen(screen_name=ImageLocation.MAP_SCREEN, image_to_compare="map_market_icon",
+		                                 confidence=0.8)
 		# VerifyScreen Market location
 		market_label = self.verify.screen(
 			screen_name=ImageLocation.MAP_SCREEN, image_to_compare="map_market_label", confidence=0.8,

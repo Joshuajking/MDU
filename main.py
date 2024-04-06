@@ -5,7 +5,6 @@ import threading
 from time import perf_counter, sleep
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from loguru import logger
 from sqlmodel import Session, select
 
 from config.config_manager import ConfigManager
@@ -14,6 +13,7 @@ from core.DUCharacters import DUCharacters
 from core.DUClientManager import DUClientManager
 from core.DUFlight import DUFlight
 from core.DUMissions import DUMissions
+from logs.logging_config import logger
 from model.models import Character
 from querysets.querysets import CharacterQuerySet, engine
 
@@ -86,7 +86,7 @@ class EngineThread(threading.Thread):
 				continue
 
 			else:
-				self.client.stop_application()
+				# self.client.stop_application()
 				client_stop = perf_counter()
 				client_runtime = client_stop - client_start
 				client_run += client_runtime

@@ -212,6 +212,11 @@ class ImageQuerySet:
 					raise ValueError("File must have a .png extension")
 			else:
 				image_name += ".png"
+
+			# # Get the base directory for image files
+			# current_dir = os.path.dirname(os.path.abspath(__file__))
+			# base_dir = os.path.join(current_dir, '..', 'data', 'du_images')
+
 			with Session(engine) as session:
 				image = session.query(Image).filter_by(image_name=image_name, image_location=image_location).first()
 				if image:
