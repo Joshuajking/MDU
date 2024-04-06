@@ -4,11 +4,11 @@ from collections import OrderedDict
 
 from sqlmodel import Session, select
 
+from config_manager import ConfigManager
 from logging_config import logger
 from models import SearchArea, Image, Mission
 from querysets import engine
-from config_manager import ConfigManager
-from MDU.settings import DirectoryPaths
+from router import DirectoryPaths
 
 
 class DumpDataBase:

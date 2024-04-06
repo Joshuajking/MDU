@@ -7,11 +7,11 @@ from datetime import datetime
 import pyautogui
 from sqlmodel import SQLModel, Session, select
 
-from MDU.src.config_manager import ConfigManager
-from MDU.src.logging_config import logger
-from MDU.src.models import SearchArea, Image, Mission
-from MDU.settings import DirectoryPaths
-from MDU.src.querysets import engine
+from router import DirectoryPaths
+from settings import engine
+from src.config_manager import ConfigManager
+from src.logging_config import logger
+from src.models import SearchArea, Image, Mission
 
 
 class DbConfig:

@@ -7,12 +7,13 @@ import numpy as np
 import pyautogui
 from PIL import Image, ImageGrab, ImageEnhance
 from pynput.mouse import Controller
-from MDU.src.logging_config import logger
-from MDU.src.config_manager import ConfigManager
-from MDU.src.models import SearchAreaLocation
-from MDU.settings import DirectoryPaths
-from MDU.src.querysets import SearchAreaQuerySet
-from MDU.src.verify_screen import VerifyScreen
+
+from router import DirectoryPaths
+from src.config_manager import ConfigManager
+from src.logging_config import logger
+from src.models import SearchAreaLocation
+from src.querysets import SearchAreaQuerySet
+from src.verify_screen import VerifyScreen
 
 
 class OCREngine:

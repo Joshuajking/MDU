@@ -1,9 +1,8 @@
 import json
 import os
 
-from MDU.src.logging_config import logger
-
-from MDU.settings import DirectoryPaths
+from router import DirectoryPaths
+from src.logging_config import logger
 
 
 def read_json(json_file) -> json:

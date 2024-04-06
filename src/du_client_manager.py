@@ -5,10 +5,10 @@ import time
 import psutil
 import pynput
 
-from MDU.src.config_manager import ConfigManager, timing_decorator
-from MDU.src.logging_config import logger
-from MDU.src.models import ImageLocation
-from MDU.src.verify_screen import VerifyScreen
+from src.config_manager import ConfigManager, timing_decorator
+from src.logging_config import logger
+from src.models import ImageLocation
+from src.verify_screen import VerifyScreen
 
 
 class DUClientManager:

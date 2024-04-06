@@ -5,17 +5,14 @@ import os
 import uuid
 from typing import Any, Tuple, Optional, Dict
 
-from sqlalchemy import create_engine
 from sqlmodel import Session, select
 
-from MDU.src.config_manager import ConfigManager
-from MDU.src.logging_config import logger
-from MDU.src.models import SearchArea, Character, Mission, Image, ImageLocation, MissionMetadata
-from MDU.settings import DirectoryPaths
+from settings import engine
+from src.config_manager import ConfigManager
+from src.logging_config import logger
+from src.models import SearchArea, Character, Mission, Image, ImageLocation, MissionMetadata
 
 config_manager = ConfigManager()
-engine = create_engine(
-	f"sqlite:///{os.path.join(DirectoryPaths.ROOT_DIR, config_manager.get_value('config.database'))}", echo=False)
 
 
 class MissionMetaQuerySet:

@@ -5,8 +5,8 @@ import pyautogui
 import pydirectinput
 import pytweening
 
-from MDU.src.logging_config import logger
-from MDU.src.querysets import ImageQuerySet
+from src.logging_config import logger
+from src.querysets import ImageQuerySet
 
 
 class VerifyScreen:

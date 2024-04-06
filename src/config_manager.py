@@ -2,10 +2,9 @@ import json
 import os
 import time
 
-from MDU.src.logging_config import logger
-
-from MDU.settings import DirectoryPaths
-from MDU.src.utils.read_json import read_json
+from router import DirectoryPaths
+from src.logging_config import logger
+from src.utils.read_json import read_json
 
 
 class ConfigManager:

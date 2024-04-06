@@ -1,17 +1,9 @@
-from pathlib import Path
+from decouple import config
+from sqlalchemy import create_engine
 
+from src.config_manager import ConfigManager
 
-class DirectoryPaths:
-	ROOT_DIR = Path(__file__).resolve().parent
+config_manager = ConfigManager()
 
-	SRC_DIR = ROOT_DIR / 'src'
-	DATA_DIR = ROOT_DIR / 'data'
-	LOGS_DIR = ROOT_DIR / 'logs'
-	DOCS_DIR = ROOT_DIR / 'docs'
-	TEMP_DIR = SRC_DIR / 'temp'
-	TESTS_DIR = ROOT_DIR / 'tests'
-	UTILS_DIR = SRC_DIR / 'utils'
-	DU_IMAGES_DIR = DATA_DIR / 'du_images'
-	SEARCH_AREA_DIR = DATA_DIR / 'bbox_images'
-	DB_DUMP_DIR = DATA_DIR / 'db_dump_files'
-
+DATABASE_URL = config('DATABASE_URL')
+engine = create_engine(f"sqlite:///{DATABASE_URL}", echo=False)
