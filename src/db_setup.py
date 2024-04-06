@@ -7,11 +7,11 @@ from datetime import datetime
 import pyautogui
 from sqlmodel import SQLModel, Session, select
 
-from config.config_manager import ConfigManager
-from logs.logging_config import logger
-from model.models import SearchArea, Image, Mission
-from path_router import DirectoryPaths
-from querysets.querysets import engine
+from MDU.src.config_manager import ConfigManager
+from MDU.src.logging_config import logger
+from MDU.src.models import SearchArea, Image, Mission
+from MDU.settings import DirectoryPaths
+from MDU.src.querysets import engine
 
 
 class DbConfig:
@@ -175,9 +175,9 @@ class DbConfig:
 
 	@staticmethod
 	def get_image_bbox(image_path, region_name, confidence=0.7):
-		from querysets.querysets import SearchAreaQuerySet
+		from MDU.src.querysets import SearchAreaQuerySet
 		screen_coords = pyautogui.locateOnScreen(image_path, minSearchTime=3, confidence=confidence)
-		# for screen_coords in pyautogui.locateAllOnScreen(r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ORBITAL_HUD_LANDED.png"):
+		# for screen_coords in pyautogui.locateAllOnScreen(r"C:\Repositories\Dual Universe\Missions Dual Universe\data\bbox_images\ORBITAL_HUD_LANDED.png"):
 		# 	screen_coords = screen_coords
 		if screen_coords is not None:
 			left, top, width, height = screen_coords
@@ -211,20 +211,20 @@ if __name__ == '__main__':
 	# area = {
 	# 	"ACTIVE_TAKEN_MISSIONS": {
 	# 		"region_name": SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
-	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ACTIVE_TAKEN_MISSIONS.png"
+	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\bbox_images\ACTIVE_TAKEN_MISSIONS.png"
 	# 	},
 	# 	"AVAILABLE_MISSIONS": {
 	# 		"region_name": SearchAreaLocation.AVAILABLE_MISSIONS,
-	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\AVAILABLE_MISSIONS.png"
+	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\bbox_images\AVAILABLE_MISSIONS.png"
 	# 	},
 	# 	"RETRIEVE_DELIVERY_STATUS": {
 	# 		"region_name": SearchAreaLocation.RETRIEVE_DELIVERY_STATUS,
-	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\unselected_deliver_package.png"
+	# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\bbox_images\unselected_deliver_package.png"
 	# 	},
 	# }
 	#
 	# obj.get_image_bbox(region_name=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
-	#                    image_path=r"C:\Repositories\Dual Universe\MDU\data\search_areas\ACTIVE_TAKEN_MISSIONS.png")
+	#                    image_path=r"C:\Repositories\Dual Universe\MDU\data\bbox_images\ACTIVE_TAKEN_MISSIONS.png")
 	#
 	# obj.get_image_bbox(region_name=SearchAreaLocation.AVAILABLE_MISSIONS,
 	#                image_path=r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-03-02 091333.png")
@@ -301,7 +301,7 @@ if __name__ == '__main__':
 		# },
 		# 	"ORBITAL_HUD_LANDED": {
 		# 		"region_name": SearchAreaLocation.ORBITAL_HUD_LANDED,
-		# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\search_areas\ORBITAL_HUD_LANDED.png"
+		# 		"image_path": r"C:\Repositories\Dual Universe\Missions Dual Universe\data\bbox_images\ORBITAL_HUD_LANDED.png"
 		# 	},
 		# }
 		# 	"GAME_CONSOLE_WINDOW": {

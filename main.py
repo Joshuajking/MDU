@@ -7,15 +7,15 @@ from time import perf_counter, sleep
 from PyQt6 import QtCore, QtGui, QtWidgets
 from sqlmodel import Session, select
 
-from config.config_manager import ConfigManager
-from config.db_setup import DbConfig
-from core.DUCharacters import DUCharacters
-from core.DUClientManager import DUClientManager
-from core.DUFlight import DUFlight
-from core.DUMissions import DUMissions
-from logs.logging_config import logger
-from model.models import Character
-from querysets.querysets import CharacterQuerySet, engine
+from MDU.src.config_manager import ConfigManager
+from MDU.src.db_setup import DbConfig
+from MDU.src.du_character import DUCharacters
+from MDU.src.du_client_manager import DUClientManager
+from MDU.src.du_flight import DUFlight
+from MDU.src.du_missions import DUMissions
+from MDU.src.logging_config import logger
+from MDU.src.models import Character
+from MDU.src.querysets import CharacterQuerySet, engine
 
 
 class EngineThread(threading.Thread):

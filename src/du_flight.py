@@ -6,13 +6,13 @@ import pyautogui
 import pydirectinput
 from pynput.mouse import Controller
 
-from config.config_manager import ConfigManager, timing_decorator
-from logs.logging_config import logger
-from model.models import ImageLocation
-from path_router import DirectoryPaths
-from querysets.querysets import ImageQuerySet, CharacterQuerySet
-from utils.special_mission_ocr import OCREngine
-from utils.verify_screen import VerifyScreen
+from MDU.src.config_manager import ConfigManager, timing_decorator
+from MDU.src.logging_config import logger
+from MDU.src.models import ImageLocation
+from MDU.settings import DirectoryPaths
+from MDU.src.querysets import ImageQuerySet, CharacterQuerySet
+from MDU.src.special_mission_ocr import OCREngine
+from MDU.src.verify_screen import VerifyScreen
 
 
 class PilotSeatNotFoundError(Exception):

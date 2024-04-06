@@ -8,10 +8,10 @@ from typing import Any, Tuple, Optional, Dict
 from sqlalchemy import create_engine
 from sqlmodel import Session, select
 
-from config.config_manager import ConfigManager
-from logs.logging_config import logger
-from model.models import SearchArea, Character, Mission, Image, ImageLocation, MissionMetadata
-from path_router import DirectoryPaths
+from MDU.src.config_manager import ConfigManager
+from MDU.src.logging_config import logger
+from MDU.src.models import SearchArea, Character, Mission, Image, ImageLocation, MissionMetadata
+from MDU.settings import DirectoryPaths
 
 config_manager = ConfigManager()
 engine = create_engine(
@@ -435,8 +435,3 @@ class MissionQuerySet:
 				session.commit()
 				logger.info(f'Mission updated in the database: {title}')
 
-
-if __name__ == '__main__':
-	sa_obj = SearchAreaQuerySet()
-	val = sa_obj.select_searcharea()
-	print(val)

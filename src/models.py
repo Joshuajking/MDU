@@ -1,9 +1,9 @@
 import uuid
 from datetime import datetime
 from enum import Enum
-from typing import Optional, Any
+from typing import Optional
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel
 from sqlmodel import SQLModel, Field
 
 

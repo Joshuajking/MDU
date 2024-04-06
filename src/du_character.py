@@ -5,11 +5,11 @@ import pyautogui
 import pydirectinput
 from ahk import AHK
 
-from config.config_manager import timing_decorator
-from logs.logging_config import logger
-from model.models import ImageLocation
-from querysets.querysets import CharacterQuerySet
-from utils.verify_screen import VerifyScreen
+from MDU.src.config_manager import timing_decorator
+from MDU.src.logging_config import logger
+from MDU.src.models import ImageLocation
+from MDU.src.querysets import CharacterQuerySet
+from MDU.src.verify_screen import VerifyScreen
 
 
 class DUCharacters:

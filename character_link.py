@@ -4,12 +4,12 @@ import keyboard
 import pyautogui
 from ahk import AHK
 
-from core.DUCharacters import DUCharacters
-from logs.logging_config import logger
-from model.models import ImageLocation, SearchAreaLocation
-from querysets.querysets import CharacterQuerySet
-from utils.special_mission_ocr import OCREngine
-from utils.verify_screen import VerifyScreen
+from src.du_character import DUCharacters
+from src.logging_config import logger
+from src.models import ImageLocation, SearchAreaLocation
+from src.querysets import CharacterQuerySet
+from src.special_mission_ocr import OCREngine
+from src.verify_screen import VerifyScreen
 
 
 class CharacterLink:

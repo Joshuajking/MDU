@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch, MagicMock, Mock
 
-from core.DUMissions import DUMissions
-from model.models import SearchAreaLocation
+from MDU.src.du_missions import DUMissions
+from MDU.src.models import SearchAreaLocation
 
 
 class TestProcessPackage(unittest.TestCase):

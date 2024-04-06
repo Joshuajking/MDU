@@ -453,7 +453,7 @@ def convert_json_to_txt():
 		# Print the content of ASSETS_DATA for debugging
 		print("ASSETS_DATA content:", json_file)
 
-		with open("../data/json/assets_data.txt", "w") as txt_file:
+		with open("../../data/json/assets_data.txt", "w") as txt_file:
 			for var, path in json_file.items():
 				txt_file.writelines(f"{var}: {path}\n")
 

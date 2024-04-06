@@ -3,9 +3,9 @@
 
 ### Custom Exclusions
 data/json/*
-database/*
-utils/**/image_cache/
-temp/*
+src/database/*
+src/utils/**/image_cache/
+src/temp/*
 templates/invalid_images/*
 
 # file I use but dont want to have on VCS
@@ -287,14 +287,14 @@ pip-selfcheck.json
 /du.db
 /file_structure.txt
 /du-missions.db
-/model/du-missions.db
-/model/missions.db
-/model/missions.db-journal
+/src/model/du-missions.db
+/src/model/missions.db
+/src/model/missions.db-journal
 /db_backup/*
-/model/missions.sqbpro
+/src/model/missions.sqbpro
 /alembic/versions/
 /alembic/
-/model/test.db
-/model/missions.db
+/src/model/test.db
+/src/model/missions.db
 /missions.db
 /data/config.json

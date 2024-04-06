@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, MagicMock
 
-from core.DUFlight import DUFlight
+from MDU.src.du_flight import DUFlight
 
 
 class TestCheckImgToLand(unittest.TestCase):

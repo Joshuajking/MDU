@@ -1,6 +1,4 @@
-import datetime
 import os.path
-import random
 import tempfile
 
 import cv2
@@ -9,12 +7,12 @@ import numpy as np
 import pyautogui
 from PIL import Image, ImageGrab, ImageEnhance
 from pynput.mouse import Controller
-from logs.logging_config import logger
-from config.config_manager import ConfigManager
-from model.models import SearchAreaLocation
-from path_router import DirectoryPaths
-from querysets.querysets import SearchAreaQuerySet
-from utils.verify_screen import VerifyScreen
+from MDU.src.logging_config import logger
+from MDU.src.config_manager import ConfigManager
+from MDU.src.models import SearchAreaLocation
+from MDU.settings import DirectoryPaths
+from MDU.src.querysets import SearchAreaQuerySet
+from MDU.src.verify_screen import VerifyScreen
 
 
 class OCREngine:
