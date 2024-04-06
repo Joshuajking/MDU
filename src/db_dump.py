@@ -7,13 +7,13 @@ from sqlmodel import Session, select
 from config_manager import ConfigManager
 from logging_config import logger
 from models import SearchArea, Image, Mission
-from querysets import engine
 from router import DirectoryPaths
+from settings import engine
 
 
 class DumpDataBase:
 	config_manager = ConfigManager()
-	# engine = create_engine(f"sqlite:///../database/test_db.db")
+	# engine = create_engine(f"sqlite:///{os.path.join(DirectoryPaths.ROOT_DIR, config('DATABASE_URL'))}")
 	engine = engine
 
 	# engine = create_engine(
@@ -43,7 +43,7 @@ class DumpDataBase:
 				filtered_data.append(ordered_data)
 
 			# Dump the data to a JSON file
-			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'Mission_table.json')
+			file_path = os.path.join(DirectoryPaths.DATA_DIR, 'Mission_table.json')
 			with open(file_path, "w+") as json_file:
 				json.dump(filtered_data, json_file, indent=4)
 		except Exception as e:
@@ -64,7 +64,7 @@ class DumpDataBase:
 				filtered_data.append(ordered_data)
 
 			# Dump the data to a JSON file
-			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'Image_table.json')
+			file_path = os.path.join(DirectoryPaths.DATA_DIR, 'Image_table.json')
 			with open(file_path, "w+") as json_file:
 				json.dump(filtered_data, json_file, indent=4)
 		except Exception as e:
@@ -85,7 +85,7 @@ class DumpDataBase:
 				filtered_data.append(ordered_data)
 
 			# Dump the data to a JSON file
-			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'SearchArea_table.json')
+			file_path = os.path.join(DirectoryPaths.DATA_DIR, 'SearchArea_table.json')
 			with open(file_path, "w+") as json_file:
 				json.dump(filtered_data, json_file, indent=4)
 		except Exception as e:
