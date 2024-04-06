@@ -21,18 +21,14 @@ class DbConfig:
 	def __init__(self, images_dir=None):
 		self.config_manager = ConfigManager()
 		self.images_dir = images_dir or os.path.relpath(DirectoryPaths.DU_IMAGES_DIR)
-		# self.__create_db_and_tables()
-		# self.__load_Image_table()
-		# self.__load_SearchArea_table()
-		# self.__load_Mission_table()
 
-	def __create_db_and_tables(self):
+	def create_db_and_tables(self):
 		SQLModel.metadata.create_all(self.engine)
 
-	def __load_SearchArea_table(self):
+	def load_SearchArea_table(self):
 		try:
 			# Load the JSON data from the file
-			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'SearchArea_table.json')
+			file_path = os.path.join(DirectoryPaths.DATA_DIR, 'SearchArea_table.json')
 			with open(file_path, "r") as json_file:
 				json_data = json.load(json_file)
 
@@ -58,10 +54,10 @@ class DbConfig:
 		except Exception as e:
 			logger.error(f"Error loading table SearchArea_table.json: {e}")
 
-	def __load_Image_table(self):
+	def load_Image_table(self):
 		try:
 			# Load the JSON data from the file
-			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'Image_table.json')
+			file_path = os.path.join(DirectoryPaths.DATA_DIR, 'Image_table.json')
 			with open(file_path, "r") as json_file:
 				json_data = json.load(json_file)
 
@@ -86,10 +82,10 @@ class DbConfig:
 		except Exception as e:
 			logger.error(f"Error loading table Image_table.json: {e}")
 
-	def __load_Mission_table(self):
+	def load_Mission_table(self):
 		try:
 			# Load the JSON data from the file
-			file_path = os.path.join(DirectoryPaths.DB_DUMP_DIR, 'Mission_table.json')
+			file_path = os.path.join(DirectoryPaths.DATA_DIR, 'Mission_table.json')
 			with open(file_path, "r") as json_file:
 				json_data = json.load(json_file)
 
@@ -175,7 +171,7 @@ class DbConfig:
 
 	@staticmethod
 	def get_image_bbox(image_path, region_name, confidence=0.7):
-		from MDU.src.querysets import SearchAreaQuerySet
+		from src.querysets import SearchAreaQuerySet
 		screen_coords = pyautogui.locateOnScreen(image_path, minSearchTime=3, confidence=confidence)
 		# for screen_coords in pyautogui.locateAllOnScreen(r"C:\Repositories\Dual Universe\Missions Dual Universe\data\bbox_images\ORBITAL_HUD_LANDED.png"):
 		# 	screen_coords = screen_coords
@@ -201,7 +197,10 @@ class DbConfig:
 if __name__ == '__main__':
 	obj = DbConfig()
 	# obj.load_image_entries_to_db()
-	obj.alt_load_image_entries_to_db()
+	# obj.alt_load_image_entries_to_db()
+	obj.load_Mission_table()
+	obj.load_Image_table()
+	obj.load_SearchArea_table()
 	# obj.load_image_entries_to_db()
 
 	# obj.delete_image_from_db()
