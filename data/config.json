@@ -1,0 +1,22 @@
+{
+  "config": {
+    "pilot": "Valdoom",
+    "game_launcher": "dual-launcher.exe",
+    "game_client": "Dual.exe",
+    "app_path": "C:\\ProgramData\\Dual Universe\\Game\\DualUniverse.exe",
+    "ocr_type": "scrollable_area",
+    "mission_type": "classic_mission",
+    "assets_data": "assets_data.json",
+    "active_mission_name": "Pure_Sulfur_Shipment",
+    "character_list": "user.json",
+    "special_mission": "False",
+    "character_progress": "character_progress.json",
+    "character_name": "character_name.txt",
+    "DEBUG": "False",
+    "mission_retrieve_loc": "origin_sicari",
+    "mission_delivery_loc": "dest_sinnen",
+    "sleep_time": 0,
+    "database": "missions.db",
+    "char_sleep_time": 0
+  }
+}
