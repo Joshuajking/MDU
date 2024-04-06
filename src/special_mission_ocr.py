@@ -36,7 +36,7 @@ class OCREngine:
 
 	def get_reader(self):
 		if self.reader is None:
-			self.reader = easyocr.Reader(["en"], gpu=True)
+			self.reader = easyocr.Reader(["en"])
 		return self.reader
 
 	def image_enhancement(self, image, factors=None):
