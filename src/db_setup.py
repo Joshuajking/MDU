@@ -20,7 +20,7 @@ class DbConfig:
 
 	def __init__(self, images_dir=None):
 		self.config_manager = ConfigManager()
-		self.images_dir = images_dir or os.path.relpath(DirectoryPaths.DU_IMAGES_DIR)
+		self.images_dir = images_dir or os.path.relpath(DirectoryPaths.IMAGES_DIR)
 
 	def create_db_and_tables(self):
 		SQLModel.metadata.create_all(self.engine)

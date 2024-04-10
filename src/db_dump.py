@@ -23,7 +23,7 @@ class DumpDataBase:
 
 	def __init__(self, images_dir=None):
 		self.config_manager = ConfigManager()
-		self.images_dir = images_dir or os.path.relpath(DirectoryPaths.DU_IMAGES_DIR)
+		self.images_dir = images_dir or os.path.relpath(DirectoryPaths.IMAGES_DIR)
 		self.__dump_table_Mission()
 		self.__dump_table_SearchArea()
 		self.__dump_table_Image()
