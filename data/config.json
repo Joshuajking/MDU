@@ -1,9 +1,9 @@
 {
   "config": {
     "pilot": "Valdoom",
-    "game_launcher": "dual-launcher.exe",
-    "game_client": "Dual.exe",
-    "app_path": "C:\\ProgramData\\Dual Universe\\Game\\DualUniverse.exe",
+    "game_launcher": "GeForceNOW.exe",
+    "game_client": "GeForceNOW.exe",
+    "app_path": "C:\\Users\\joshu\\AppData\\Local\\NVIDIA Corporation\\GeForceNOW\\CEF\\GeForceNOW.exe",
     "ocr_type": "scrollable_area",
     "mission_type": "classic_mission",
     "assets_data": "assets_data.json",

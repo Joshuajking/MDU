@@ -26,20 +26,16 @@ class DUClientManager:
 		"""Check if the code is running in a debugger."""
 		return os.environ.get("DEBUG_MODE", "0") == "1"
 
-	def is_client_running(self) -> int:
+	def is_client_running(self) -> int | None:
 		"""Check if the game_client is running."""
-		# TODO: Need to find an alternative to setting window to focus Windows has made to many restrictions on this
-		# One thought would be to freeze mouse and keyboard control and then move the mouse to the client/game by image capture
-		# or pyautogui
+		pid = None
+		list_of_processes = []
+
 		if self.is_debugging():
-			# Code to be disabled when running in debug mode
-			# Disable mouse and keyboard events
 			self.mouse_listener.start()
 			self.keyboard_listener.start()
 			logger.debug("Debug mode is active. Some code is disabled.")
 
-		pid = None
-		list_of_processes = []
 		for process in psutil.process_iter(['pid', 'name', 'create_time']):
 			list_of_processes.append(process)
 			if process.info['name'] == self.game_client:
@@ -67,11 +63,12 @@ class DUClientManager:
 			image_to_compare="geforce_select_game",
 			mouse_click=True
 		)
-		self.verify.screen(
-			screen_name=ImageLocation.GEFORCE_SCREEN,
-			image_to_compare="geforce_play_btn",
-			mouse_click=True
-		)
+		## xxx: this is for NovaQuark GeforceNow version not Steam version
+		# self.verify.screen(
+		# 	screen_name=ImageLocation.GEFORCE_SCREEN,
+		# 	image_to_compare="geforce_play_btn",
+		# 	mouse_click=True
+		# )
 
 	@timing_decorator
 	def start_application(self):
@@ -84,7 +81,7 @@ class DUClientManager:
 				logger.debug(f'Started game client: {self.app_path}')
 			except Exception as e:
 				logger.error(f"Error while starting the application: {e}, {self.app_path}")
-			if self.game_client == "Dual Universe on GeForce NOW":
+			if self.game_client == "GeForceNOW.exe":
 				self.geforce_client()
 			self.verify.screen(
 				screen_name=ImageLocation.LOGIN_SCREEN,
@@ -92,6 +89,8 @@ class DUClientManager:
 				verify_screen=True
 			)
 			logger.success(f"game client started: {self.app_path}")
+		else:
+			logger.debug(f"game client running already")
 
 	def stop_application(self):
 		"""Stop the game_client application if running."""
@@ -119,8 +118,8 @@ class DUClientManager:
 if __name__ == '__main__':
 	start_time = time.perf_counter()
 	du_client = DUClientManager()
-	# du_client.start_application()
-	# du_client.stop_application()
+	du_client.start_application()
+	du_client.stop_application()
 	end_time = time.perf_counter()
 	elapsed_time = end_time - start_time
 	print(f"Elapsed time: {elapsed_time}")

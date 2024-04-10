@@ -106,6 +106,9 @@ class VerifyScreen:
 			raise ValueError(
 				f"Error: screen passed {screen_name}, but image_location for {image_to_compare} is {image_data.image_location}")
 		while max_checks >= check_count:
+			# screen_coords = template_matching(image_to_compare=image_data.image_url)
+			# sleep(1)
+			# if screen_coords is not None:
 			if (screen_coords := pyautogui.locateOnScreen(
 					image=image_data.image_url,
 					# region=region,
@@ -119,8 +122,7 @@ class VerifyScreen:
 				center_y = top + height // 2
 				screen_coords = center_x, center_y
 
-				# Convert tuple to a string representation
-				self.region_str = f"({left}, {top}, {width}, {height})"
+			# self.region_str = f"({left}, {top}, {width}, {height})"
 
 				# if not image_data.region:
 				# 	image_data = ImageQuerySet.update_image_by_id(image_data.id, {

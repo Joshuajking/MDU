@@ -55,7 +55,7 @@ class DUFlight:
 	# raise PilotSeatNotFoundError(f"Pilot seat not found: {image_name}")
 	@timing_decorator
 	def get_fuel_level(self):
-		timeout_seconds = 900
+		timeout_seconds = 14800
 		start_time = time.perf_counter()
 		fuel_success = True  # Start with True to enter the loop
 		while fuel_success:
@@ -97,6 +97,7 @@ class DUFlight:
 	def mission_flight(self, retrieve_mode):
 		self.respawn()
 		self.get_pilot_seat()
+		# self.get_fuel_level()
 
 		images = self.flight_locations(retrieve_mode)
 
@@ -140,18 +141,29 @@ class DUFlight:
 			confidence=0.75,
 		)
 
+	def afk_timer(self, afk_start):
+		elapsed_time = time.perf_counter() - afk_start
+		if elapsed_time >= 900:
+			pyautogui.press('tab', presses=2, interval=0.2)
+		elif elapsed_time >= 600:
+			pyautogui.press('tab', presses=2, interval=0.2)
+		elif elapsed_time >= 300:
+			pyautogui.press('tab', presses=2, interval=0.2)
+
 	@timing_decorator
 	def check_img_to_land(self):
 		sleep(10)
 		logger.info(f"waiting to land...")
 
 		timeout_seconds = 900
+		afk_start = time.perf_counter()
 		start_time = time.perf_counter()
 		screen_coords = None
 
 		while screen_coords is None:
 			screen_coords = self.check_ship_landed()
 			elapsed_time = time.perf_counter() - start_time
+			self.afk_timer(afk_start)
 			if elapsed_time >= timeout_seconds:
 				logger.debug(f"check_img_to_land: Timeo-out")
 				break

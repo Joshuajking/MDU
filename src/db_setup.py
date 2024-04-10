@@ -153,7 +153,7 @@ class DbConfig:
 							                                                image_location=location).first()
 							if not existing_image:
 								# Update the image URL to the new path
-								image_url = os.path.join('data', 'du_images', location, image_name)
+								image_url = os.path.join('data', 'images', location, image_name)
 								new_image = Image(image_name=image_name, image_location=location, image_url=image_url)
 								session.add(new_image)
 								new_image.created_at = datetime.now()
@@ -161,7 +161,7 @@ class DbConfig:
 							else:
 								# Update existing image URL if it has changed
 								if existing_image.image_url != image_path:
-									existing_image.image_url = os.path.join('data', 'du_images', location, image_name)
+									existing_image.image_url = os.path.join('data', 'images', location, image_name)
 									count += 1
 			if count > 0:
 				logger.info(f"Total images updated: {count}")
@@ -196,11 +196,12 @@ class DbConfig:
 
 if __name__ == '__main__':
 	obj = DbConfig()
-	# obj.load_image_entries_to_db()
-	# obj.alt_load_image_entries_to_db()
-	obj.load_Mission_table()
-	obj.load_Image_table()
-	obj.load_SearchArea_table()
+	# # obj.load_image_entries_to_db()
+	obj.alt_load_image_entries_to_db()
+	# # obj.create_db_and_tables()
+	# # obj.load_Mission_table()
+	# obj.load_Image_table()
+	# obj.load_SearchArea_table()
 	# obj.load_image_entries_to_db()
 
 	# obj.delete_image_from_db()

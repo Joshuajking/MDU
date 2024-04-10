@@ -9,7 +9,6 @@ from sqlmodel import Session, select
 
 from settings import engine
 from src.config_manager import ConfigManager
-from src.db_setup import DbConfig
 from src.du_character import DUCharacters
 from src.du_client_manager import DUClientManager
 from src.du_flight import DUFlight
@@ -17,6 +16,7 @@ from src.du_missions import DUMissions
 from src.logging_config import logger
 from src.models import Character
 from src.querysets import CharacterQuerySet
+from src.video_recording import get_last_30_seconds
 
 
 class EngineThread(threading.Thread):
@@ -77,6 +77,7 @@ class EngineThread(threading.Thread):
 				flight.mission_flight(self.retrieve_mode)
 
 			except Exception as e:
+				get_last_30_seconds()
 				logger.error(f"Exception: {str(e)}")
 				self.client.stop_application()
 				client_stop = perf_counter()
@@ -87,14 +88,17 @@ class EngineThread(threading.Thread):
 				continue
 
 			else:
-				# self.client.stop_application()
 				client_stop = perf_counter()
 				client_runtime = client_stop - client_start
 				client_run += client_runtime
 				logger.info(f"Client runtime: {client_run}")
 				elapsed_time = perf_counter() - start_time
 				if elapsed_time >= 6 * 60 * 60:  # 6 hours in seconds
+					self.client.stop_application()
 					break
+			logger.info("Restarting after 6 hours...")
+			continue
+
 
 	def stop(self):
 		self._running.clear()
@@ -422,8 +426,8 @@ def delete_large_files(directory, max_size_mb):
 
 if __name__ == "__main__":
 	# Database initial setup
-	pre_load = DbConfig()
-	pre_load.load_image_entries_to_db()
+	# pre_load = DbConfig()
+	# pre_load.load_image_entries_to_db()
 	# TODO: Initial File creation
 
 	# TODO: delete over-size-limit dir

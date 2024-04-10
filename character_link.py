@@ -2,8 +2,10 @@ from time import sleep
 
 import keyboard
 import pyautogui
+import pydirectinput
 from ahk import AHK
 
+from src.config_manager import timing_decorator
 from src.du_character import DUCharacters
 from src.logging_config import logger
 from src.models import ImageLocation, SearchAreaLocation
@@ -37,7 +39,9 @@ class CharacterLink:
 		if float(currency) > base_amount:
 			converted_currency = float(currency) - base_amount
 			self.remaining_currency = str(converted_currency)
-			# return remaining_currency
+			return True
+		else:
+			return False
 
 	def get_recipient_searchEdit(self):
 		# Find recipient search field & click in it
@@ -105,7 +109,9 @@ class CharacterLink:
 			mouse_click=True,
 		)
 
+	@timing_decorator
 	def character_link(self):
+		delay = 10
 		all_active_characters = CharacterQuerySet.get_active_characters()  # Get the characters dictionary
 		# loop over all the accounts
 		for character in all_active_characters:
@@ -115,22 +121,43 @@ class CharacterLink:
 			# 	minSearchTime=3,
 			# 	confidence=0.8
 			# )
-
 			has_gametime = self.characters.login(self.character)
-
 			if not has_gametime:
 				continue
-			sleep(15)
-			# Open wallet screen
-			# pydirectinput.press('o')
-			# sleep(3)
-			# self.get_wallet_currency()
-			# self.get_recipient_searchEdit()
-			# self.get_recipient_searchArea()
-			# self.get_amount()
-			# self.complete_transfer()
+			for i in range(delay):
+				sleep(1)
+				logger.info(f"Waiting for {i}/{delay}")
+		# Open wallet screen
+		# pydirectinput.press('o')
+		# sleep(3)
+		# result = self.get_wallet_currency()
+		# if result:
+		# 	self.get_recipient_searchEdit()
+		# 	self.get_recipient_searchArea()
+		# 	self.get_amount()
+		# 	self.complete_transfer()
 
 		self.characters.logout()
+
+	def set_link(self):
+		screen_width, screen_height = pyautogui.size()
+		screen_x = screen_width / 2
+		screen_y = screen_height / 2
+		var = None
+		while var is None:
+			var = pyautogui.locateOnScreen(
+				image=r"C:\Users\joshu\Pictures\Screenshots\Screenshot 2024-04-07 204607.png",
+				minSearchTime=3,
+				confidence=0.7,
+			)
+			if var is None:
+				screen_y -= screen_y * -0.25
+				pydirectinput.moveTo(round(screen_x), round(screen_y), duration=3)
+			else:
+				sleep(2)
+				pydirectinput.moveTo(var, duration=3)
+				sleep(2)
+				pydirectinput.rightClick(var)
 
 
 if __name__ == "__main__":
