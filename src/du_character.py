@@ -147,13 +147,13 @@ class DUCharacters:
 
 			with multiprocessing.Pool(processes=5) as pool:
 				connection_queued_result = pool.apply_async(get_connection_queued, (self.verify,))
-				email_login_result = pool.apply_async(get_email_login, (self.verify,))
+				# email_login_result = pool.apply_async(get_email_login, (self.verify,))
 				internal_error_result = pool.apply_async(get_internal_error, (self.verify,))
 				gametime_error_lable_result = pool.apply_async(get_gametime_error_lable, (self.verify,))
 				password_error_result = pool.apply_async(get_password_error, (self.verify,))
 
 				success_connection_queued, screen_coords_connection_queued, minSearchTime_connection_queued = connection_queued_result.get()
-				success_email_login, screen_coords_email_login, minSearchTime_email_login = email_login_result.get()
+				# success_email_login, screen_coords_email_login, minSearchTime_email_login = email_login_result.get()
 				success_internal_error, screen_coords_internal_error, minSearchTime_internal_error = internal_error_result.get()
 				success_gametime_error_lable, screen_coords_gametime_error_lable, minSearchTime_gametime_error_lable = gametime_error_lable_result.get()
 				success_password_error, screen_coords_password_error, minSearchTime_password_error = password_error_result.get()
@@ -169,9 +169,9 @@ class DUCharacters:
 				CharacterQuerySet.update_character(character, {'has_gametime': False, 'active': False})
 				logger.warning(f"Password error: character {character.email} deactivated")
 				return False
-			elif success_email_login:
-				logger.warning(f"Email error: {character.email} was skipped")
-				continue
+			# elif success_email_login:
+			# 	logger.warning(f"Email error: {character.email} was skipped")
+			# 	continue
 			elif success_connection_queued:
 				CharacterQuerySet.update_character(character, {'has_gametime': True})
 				logger.success(f"Connection successful: character {character.email} active")

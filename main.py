@@ -80,7 +80,7 @@ class EngineThread(threading.Thread):
 				get_last_30_seconds()
 				sleep(10)
 				logger.error(f"Exception: {str(e)}")
-				# self.client.stop_application()
+				self.client.stop_application()
 				client_stop = perf_counter()
 				client_runtime = client_stop - client_start
 				client_run += client_runtime
