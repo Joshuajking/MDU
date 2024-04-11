@@ -4,5 +4,6 @@
 
 
 "game_launcher": "GeForceNOW.exe",
-"game_client": "Dual Universe on GeForce NOW",
+"game_client": "GeForceNOW.exe",
 "app_path": "C:\\Users\\joshu\\AppData\\Local\\NVIDIA Corporation\\GeForceNOW\\CEF\\GeForceNOW.exe",
+

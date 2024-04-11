@@ -28,7 +28,7 @@ class EngineThread(threading.Thread):
 		self.retrieve_mode = True
 
 	def active_package_count(self):
-		package_count = CharacterQuerySet.count_has_package_characters()
+		package_count = CharacterQuerySet.count_has_package_and_active_characters()
 		logger.info(f"package_count: {package_count}")
 		active_character_count = CharacterQuerySet.count_active_characters()
 

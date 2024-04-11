@@ -169,6 +169,9 @@ class DUCharacters:
 				CharacterQuerySet.update_character(character, {'has_gametime': False, 'active': False})
 				logger.warning(f"Password error: character {character.email} deactivated")
 				return False
+			elif success_email_login:
+				logger.warning(f"Email error: {character.email} was skipped")
+				continue
 			elif success_connection_queued:
 				CharacterQuerySet.update_character(character, {'has_gametime': True})
 				logger.success(f"Connection successful: character {character.email} active")
@@ -181,6 +184,8 @@ class DUCharacters:
 			self.survey()
 			self.welcome_reward()
 			return True
+		logger.error(f"Error occured: loop timed out")
+		raise Exception(f"Error occured: loop timed out")
 
 	@timing_decorator
 	def logout(self, respawn=False):
@@ -201,14 +206,14 @@ class DUCharacters:
 				break
 
 			# pydirectinput.press("esc")
-			# sleep(random.uniform(0.5, 2.0))
+			sleep(random.uniform(0.75, 1.5))
 			logout_btn_response = self.verify.screen(
 				screen_name=ImageLocation.LOGOUT_SCREEN,
 				image_to_compare="logout_btn",
 				skip_sleep=True,
 				esc=True,
 				mouse_click=True,
-				mouse_clicks=1,
+				mouse_clicks=2,
 			)
 			if not logout_btn_response['success']:
 				count += 1
