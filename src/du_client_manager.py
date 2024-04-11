@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 import time
 
 import psutil
@@ -30,6 +31,10 @@ class DUClientManager:
 		"""Check if the game_client is running."""
 		pid = None
 		list_of_processes = []
+
+		# if sys.platform not in ('java', 'darwin', 'win32'):  # todo: build this out
+		if not sys.platform == 'win32':
+			raise NotImplementedError()
 
 		if self.is_debugging():
 			self.mouse_listener.start()
