@@ -121,7 +121,6 @@ class DUFlight:
 				pydirectinput.press("ctrl")
 				sleep(0.5)
 				pydirectinput.middleClick()
-				# self.controller.scroll(dx=0, dy=240)
 				self.check_img_to_land()
 				break
 			else:
@@ -132,6 +131,7 @@ class DUFlight:
 		else:
 			# If no match found after all attempts
 			logger.error("No match found for image:", images)
+			raise Exception(f"No match found for image: {images}")
 		self.get_pilot_seat()
 
 	def check_ship_landed(self, img=(os.path.join(DirectoryPaths.SEARCH_AREA_DIR, 'ORBITAL_HUD_LANDED.png'))):
@@ -191,10 +191,10 @@ class DUFlight:
 
 if __name__ == "__main__":
 	# pre_load.load_image_entries_to_db()
-	# obj = DUFlight()
-	# obj.mission_flight(retrieve_mode=True)
-	sleep(3)
-	for i in range(10):
-		pydirectinput.press("tab", presses=2, interval=1)
-		sleep(3)
+	obj = DUFlight()
+	obj.mission_flight(retrieve_mode=True)
+	# sleep(3)
+	# for i in range(10):
+	# 	pydirectinput.press("tab", presses=2, interval=1)
+	# 	sleep(3)
 
