@@ -42,7 +42,6 @@ class EngineThread(threading.Thread):
 
 	def run(self):
 
-		client_limit = 21600
 		client_run = 0
 		start_time = perf_counter()
 		while self._running.is_set():
@@ -85,7 +84,7 @@ class EngineThread(threading.Thread):
 				client_runtime = client_stop - client_start
 				client_run += client_runtime
 				logger.info(f"Client runtime: {client_run}")
-				sleep(20)
+				sleep(90)
 				continue
 
 			else:

@@ -248,7 +248,7 @@ class DUCharacters:
 		market_label = self.verify.screen(
 			screen_name=ImageLocation.MAP_SCREEN, image_to_compare="map_market_label", confidence=0.8,
 		)
-		# close map (Esc)
+		# close map (Esc)2uhg
 		pydirectinput.press("esc")
 
 	@timing_decorator
@@ -286,4 +286,4 @@ if __name__ == "__main__":
 	all_active_characters = CharacterQuerySet.get_active_characters()
 	for character in all_active_characters:
 		obj.login(character)
-	obj.logout(respawn=False)
+	# obj.logout(respawn=False)

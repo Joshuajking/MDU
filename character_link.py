@@ -28,6 +28,7 @@ class CharacterLink:
 
 	def get_wallet_currency(self):
 		# Ocr for the currency amount
+		sleep(3)
 		currency = self.ocr.ocr_missions(
 			search_area=SearchAreaLocation.WALLET_CURRENCY,
 			scrap=True,
@@ -127,15 +128,15 @@ class CharacterLink:
 			for i in range(delay):
 				sleep(1)
 				logger.info(f"Waiting for {i}/{delay}")
-		# Open wallet screen
-		# pydirectinput.press('o')
-		# sleep(3)
-		# result = self.get_wallet_currency()
-		# if result:
-		# 	self.get_recipient_searchEdit()
-		# 	self.get_recipient_searchArea()
-		# 	self.get_amount()
-		# 	self.complete_transfer()
+			# Open wallet screen
+			pydirectinput.press('o')
+			sleep(3)
+			result = self.get_wallet_currency()
+			if result:
+				self.get_recipient_searchEdit()
+				self.get_recipient_searchArea()
+				self.get_amount()
+				self.complete_transfer()
 
 		self.characters.logout()
 
