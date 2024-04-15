@@ -84,7 +84,7 @@ class EngineThread(threading.Thread):
 				client_runtime = client_stop - client_start
 				client_run += client_runtime
 				logger.info(f"Client runtime: {client_run}")
-				sleep(20)
+				sleep(60)
 				continue
 
 			else:
