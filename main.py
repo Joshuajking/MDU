@@ -28,7 +28,7 @@ class EngineThread(threading.Thread):
 		self.retrieve_mode = True
 
 	def active_package_count(self):
-		package_count = CharacterQuerySet.count_has_package_characters()
+		package_count = CharacterQuerySet.count_has_package_and_active_characters()
 		logger.info(f"package_count: {package_count}")
 		active_character_count = CharacterQuerySet.count_active_characters()
 
@@ -42,7 +42,6 @@ class EngineThread(threading.Thread):
 
 	def run(self):
 
-		client_limit = 21600
 		client_run = 0
 		start_time = perf_counter()
 		while self._running.is_set():
@@ -78,13 +77,14 @@ class EngineThread(threading.Thread):
 
 			except Exception as e:
 				get_last_30_seconds()
+				sleep(10)
 				logger.error(f"Exception: {str(e)}")
 				self.client.stop_application()
 				client_stop = perf_counter()
 				client_runtime = client_stop - client_start
 				client_run += client_runtime
 				logger.info(f"Client runtime: {client_run}")
-				sleep(60)
+				sleep(90)
 				continue
 
 			else:

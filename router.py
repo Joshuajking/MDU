@@ -11,6 +11,6 @@ class DirectoryPaths:
 	TEMP_DIR = SRC_DIR / 'temp'
 	TESTS_DIR = ROOT_DIR / 'tests'
 	UTILS_DIR = SRC_DIR / 'utils'
-	DU_IMAGES_DIR = DATA_DIR / 'images'
+	IMAGES_DIR = DATA_DIR / 'images'
 	SEARCH_AREA_DIR = DATA_DIR / 'bbox_images'
 	DB_DUMP_DIR = DATA_DIR / 'db_dump_files'

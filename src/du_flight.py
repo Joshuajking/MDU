@@ -121,7 +121,6 @@ class DUFlight:
 				pydirectinput.press("ctrl")
 				sleep(0.5)
 				pydirectinput.middleClick()
-				# self.controller.scroll(dx=0, dy=240)
 				self.check_img_to_land()
 				break
 			else:
@@ -132,23 +131,15 @@ class DUFlight:
 		else:
 			# If no match found after all attempts
 			logger.error("No match found for image:", images)
+			raise Exception(f"No match found for image: {images}")
 		self.get_pilot_seat()
 
 	def check_ship_landed(self, img=(os.path.join(DirectoryPaths.SEARCH_AREA_DIR, 'ORBITAL_HUD_LANDED.png'))):
 		return pyautogui.locateCenterOnScreen(
 			image=img,
-			minSearchTime=1,
+			minSearchTime=300,
 			confidence=0.75,
 		)
-
-	def afk_timer(self, afk_start):
-		elapsed_time = time.perf_counter() - afk_start
-		if elapsed_time >= 900:
-			pyautogui.press('tab', presses=2, interval=0.2)
-		elif elapsed_time >= 600:
-			pyautogui.press('tab', presses=2, interval=0.2)
-		elif elapsed_time >= 300:
-			pyautogui.press('tab', presses=2, interval=0.2)
 
 	@timing_decorator
 	def check_img_to_land(self):
@@ -162,8 +153,8 @@ class DUFlight:
 
 		while screen_coords is None:
 			screen_coords = self.check_ship_landed()
+			pydirectinput.press("tab", presses=2, interval=1)
 			elapsed_time = time.perf_counter() - start_time
-			self.afk_timer(afk_start)
 			if elapsed_time >= timeout_seconds:
 				logger.debug(f"check_img_to_land: Timeo-out")
 				break
@@ -201,4 +192,9 @@ class DUFlight:
 if __name__ == "__main__":
 	# pre_load.load_image_entries_to_db()
 	obj = DUFlight()
-	obj.get_fuel_level()
+	obj.mission_flight(retrieve_mode=True)
+	# sleep(3)
+	# for i in range(10):
+	# 	pydirectinput.press("tab", presses=2, interval=1)
+	# 	sleep(3)
+

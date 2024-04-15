@@ -1,3 +1,4 @@
+import os
 import random
 from time import sleep
 
@@ -5,6 +6,7 @@ import pyautogui
 import pydirectinput
 import pytweening
 
+from router import DirectoryPaths
 from src.logging_config import logger
 from src.querysets import ImageQuerySet
 
@@ -14,7 +16,19 @@ class VerifyScreen:
 		success = False
 		self.region_str = None
 		self.w, self.h = pyautogui.size()
-		self.screen_size = self.w//2, self.h//2
+		self.screen_size = self.w // 2, self.h // 2
+		self.image_data = None
+
+	def ensure_click(self):
+		result = not None
+		while result:
+			result = pyautogui.locateCenterOnScreen(image=os.path.join(DirectoryPaths.ROOT_DIR, self.image_data.image_url), minSearchTime=1)
+			if result is not None:
+				x, y = result.x, result.y
+				pydirectinput.click(x, y)
+				print(f'Click on {self.image_data.image_url}')
+			else:
+				break
 
 	def simulate_mouse(self, dest_x, dest_y, mouse_click, mouse_clicks):
 		# Get screen size
@@ -62,7 +76,8 @@ class VerifyScreen:
 		pyautogui.moveTo(dest_x, dest_y, duration=random.uniform(0.1, 1.2), tween=selected_easing_function, _pause=True)
 		if mouse_click:
 			# pyautogui.click(clicks=mouse_clicks, duration=random.uniform(0.2, 0.4))
-			pydirectinput.click(clicks=mouse_clicks, interval=0.2)
+			pydirectinput.click(clicks=mouse_clicks, interval=0.5)
+			# self.ensure_click()
 		return
 
 	def screen(
@@ -95,22 +110,22 @@ class VerifyScreen:
         :return: {'success': True, 'screen_coords': screen_coords, 'bbox': (left, top, width, height), 'minSearchTime': minSearchTime} or False return {'success': False, 'screen_coords': None, 'minSearchTime': minSearchTime}
         """
 		if skip_sleep:
-			minSearchTime = 3
+			minSearchTime = 5
 		is_on_screen = False
 		check_count = 0
 		max_checks = 60
 
-		image_data = ImageQuerySet.read_image_by_name(image_name=image_to_compare, image_location=screen_name)
+		self.image_data = ImageQuerySet.read_image_by_name(image_name=image_to_compare, image_location=screen_name)
 		# region = image_data.region if image_data is not None else None
-		if not image_data.image_location == screen_name:
+		if not self.image_data.image_location == screen_name:
 			raise ValueError(
-				f"Error: screen passed {screen_name}, but image_location for {image_to_compare} is {image_data.image_location}")
+				f"Error: screen passed {screen_name}, but image_location for {image_to_compare} is {self.image_data.image_location}")
 		while max_checks >= check_count:
 			# screen_coords = template_matching(image_to_compare=image_data.image_url)
 			# sleep(1)
 			# if screen_coords is not None:
 			if (screen_coords := pyautogui.locateOnScreen(
-					image=image_data.image_url,
+					image=os.path.join(DirectoryPaths.ROOT_DIR, self.image_data.image_url),
 					# region=region,
 					minSearchTime=minSearchTime,
 					confidence=confidence,
@@ -122,7 +137,7 @@ class VerifyScreen:
 				center_y = top + height // 2
 				screen_coords = center_x, center_y
 
-			# self.region_str = f"({left}, {top}, {width}, {height})"
+				# self.region_str = f"({left}, {top}, {width}, {height})"
 
 				# if not image_data.region:
 				# 	image_data = ImageQuerySet.update_image_by_id(image_data.id, {
@@ -171,9 +186,9 @@ class VerifyScreen:
 			sleep(random.uniform(0.10, 1.0))
 			if screen_coords is None:
 				return {
-				    'success': False,
-				    'screen_coords': screen_coords,
-				    'minSearchTime': minSearchTime,
+					'success': False,
+					'screen_coords': screen_coords,
+					'minSearchTime': minSearchTime,
 				}
 			else:
 				return {
@@ -200,5 +215,4 @@ class VerifyScreen:
 
 
 if __name__ == "__main__":
-	# self.verify.screen("test", "agg_hold", skip_sleep=True)
-	pass
+	check_image_paths_valid(image_dir="data/images")

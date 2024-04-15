@@ -71,7 +71,8 @@ class DUMissions:
 
 	@timing_decorator
 	def is_active_mission(self):
-		sleep(random.uniform(1, 2))
+		logger.debug(f"Checking for active mission: {self.active_mission_name}")
+		sleep(random.uniform(2, 3))
 		is_active_mission = self.ocr.ocr_missions(
 			search_area=SearchAreaLocation.ACTIVE_TAKEN_MISSIONS,
 			search_text=self.active_mission_name,

@@ -1,3 +1,4 @@
+import multiprocessing
 import random
 from time import sleep
 
@@ -12,6 +13,79 @@ from src.querysets import CharacterQuerySet
 from src.verify_screen import VerifyScreen
 
 
+def get_du_login_screen_label(verify):
+	result = verify.screen(
+		screen_name=ImageLocation.LOGIN_SCREEN,
+		image_to_compare="du_login_screen_label",
+		skip_sleep=True,
+	)
+	return result['success'], result['screen_coords'], result['minSearchTime']
+
+
+def get_loading_complete(verify):
+	result = verify.screen(
+		screen_name=ImageLocation.IN_GAME_SCREEN,
+		image_to_compare="loading_complete",
+		skip_sleep=True,
+	)
+	return result['success'], result['screen_coords'], result['minSearchTime']
+
+
+def get_connection_queued(verify):
+	result = verify.screen(
+		screen_name=ImageLocation.LOGIN_SCREEN,
+		image_to_compare="connection_queued",
+		confidence=0.8,
+		minSearchTime=2,
+		skip_sleep=True,
+	)
+	return result['success'], result['screen_coords'], result['minSearchTime']
+
+
+def get_internal_error(verify):
+	result = verify.screen(
+		screen_name=ImageLocation.LOGIN_SCREEN,
+		image_to_compare="internal_error",
+		confidence=0.8,
+		minSearchTime=2,
+		skip_sleep=True,
+	)
+	return result['success'], result['screen_coords'], result['minSearchTime']
+
+
+def get_email_login(verify):
+	result = verify.screen(
+		screen_name=ImageLocation.LOGIN_SCREEN,
+		image_to_compare="email_login",
+		confidence=0.8,
+		minSearchTime=2,
+		skip_sleep=True,
+	)
+	return result['success'], result['screen_coords'], result['minSearchTime']
+
+
+def get_gametime_error_lable(verify):
+	result = verify.screen(
+		screen_name=ImageLocation.LOGIN_SCREEN,
+		image_to_compare="gametime_error_lable",
+		confidence=0.8,
+		minSearchTime=2,
+		skip_sleep=True,
+	)
+	return result['success'], result['screen_coords'], result['minSearchTime']
+
+
+def get_password_error(verify):
+	result = verify.screen(
+		screen_name=ImageLocation.LOGIN_SCREEN,
+		image_to_compare="password_error_lable",
+		confidence=0.8,
+		minSearchTime=2,
+		skip_sleep=True,
+	)
+	return result['success'], result['screen_coords'], result['minSearchTime']
+
+
 class DUCharacters:
 
 	def __init__(self):
@@ -21,22 +95,20 @@ class DUCharacters:
 	@timing_decorator
 	def login(self, character):
 
-		response_du_login_screen_label = self.verify.screen(
-			screen_name=ImageLocation.LOGIN_SCREEN,
-			image_to_compare="du_login_screen_label",
-			skip_sleep=True,
-		)
-		if not response_du_login_screen_label['success']:
-			self.logout()
-		response_du_login_screen_label = self.verify.screen(
-			screen_name=ImageLocation.LOGIN_SCREEN,
-			image_to_compare="du_login_screen_label",
-			skip_sleep=True,
-			# mouse_click=True,
-			# mouse_clicks=2
-		)
-		if not response_du_login_screen_label['success']:
-			raise Exception(f"screen not found")
+		with multiprocessing.Pool(processes=2) as pool:
+			du_login_screen_label_result = pool.apply_async(get_du_login_screen_label, (self.verify,))
+			loading_complete_result = pool.apply_async(get_loading_complete, (self.verify,))
+
+			success_du_login_screen_label, screen_coords_du_login_screen_label, minSearchTime_du_login_screen_label = du_login_screen_label_result.get()
+			success_loading_complete, screen_coords_loading_complete, minSearchTime_loading_complete = loading_complete_result.get()
+
+			if not success_du_login_screen_label:
+				self.logout()
+			elif not success_loading_complete:
+				pass
+			elif not success_du_login_screen_label and success_loading_complete:
+				raise Exception(f"screen not found")
+
 		attempts = 3
 		count = 0
 		while count <= attempts:
@@ -53,6 +125,8 @@ class DUCharacters:
 				mouse_click=True,
 				mouse_clicks=2
 			)
+			if not response_email_login['success']:
+				continue
 
 			self.ahk.send_raw(character.email)
 			sleep(0.2)
@@ -64,53 +138,54 @@ class DUCharacters:
 				mouse_click=True,
 				mouse_clicks=2
 			)
+			if not response_password_login['success']:
+				continue
 
 			self.ahk.send_raw(character.password)
 			sleep(random.uniform(0.1, 0.4))
 			pydirectinput.press("enter")
 
-			internal_error = self.verify.screen(
-				screen_name=ImageLocation.LOGIN_SCREEN,
-				image_to_compare="internal_error",
-				confidence=0.8,
-				minSearchTime=2,
-				skip_sleep=True,
-			)
-			response_email_login = self.verify.screen(
-				screen_name=ImageLocation.LOGIN_SCREEN,
-				image_to_compare="email_login",
-				mouse_click=True,
-				minSearchTime=2,
-				skip_sleep=True
-			)
+			with multiprocessing.Pool(processes=5) as pool:
+				connection_queued_result = pool.apply_async(get_connection_queued, (self.verify,))
+				# email_login_result = pool.apply_async(get_email_login, (self.verify,))
+				internal_error_result = pool.apply_async(get_internal_error, (self.verify,))
+				gametime_error_lable_result = pool.apply_async(get_gametime_error_lable, (self.verify,))
+				password_error_result = pool.apply_async(get_password_error, (self.verify,))
 
-			if internal_error['success'] and not response_email_login['success']:
-				logger.warning({"success": False, "status": "email_field: failed"})
+				success_connection_queued, screen_coords_connection_queued, minSearchTime_connection_queued = connection_queued_result.get()
+				# success_email_login, screen_coords_email_login, minSearchTime_email_login = email_login_result.get()
+				success_internal_error, screen_coords_internal_error, minSearchTime_internal_error = internal_error_result.get()
+				success_gametime_error_lable, screen_coords_gametime_error_lable, minSearchTime_gametime_error_lable = gametime_error_lable_result.get()
+				success_password_error, screen_coords_password_error, minSearchTime_password_error = password_error_result.get()
+
+			if success_internal_error:
+				logger.warning(f"Internal error: Server not responding")
 				continue
-
-			response_gametime_error_lable = self.verify.screen(
-				screen_name=ImageLocation.LOGIN_SCREEN,
-				image_to_compare="gametime_error_lable",
-				skip_sleep=True,
-			)
-
-			if response_gametime_error_lable['success']:
-				logger.debug(f"No game time: {character.username}")
+			elif success_gametime_error_lable:
 				CharacterQuerySet.update_character(character, {'has_gametime': False, 'active': False})
-
+				logger.warning(f"Gametime error: {character.email} deactivated")
 				return False
+			elif success_password_error:
+				CharacterQuerySet.update_character(character, {'has_gametime': False, 'active': False})
+				logger.warning(f"Password error: character {character.email} deactivated")
+				return False
+			# elif success_email_login:
+			# 	logger.warning(f"Email error: {character.email} was skipped")
+			# 	continue
+			elif success_connection_queued:
+				CharacterQuerySet.update_character(character, {'has_gametime': True})
+				logger.success(f"Connection successful: character {character.email} active")
 
 			response_loading_complete = self.verify.screen(
 				screen_name=ImageLocation.IN_GAME_SCREEN,
 				image_to_compare="loading_complete",
 
 			)
-
-			logger.success(f"{character.username} Successfully loaded game")
-			CharacterQuerySet.update_character(character, {'has_gametime': True})
 			self.survey()
 			self.welcome_reward()
 			return True
+		logger.error(f"Error occured: loop timed out")
+		raise Exception(f"Error occured: loop timed out")
 
 	@timing_decorator
 	def logout(self, respawn=False):
@@ -131,14 +206,14 @@ class DUCharacters:
 				break
 
 			# pydirectinput.press("esc")
-			# sleep(random.uniform(0.5, 2.0))
+			sleep(random.uniform(0.75, 1.5))
 			logout_btn_response = self.verify.screen(
 				screen_name=ImageLocation.LOGOUT_SCREEN,
 				image_to_compare="logout_btn",
 				skip_sleep=True,
 				esc=True,
 				mouse_click=True,
-				mouse_clicks=1,
+				mouse_clicks=2,
 			)
 			if not logout_btn_response['success']:
 				count += 1
@@ -173,7 +248,7 @@ class DUCharacters:
 		market_label = self.verify.screen(
 			screen_name=ImageLocation.MAP_SCREEN, image_to_compare="map_market_label", confidence=0.8,
 		)
-		# close map (Esc)
+		# close map (Esc)2uhg
 		pydirectinput.press("esc")
 
 	@timing_decorator
@@ -208,4 +283,7 @@ class DUCharacters:
 
 if __name__ == "__main__":
 	obj = DUCharacters()
-	obj.logout(respawn=False)
+	all_active_characters = CharacterQuerySet.get_active_characters()
+	for character in all_active_characters:
+		obj.login(character)
+	# obj.logout(respawn=False)
