@@ -35,10 +35,23 @@ class CharacterLink:
 		)
 		logger.debug(f"{self.character.username}: OCR'd - {currency}")
 
-		base_amount = 100000.00
+		base_amount: float = 100000.00
 		currency = currency.replace(' ', '')  # Remove spaces
-		if float(currency) > base_amount:
-			converted_currency = float(currency) - base_amount
+		currency = currency.replace('O', '0')
+		try:
+			if '.' in currency:
+				currency_float = float(currency)
+			else:
+				currency_float = int(currency)
+		except ValueError:
+			# Handle the case where `currency` is not a valid number
+			# For example, log an error message
+			logger.error(f"Invalid currency value: {currency}")
+			return False
+
+		# Now you can compare `currency_float` with `base_amount`
+		if currency_float > base_amount:
+			converted_currency = currency_float - base_amount
 			self.remaining_currency = str(converted_currency)
 			return True
 		else:
@@ -117,6 +130,7 @@ class CharacterLink:
 		# loop over all the accounts
 		for character in all_active_characters:
 			self.character = character
+			# result = self.get_wallet_currency()  # fixme: do not leave
 			# var = pyautogui.locateOnScreen(
 			# 	image=r'..\data\du_images\login_screen\du_login_screen_label.png',
 			# 	minSearchTime=3,
