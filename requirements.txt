@@ -12,7 +12,7 @@ entrypoint2==1.1
 filelock==3.13.1
 fsspec==2024.2.0
 greenlet==3.0.3
-idna==3.6
+idna==3.7
 imageio==2.34.0
 Jinja2==3.1.4
 keyboard==0.13.5
