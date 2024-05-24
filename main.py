@@ -9,6 +9,7 @@ from sqlmodel import Session, select
 
 from settings import engine
 from src.config_manager import ConfigManager
+from src.db_setup import DbConfig
 from src.du_character import DUCharacters
 from src.du_client_manager import DUClientManager
 from src.du_flight import DUFlight
@@ -40,6 +41,7 @@ class EngineThread(threading.Thread):
 			else:
 				self.retrieve_mode = True
 
+	@logger.catch
 	def run(self):
 
 		client_run = 0
@@ -426,7 +428,7 @@ def delete_large_files(directory, max_size_mb):
 
 if __name__ == "__main__":
 	# Database initial setup
-	# pre_load = DbConfig()
+	pre_load = DbConfig()
 	# pre_load.load_image_entries_to_db()
 	# TODO: Initial File creation
 
