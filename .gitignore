@@ -6,7 +6,7 @@ data/json/*
 utils/**/image_cache/
 temp/*
 templates/invalid_images/*
-
+*.db
 # file I use but dont want to have on VCS
 /Unversioned files
 
