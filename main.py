@@ -8,7 +8,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from sqlmodel import Session, select
 
 from settings import engine
-from src.config_manager import ConfigManager
+from src.config_manager import ConfigManagerMixin
 from src.db_setup import DbConfig
 from src.du_character import DUCharacters
 from src.du_client_manager import DUClientManager
@@ -54,7 +54,7 @@ class EngineThread(threading.Thread):
 				du_characters = DUCharacters()
 				flight = DUFlight()
 				missions = DUMissions()
-				config_manager = ConfigManager()
+				config_manager = ConfigManagerMixin()
 				all_active_characters = CharacterQuerySet.get_active_characters()
 				active_character_count = CharacterQuerySet.count_active_characters()
 				for character in all_active_characters:
@@ -428,8 +428,10 @@ def delete_large_files(directory, max_size_mb):
 
 if __name__ == "__main__":
 	# Database initial setup
-	pre_load = DbConfig()
-	# pre_load.load_image_entries_to_db()
+	obj = DbConfig()
+	obj.main()
+	# pre_load = DbConfig()
+	pre_load.load_image_entries_to_db()
 	# TODO: Initial File creation
 
 	# TODO: delete over-size-limit dir

@@ -6,7 +6,7 @@ import time
 import psutil
 import pynput
 
-from src.config_manager import ConfigManager, timing_decorator
+from src.config_manager import ConfigManagerMixin, timing_decorator
 from src.logging_config import logger
 from src.models import ImageLocation
 from src.verify_screen import VerifyScreen
@@ -14,7 +14,7 @@ from src.verify_screen import VerifyScreen
 
 class DUClientManager:
 	def __init__(self):
-		self.config_manager = ConfigManager()
+		self.config_manager = ConfigManagerMixin()
 		self.verify = VerifyScreen()
 		self.game_client = self.config_manager.get_value('config.game_client')
 		self.app_path = self.config_manager.get_value('config.app_path')

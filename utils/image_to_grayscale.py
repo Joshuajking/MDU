@@ -2,12 +2,12 @@ import os
 
 from PIL import Image
 
-from config.config_manager import ConfigManager
+from config.config_manager import ConfigManagerMixin
 from utils.read_json import read_json
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 json_dir = os.path.join(script_dir, '..', 'json/config.json')
-config_manager = ConfigManager(json_dir)
+config_manager = ConfigManagerMixin(json_dir)
 
 
 assets_data = read_json(config_manager.get_value('config.assets_data'))

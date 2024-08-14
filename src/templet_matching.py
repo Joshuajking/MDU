@@ -5,14 +5,14 @@ import pyautogui
 from PIL import ImageGrab, Image
 
 from router import DirectoryPaths
-from src.config_manager import ConfigManager
+from src.config_manager import ConfigManagerMixin
 from src.logging_config import logger
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 config_json = os.path.join(script_dir, '..', 'json/config.json')
 images_dir = os.path.join(script_dir, '..', 'du_images')
 
-config_manager = ConfigManager()
+config_manager = ConfigManagerMixin()
 
 
 def convert_to_32_bit():

@@ -2,7 +2,7 @@ import os
 import unittest
 from unittest.mock import patch, MagicMock
 
-from src.config_manager import ConfigManager
+from src.config_manager import ConfigManagerMixin
 from src.du_client_manager import DUClientManager
 from src.verify_screen import VerifyScreen
 
@@ -10,7 +10,7 @@ from src.verify_screen import VerifyScreen
 class TestDUClientManager(unittest.TestCase):
 
 	def setUp(self):
-		self.config_manager = ConfigManager()
+		self.config_manager = ConfigManagerMixin()
 		self.client_manager = DUClientManager()
 		self.verify = VerifyScreen()
 		self.game_client = self.config_manager.get_value('config.game_client')

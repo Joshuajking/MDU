@@ -4,7 +4,7 @@ from time import sleep
 import pydirectinput
 import pyperclip
 
-from src.config_manager import ConfigManager, timing_decorator
+from src.config_manager import ConfigManagerMixin, timing_decorator
 from src.logging_config import logger
 from src.models import SearchAreaLocation, ImageLocation
 from src.querysets import CharacterQuerySet, SearchAreaQuerySet
@@ -17,7 +17,7 @@ class DUMissions:
 	search_text_list = ["RETRIEVE PACKAGE", "DELIVER PACKAGE"]
 
 	def __init__(self):
-		self.config_manager = ConfigManager()
+		self.config_manager = ConfigManagerMixin()
 		self.verify = VerifyScreen()
 		self.ocr = OCREngine()
 		self.active_mission_name = self.config_manager.get_value("config.active_mission_name")

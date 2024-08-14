@@ -4,10 +4,10 @@
 ### Custom Exclusions
 data/json/*
 src/database/*
-src/utils/**/image_cache/
+utils/**/image_cache/
 src/temp/*
 templates/invalid_images/*
-
+*.db
 # file I use but dont want to have on VCS
 /Unversioned files
 
@@ -296,5 +296,5 @@ pip-selfcheck.json
 /alembic/
 /src/model/test.db
 /src/model/missions.db
-/missions.db
+/old_missions.db
 /data/config.json

@@ -2,12 +2,12 @@ from time import time
 
 import cv2 as cv
 
-from config.config_manager import ConfigManager
+from config.config_manager import ConfigManagerMixin
 from utils.read_json import read_json
 from vision import Vision
 from windowcapture import WindowCapture
 
-config_manager = ConfigManager()
+config_manager = ConfigManagerMixin()
 
 assets_data = read_json(config_manager.get_value('config.assets_data'))
 

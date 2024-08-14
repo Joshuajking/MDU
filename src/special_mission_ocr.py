@@ -9,7 +9,7 @@ from PIL import Image, ImageGrab, ImageEnhance
 from pynput.mouse import Controller
 
 from router import DirectoryPaths
-from src.config_manager import ConfigManager
+from src.config_manager import ConfigManagerMixin
 from src.logging_config import logger
 from src.models import SearchAreaLocation
 from src.querysets import SearchAreaQuerySet
@@ -283,7 +283,7 @@ class OCREngine:
 
 
 if __name__ == '__main__':
-	config_manager = ConfigManager()
+	config_manager = ConfigManagerMixin()
 	active_mission_name = config_manager.get_value('config.active_mission_name')
 	ocr = OCREngine()
 	ocr_scan = ocr.ocr_missions(

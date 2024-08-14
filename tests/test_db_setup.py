@@ -16,7 +16,7 @@ class TestDBSetup(unittest.TestCase):
     def setUp(self):
         self.engine = create_engine('sqlite:///:memory:')
         SQLModel.metadata.create_all(self.engine)
-        self.db_config = DbConfig(self.engine)
+        # self.db_config = DbConfig(self.engine)
 
     def tearDown(self):
         pass

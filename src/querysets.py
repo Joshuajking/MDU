@@ -8,11 +8,11 @@ from typing import Any, Tuple, Optional, Dict
 from sqlmodel import Session, select
 
 from settings import engine
-from src.config_manager import ConfigManager
+from src.config_manager import ConfigManagerMixin
 from src.logging_config import logger
 from src.models import SearchArea, Character, Mission, Image, ImageLocation, MissionMetadata
 
-config_manager = ConfigManager()
+config_manager = ConfigManagerMixin()
 
 
 class MissionMetaQuerySet:

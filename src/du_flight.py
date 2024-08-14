@@ -7,7 +7,7 @@ import pydirectinput
 from pynput.mouse import Controller
 
 from router import DirectoryPaths
-from src.config_manager import ConfigManager, timing_decorator
+from src.config_manager import ConfigManagerMixin, timing_decorator
 from src.logging_config import logger
 from src.models import ImageLocation
 from src.querysets import ImageQuerySet, CharacterQuerySet
@@ -26,7 +26,7 @@ class PilotSeatNotFoundError(Exception):
 class DUFlight:
 
 	def __init__(self):
-		self.config_manager = ConfigManager()
+		self.config_manager = ConfigManagerMixin()
 		self.verify = VerifyScreen()
 		self.ocr = OCREngine()
 		self.controller = Controller()

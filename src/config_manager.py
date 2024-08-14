@@ -4,10 +4,10 @@ import time
 
 from router import DirectoryPaths
 from src.logging_config import logger
-from src.utils.read_json import read_json
+from utils.read_json import read_json
 
 
-class ConfigManager:
+class ConfigManagerMixin:
 	# json_config_path = os.path.join(DirectoryPaths.JSON_DIR, 'config.json')
 
 	def __init__(self):
@@ -54,6 +54,6 @@ def timing_decorator(func):
 
 
 if __name__ == '__main__':
-	config_manager = ConfigManager()
+	config_manager = ConfigManagerMixin()
 	character_progress_data = read_json(config_manager.get_value('config.character_progress'))
 	print(character_progress_data)

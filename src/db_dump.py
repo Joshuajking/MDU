@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from sqlmodel import Session, select
 
-from config_manager import ConfigManager
+from config_manager import ConfigManagerMixin
 from logging_config import logger
 from models import SearchArea, Image, Mission
 from router import DirectoryPaths
@@ -12,7 +12,7 @@ from settings import engine
 
 
 class DumpDataBase:
-	config_manager = ConfigManager()
+	config_manager = ConfigManagerMixin()
 	# engine = create_engine(f"sqlite:///{os.path.join(DirectoryPaths.ROOT_DIR, config('DATABASE_URL'))}")
 	engine = engine
 
@@ -22,7 +22,7 @@ class DumpDataBase:
 	# )
 
 	def __init__(self, images_dir=None):
-		self.config_manager = ConfigManager()
+		self.config_manager = ConfigManagerMixin()
 		self.images_dir = images_dir or os.path.relpath(DirectoryPaths.IMAGES_DIR)
 		self.__dump_table_Mission()
 		self.__dump_table_SearchArea()
