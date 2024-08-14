@@ -8,5 +8,7 @@ from src.config_manager import ConfigManagerMixin
 
 config_manager = ConfigManagerMixin()
 
-DATABASE_URL = config('DATABASE_URL')
-engine = create_engine(f"sqlite:///{os.path.join(DirectoryPaths.ROOT_DIR, DATABASE_URL)}", echo=False)
+DATABASE_URL = config("DATABASE_URL")
+engine = create_engine(
+    f"sqlite:///{os.path.join(DirectoryPaths.ROOT_DIR, DATABASE_URL)}", echo=False
+)

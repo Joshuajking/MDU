@@ -14,6 +14,9 @@ from router import DirectoryPaths
 # os.makedirs(log_dir, exist_ok=True)
 
 # Configure the logger to write to a file and console
-logger.add(os.path.join(DirectoryPaths.ROOT_DIR, "logfile.log"), rotation="500 MB", backtrace=True, diagnose=True)
-
-
+logger.add(
+    os.path.join(DirectoryPaths.ROOT_DIR, "logfile.log"),
+    rotation="500 MB",
+    backtrace=True,
+    diagnose=True,
+)

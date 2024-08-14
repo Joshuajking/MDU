@@ -2,8 +2,8 @@ import unittest
 
 
 class TestFiles(unittest.TestCase):
-	pass
+    pass
 
 
-if __name__ == '__main__':
-	unittest.main()
+if __name__ == "__main__":
+    unittest.main()

@@ -14,7 +14,7 @@ from sqlmodel import SQLModel, Session, select
 
 class TestDBSetup(unittest.TestCase):
     def setUp(self):
-        self.engine = create_engine('sqlite:///:memory:')
+        self.engine = create_engine("sqlite:///:memory:")
         SQLModel.metadata.create_all(self.engine)
         # self.db_config = DbConfig(self.engine)
 
@@ -28,7 +28,7 @@ class TestDBSetup(unittest.TestCase):
             table_names = inspector.get_table_names()
 
         self.assertIn("character", table_names)
-        logger.info('TestDBSetup.test_Character_table_exists')
+        logger.info("TestDBSetup.test_Character_table_exists")
 
     def test_Image_table_exists(self):
         # Assuming self.engine is your SQLAlchemy engine
@@ -37,7 +37,7 @@ class TestDBSetup(unittest.TestCase):
             table_names = inspector.get_table_names()
 
         self.assertIn("image", table_names)
-        logger.info('TestDBSetup.test_Image_table_exists')
+        logger.info("TestDBSetup.test_Image_table_exists")
 
     def test_Mission_table_exists(self):
         # Assuming self.engine is your SQLAlchemy engine
@@ -46,7 +46,7 @@ class TestDBSetup(unittest.TestCase):
             table_names = inspector.get_table_names()
 
         self.assertIn("mission", table_names)
-        logger.info('TestDBSetup.test_Mission_table_exists')
+        logger.info("TestDBSetup.test_Mission_table_exists")
 
     def test_MissionMetadata_table_exists(self):
         # Assuming self.engine is your SQLAlchemy engine
@@ -55,7 +55,7 @@ class TestDBSetup(unittest.TestCase):
             table_names = inspector.get_table_names()
 
         self.assertIn("missionmetadata", table_names)
-        logger.info('TestDBSetup.test_MissionMetadata_table_exists')
+        logger.info("TestDBSetup.test_MissionMetadata_table_exists")
 
     def test_SearchArea_table_exists(self):
         # Assuming self.engine is your SQLAlchemy engine
@@ -64,7 +64,7 @@ class TestDBSetup(unittest.TestCase):
             table_names = inspector.get_table_names()
 
         self.assertIn("searcharea", table_names)
-        logger.info('TestDBSetup.test_SearchArea_table_exists')
+        logger.info("TestDBSetup.test_SearchArea_table_exists")
 
     @unittest.skip("TestDBSetup.test_load_Character_table")
     def test_load_Character_table(self):
@@ -74,7 +74,7 @@ class TestDBSetup(unittest.TestCase):
             results = session.exec(_Character).first()
 
         self.assertIsInstance(results, Character)
-        logger.info('TestDBSetup.test_load_Character_table')
+        logger.info("TestDBSetup.test_load_Character_table")
 
     def test_load_Image_table(self):
         self.db_config.load_Image_table()
@@ -83,7 +83,7 @@ class TestDBSetup(unittest.TestCase):
             results = session.exec(_Image).first()
 
         self.assertTrue(results is not None)
-        logger.info('TestDBSetup.test_load_Image_table')
+        logger.info("TestDBSetup.test_load_Image_table")
 
     @unittest.skip("TestDBSetup.test_load_Mission_table")
     def test_load_Mission_table(self):
@@ -93,7 +93,7 @@ class TestDBSetup(unittest.TestCase):
             results = session.exec(_Mission).first()
 
         self.assertTrue(results is not None)
-        logger.info('TestDBSetup.test_load_Mission_table')
+        logger.info("TestDBSetup.test_load_Mission_table")
 
     @unittest.skip("TestDBSetup.test_load_MissionMetadata_table")
     def test_load_MissionMetadata_table(self):
@@ -103,7 +103,7 @@ class TestDBSetup(unittest.TestCase):
             results = session.exec(_MissionMetadata).first()
 
         self.assertTrue(results is not None)
-        logger.info('TestDBSetup.test_load_MissionMetadata_table')
+        logger.info("TestDBSetup.test_load_MissionMetadata_table")
 
     def test_load_SearchArea_table(self):
         self.db_config.load_SearchArea_table()
@@ -112,4 +112,4 @@ class TestDBSetup(unittest.TestCase):
             results = session.exec(_SearchArea).first()
 
         self.assertTrue(results is not None)
-        logger.info('TestDBSetup.test_load_SearchArea_table')
+        logger.info("TestDBSetup.test_load_SearchArea_table")
