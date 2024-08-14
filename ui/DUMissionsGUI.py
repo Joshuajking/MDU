@@ -41,7 +41,9 @@ class Ui_Dialog(object):
         self.tableView = QtWidgets.QTableView(Dialog)
         self.tableView.setGeometry(QtCore.QRect(10, 10, 361, 661))
         self.tableView.setObjectName("tableView")
-        self.tableView.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Stretch)
+        self.tableView.horizontalHeader().setSectionResizeMode(
+            QtWidgets.QHeaderView.ResizeMode.Stretch
+        )
 
         self.textEdit = QtWidgets.QTextEdit(Dialog)
         self.textEdit.setGeometry(QtCore.QRect(510, 20, 261, 21))
@@ -70,17 +72,23 @@ class Ui_Dialog(object):
         self.pushButton = QtWidgets.QPushButton(Dialog)
         self.pushButton.setGeometry(QtCore.QRect(410, 650, 75, 24))
         self.pushButton.setObjectName("pushButton")
-        self.pushButton.clicked.connect(self.upload_file)  # Connect upload button to function
+        self.pushButton.clicked.connect(
+            self.upload_file
+        )  # Connect upload button to function
 
         self.pushButton_2 = QtWidgets.QPushButton(Dialog)
         self.pushButton_2.setGeometry(QtCore.QRect(690, 150, 75, 24))
         self.pushButton_2.setObjectName("pushButton_2")
-        self.pushButton_2.clicked.connect(self.select_all)  # Connect Select All button to function
+        self.pushButton_2.clicked.connect(
+            self.select_all
+        )  # Connect Select All button to function
 
         self.pushButton_3 = QtWidgets.QPushButton(Dialog)
         self.pushButton_3.setGeometry(QtCore.QRect(520, 150, 75, 24))
         self.pushButton_3.setObjectName("pushButton_3")
-        self.pushButton_3.clicked.connect(self.deselect_all)  # Connect Deselect All button to function
+        self.pushButton_3.clicked.connect(
+            self.deselect_all
+        )  # Connect Deselect All button to function
 
         self.verticalLayoutWidget = QtWidgets.QWidget(Dialog)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(400, 190, 160, 451))
@@ -111,19 +119,25 @@ class Ui_Dialog(object):
 
     def upload_file(self):
         file_dialog = QtWidgets.QFileDialog()
-        file_path, _ = file_dialog.getOpenFileName(None, 'Open File', '',
-                                                   'CSV Files (*.csv);;Text Files (*.txt);;JSON Files (*.json)')
-        allowed_headers = ['username', 'email', 'password']
+        file_path, _ = file_dialog.getOpenFileName(
+            None,
+            "Open File",
+            "",
+            "CSV Files (*.csv);;Text Files (*.txt);;JSON Files (*.json)",
+        )
+        allowed_headers = ["username", "email", "password"]
 
         # Fetch existing characters from the database
         with Session(engine) as session:
             characters_from_db = session.exec(select(Character)).all()
-            existing_usernames = {character.username.lower() for character in characters_from_db}
+            existing_usernames = {
+                character.username.lower() for character in characters_from_db
+            }
 
         # Process the file if a file is selected
         if file_path:
             new_characters = []
-            with open(file_path, 'r') as file:
+            with open(file_path, "r") as file:
                 csv_reader = csv.DictReader(file)
                 for row in csv_reader:
                     if all(header in row for header in allowed_headers):
@@ -132,26 +146,32 @@ class Ui_Dialog(object):
                             character_data = {
                                 "username": username,
                                 "email": row["email"],
-                                "password": row["password"]
+                                "password": row["password"],
                             }
                             new_characters.append(character_data)
 
             # Update existing characters and add new characters to the database
             with Session(engine) as session:
                 for character_data in new_characters:
-                    username = character_data["username"]  # Convert to lowercase for case-insensitive check
+                    username = character_data[
+                        "username"
+                    ]  # Convert to lowercase for case-insensitive check
                     if username in existing_usernames:
                         # Update existing character
                         existing_character = session.exec(
-                            select(Character).filter(Character.username.ilike(username))).one()
+                            select(Character).filter(Character.username.ilike(username))
+                        ).one()
                         existing_character.email = character_data["email"]
                         existing_character.password = character_data["password"]
                         existing_character.active = username in self.selected_usernames
                     else:
                         # Add new character
-                        new_character = Character(username=username, email=character_data["email"],
-                                                  password=character_data["password"],
-                                                  active=username in self.selected_usernames)
+                        new_character = Character(
+                            username=username,
+                            email=character_data["email"],
+                            password=character_data["password"],
+                            active=username in self.selected_usernames,
+                        )
                         session.add(new_character)
 
                 # Commit the changes to the database
@@ -169,7 +189,9 @@ class Ui_Dialog(object):
                 username_item = model.item(row, 1)
                 username = username_item.text()
                 active = model.item(row, 0).checkState() == QtCore.Qt.CheckState.Checked
-                character = session.exec(select(Character).filter(Character.username.ilike(username))).one()
+                character = session.exec(
+                    select(Character).filter(Character.username.ilike(username))
+                ).one()
                 character.active = active
             session.commit()
 
@@ -185,26 +207,43 @@ class Ui_Dialog(object):
             password = character.password
             has_package = character.has_package
             has_gametime = character.has_gametime
-            active = character.active  # Assuming you have an 'active' attribute in your Character models
+            active = (
+                character.active
+            )  # Assuming you have an 'active' attribute in your Character models
             character_info = {
                 "email": email,
                 "password": password,
                 "has_package": has_package,
                 "has_gametime": has_gametime,
-                "active": active
+                "active": active,
             }
             nested_dict["characters"][username] = character_info
 
         model = QtGui.QStandardItemModel()
         model.setColumnCount(5)
-        model.setHorizontalHeaderLabels(["Select", "Username", "Email", "Password", "Package", "Game Time", "Active"])
+        model.setHorizontalHeaderLabels(
+            [
+                "Select",
+                "Username",
+                "Email",
+                "Password",
+                "Package",
+                "Game Time",
+                "Active",
+            ]
+        )
 
-        for row, (username, character_info) in enumerate(nested_dict["characters"].items()):
+        for row, (username, character_info) in enumerate(
+            nested_dict["characters"].items()
+        ):
             check_box = QtWidgets.QCheckBox()
             item = QtGui.QStandardItem()
             item.setCheckable(True)
             item.setCheckState(
-                QtCore.Qt.CheckState.Checked if character_info["active"] else QtCore.Qt.CheckState.Unchecked)
+                QtCore.Qt.CheckState.Checked
+                if character_info["active"]
+                else QtCore.Qt.CheckState.Unchecked
+            )
             model.setItem(row, 0, item)
             self.tableView.setIndexWidget(model.index(row, 0), check_box)
 
@@ -213,7 +252,13 @@ class Ui_Dialog(object):
             model.setItem(row, 3, QtGui.QStandardItem(character_info["password"]))
             model.setItem(row, 4, QtGui.QStandardItem(character_info["has_package"]))
             model.setItem(row, 5, QtGui.QStandardItem(character_info["has_gametime"]))
-            model.setItem(row, 6, QtGui.QStandardItem("Active" if character_info["active"] else "Inactive"))
+            model.setItem(
+                row,
+                6,
+                QtGui.QStandardItem(
+                    "Active" if character_info["active"] else "Inactive"
+                ),
+            )
 
         self.tableView.setModel(model)
         self.tableView.resizeColumnsToContents()

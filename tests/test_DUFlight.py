@@ -6,8 +6,8 @@ from core.DUFlight import DUFlight
 
 class TestCheckImgToLand(unittest.TestCase):
 
-    @patch('time.sleep', MagicMock())  # Mock time.sleep to avoid actual waiting
-    @patch('pyautogui.locateCenterOnScreen')
+    @patch("time.sleep", MagicMock())  # Mock time.sleep to avoid actual waiting
+    @patch("pyautogui.locateCenterOnScreen")
     def test_check_img_to_land(self, mock_locate_center):
         # Set up the mock to return screen coordinates after a certain number of calls
         mock_locate_center.return_value = (100, 100)
@@ -25,5 +25,5 @@ class TestCheckImgToLand(unittest.TestCase):
         self.assertEqual(mock_locate_center.call_count, 2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
