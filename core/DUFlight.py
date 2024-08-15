@@ -13,7 +13,7 @@ from models.models import ImageLocation, SearchAreaLocation
 from path_router import DirectoryPaths
 from querysets.querysets import ImageQuerySet, CharacterQuerySet
 from utils.special_mission_ocr import OCREngine
-from utils.verify_screen import VerifyScreen
+from utils.verify_screen import VerifyScreenMixin
 
 
 class PilotSeatNotFoundError(Exception):
@@ -27,7 +27,7 @@ class DUFlight:
 
     def __init__(self):
         self.config_manager = ConfigManager()
-        self.verify = VerifyScreen()
+        self.verify = VerifyScreenMixin()
         self.ocr = OCREngine()
         self.character = CharacterQuerySet.read_character_by_username(
             self.config_manager.get_value("config.pilot")

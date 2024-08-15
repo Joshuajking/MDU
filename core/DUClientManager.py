@@ -8,13 +8,13 @@ import pynput
 from config.config_manager import ConfigManager, timing_decorator
 from logs.logging_config import logger
 from models.models import ImageLocation
-from utils.verify_screen import VerifyScreen
+from utils.verify_screen import VerifyScreenMixin
 
 
 class DUClientManager:
     def __init__(self):
         self.config_manager = ConfigManager()
-        self.verify = VerifyScreen()
+        self.verify = VerifyScreenMixin()
         self.game_client = self.config_manager.get_value("config.game_client")
         self.app_path = self.config_manager.get_value("config.app_path")
         self.DEBUG_MODE = self.is_debugging()

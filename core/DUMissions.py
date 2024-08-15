@@ -9,7 +9,7 @@ from logs.logging_config import logger
 from models.models import SearchAreaLocation, ImageLocation
 from querysets.querysets import CharacterQuerySet, SearchAreaQuerySet
 from utils.special_mission_ocr import OCREngine
-from utils.verify_screen import VerifyScreen
+from utils.verify_screen import VerifyScreenMixin
 
 
 class DUMissions:
@@ -18,7 +18,7 @@ class DUMissions:
 
     def __init__(self):
         self.config_manager = ConfigManager()
-        self.verify = VerifyScreen()
+        self.verify = VerifyScreenMixin()
         self.ocr = OCREngine()
         self.active_mission_name = self.config_manager.get_value(
             "config.active_mission_name"

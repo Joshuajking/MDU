@@ -9,12 +9,12 @@ from config.config_manager import timing_decorator
 from logs.logging_config import logger
 from models.models import ImageLocation
 from querysets.querysets import CharacterQuerySet
-from utils.verify_screen import VerifyScreen
+from utils.verify_screen import VerifyScreenMixin
 
 
 class DUCharacters:
     def __init__(self):
-        self.verify = VerifyScreen()
+        self.verify = VerifyScreenMixin()
 
     @timing_decorator
     def login(self, character):

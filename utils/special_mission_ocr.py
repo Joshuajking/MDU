@@ -14,13 +14,13 @@ from config.config_manager import ConfigManager
 from models.models import SearchAreaLocation
 from path_router import DirectoryPaths
 from querysets.querysets import SearchAreaQuerySet
-from utils.verify_screen import VerifyScreen
+from utils.verify_screen import VerifyScreenMixin
 
 
 class OCREngine:
 
     def __init__(self, coords=None):
-        self.verify = VerifyScreen()
+        self.verify = VerifyScreenMixin()
         self.screen_w, self.screen_h = pyautogui.size()
         self.screen_size = (self.screen_w, self.screen_h)
         self.coords = coords
