@@ -1,4 +1,3 @@
-import abc
 import random
 
 import pyautogui
@@ -18,6 +17,7 @@ class MouseControllerMixin:
                 f"Did you mean to have mouse_clicks = 0: defaulting to mouse_clicks = 1"
             )
             self.mouse_clicks = 1
+        self.simulate_mouse()
 
     def simulate_mouse(self):
         EASING_FUNCTIONS = {
@@ -76,4 +76,3 @@ class MouseControllerMixin:
         if self.mouse_click:
             # pyautogui.click(clicks=mouse_clicks, duration=random.uniform(0.2, 0.4))
             pydirectinput.click(clicks=self.mouse_clicks, interval=0.2)
-        return
