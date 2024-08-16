@@ -1,6 +1,4 @@
-import datetime
 import os.path
-import random
 import tempfile
 
 import cv2
@@ -9,18 +7,19 @@ import numpy as np
 import pyautogui
 from PIL import Image, ImageGrab, ImageEnhance
 from pynput.mouse import Controller
+
+from core.mouse_controller import MouseControllerMixin
 from logs.logging_config import logger
 from config.config_manager import ConfigManager
 from models.models import SearchAreaLocation
 from path_router import DirectoryPaths
 from querysets.querysets import SearchAreaQuerySet
-from utils.verify_screen import VerifyScreenMixin
+from core.verify_screen import VerifyScreenMixin
 
 
 class OCREngine:
 
     def __init__(self, coords=None):
-        self.verify = VerifyScreenMixin()
         self.screen_w, self.screen_h = pyautogui.size()
         self.screen_size = (self.screen_w, self.screen_h)
         self.coords = coords
@@ -46,38 +45,38 @@ class OCREngine:
             brightness_factor = factors.get("brightness", 1.0)
             brightness = ImageEnhance.Brightness(image).enhance(brightness_factor)
             """Adjust image brightness.
-                This class can be used to control the brightness of an image.  An
-                enhancement factor of 0.0 gives a black image. A factor of 1.0 gives the
-                original image.
-                """
+				This class can be used to control the brightness of an image.  An
+				enhancement factor of 0.0 gives a black image. A factor of 1.0 gives the
+				original image.
+				"""
 
             # Apply sharpness enhancement
             sharpness_factor = factors.get("sharpness", 1.0)
             sharpness = ImageEnhance.Sharpness(brightness).enhance(sharpness_factor)
             """Adjust image sharpness.
-                This class can be used to adjust the sharpness of an image. An
-                enhancement factor of 0.0 gives a blurred image, a factor of 1.0 gives the
-                original image, and a factor of 2.0 gives a sharpened image.
-                """
+				This class can be used to adjust the sharpness of an image. An
+				enhancement factor of 0.0 gives a blurred image, a factor of 1.0 gives the
+				original image, and a factor of 2.0 gives a sharpened image.
+				"""
 
             # Apply color enhancement
             color_factor = factors.get("color", 1.0)
             color = ImageEnhance.Color(sharpness).enhance(color_factor)
             """Adjust image color balance.
-                This class can be used to adjust the colour balance of an image, in
-                a manner similar to the controls on a colour TV set. An enhancement
-                factor of 0.0 gives a black and white image. A factor of 1.0 gives
-                the original image.
-                """
+				This class can be used to adjust the colour balance of an image, in
+				a manner similar to the controls on a colour TV set. An enhancement
+				factor of 0.0 gives a black and white image. A factor of 1.0 gives
+				the original image.
+				"""
 
             # Apply contrast enhancement
             contrast_factor = factors.get("contrast", 1.0)
             contrast = ImageEnhance.Contrast(color).enhance(contrast_factor)
             """Adjust image contrast.
-                This class can be used to control the contrast of an image, similar
-                to the contrast control on a TV set. An enhancement factor of 0.0
-                gives a solid grey image. A factor of 1.0 gives the original image.
-                """
+				This class can be used to control the contrast of an image, similar
+				to the contrast control on a TV set. An enhancement factor of 0.0
+				gives a solid grey image. A factor of 1.0 gives the original image.
+				"""
 
             # Convert to grayscale if 'grayscale' flag is True
             if factors.get("grayscale", False):
@@ -147,21 +146,20 @@ class OCREngine:
         :param click:
         :param scrap:
         :return: ResponseData(
-                                                success= bool,
-                                                message= str,
-                                                text= str
-                                        )
+                                                                                        success= bool,
+                                                                                        message= str,
+                                                                                        text= str
+                                                                        )
         """
         self.click = click
         self.scroll = scroll
         self.scrap = scrap
         region = SearchAreaQuerySet.read_search_area_by_name(region_name=search_area)
+        x, y = region.center_x, region.center_y
 
         # self.verify.simulate_mouse(region.center_x, region.center_y, mouse_click=False, mouse_clicks=0)
         if self.scroll:
-            self.verify.simulate_mouse(
-                region.center_x, region.center_y, mouse_click=False, mouse_clicks=0
-            )
+            MouseControllerMixin(x, y, mouse_click=False).simulate_mouse()
             self.get_mouse().scroll(dx=0, dy=20)
         attempts = 0
         max_attempts = 9
@@ -200,17 +198,17 @@ class OCREngine:
                     "mag_ratio": 1,
                 }
                 """
-                Text Layout Analysis:
-                    paragraph: Set to True to enable paragraph analysis.
-                    min_size: Minimum text size to recognize.
-                    contrast_ths: Specifies the contrast threshold for text detection.
-                Image Preprocessing:
-                    text_threshold (float, default = 0.7) - Text confidence threshold
-                    low_text (float, default = 0.4) - Text low-bound score
-                    link_threshold (float, default = 0.4) - Link confidence threshold
-                    canvas_size (int, default = 2560) - Maximum image size. Image bigger than this value will be resized down.
-                    mag_ratio (float, default = 1) - Image magnification ratio.
-                """
+				Text Layout Analysis:
+					paragraph: Set to True to enable paragraph analysis.
+					min_size: Minimum text size to recognize.
+					contrast_ths: Specifies the contrast threshold for text detection.
+				Image Preprocessing:
+					text_threshold (float, default = 0.7) - Text confidence threshold
+					low_text (float, default = 0.4) - Text low-bound score
+					link_threshold (float, default = 0.4) - Link confidence threshold
+					canvas_size (int, default = 2560) - Maximum image size. Image bigger than this value will be resized down.
+					mag_ratio (float, default = 1) - Image magnification ratio.
+				"""
 
                 with tempfile.NamedTemporaryFile(
                     suffix=".png", delete=False
@@ -244,10 +242,10 @@ class OCREngine:
 
                         # self.verify.simulate_mouse(center_x, center_y, mouse_click=False, mouse_clicks=0)
                         if self.click:
-                            self.verify.simulate_mouse(
-                                center_x, center_y, mouse_click=True, mouse_clicks=1
-                            )
-                            # pyautogui.click(center_x, center_y, interval=0.2)
+                            MouseControllerMixin(
+                                center_x, center_y, mouse_click=True
+                            ).simulate_mouse()
+                        # pyautogui.click(center_x, center_y, interval=0.2)
                         self.coords = center_x, center_y
 
                         logger.success(
@@ -256,12 +254,9 @@ class OCREngine:
                         return {"success": True, "message": "TEXT_FOUND", "text": text}
 
                 if self.scroll:
-                    self.verify.simulate_mouse(
-                        region.center_x,
-                        region.center_y,
-                        mouse_click=False,
-                        mouse_clicks=0,
-                    )
+                    MouseControllerMixin(
+                        region.center_x, region.center_y, mouse_click=False
+                    ).simulate_mouse()
                     self.get_mouse().scroll(dx=0, dy=-2)
                     continue
 

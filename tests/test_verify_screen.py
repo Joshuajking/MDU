@@ -1,7 +1,6 @@
 import unittest
 from unittest.mock import patch, MagicMock
-from querysets.querysets import ImageQuerySet
-from utils.verify_screen import (
+from core.verify_screen import (
     VerifyScreenMixin,
 )  # Replace `your_module` with the actual module name
 
