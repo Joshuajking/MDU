@@ -14,10 +14,9 @@ from config.config_manager import ConfigManager
 from models.models import SearchAreaLocation
 from path_router import DirectoryPaths
 from querysets.querysets import SearchAreaQuerySet
-from core.verify_screen import VerifyScreenMixin
 
 
-class OCREngine:
+class OCREngine(MouseControllerMixin):
 
     def __init__(self, coords=None):
         self.screen_w, self.screen_h = pyautogui.size()
@@ -146,10 +145,10 @@ class OCREngine:
         :param click:
         :param scrap:
         :return: ResponseData(
-                                                                                        success= bool,
-                                                                                        message= str,
-                                                                                        text= str
-                                                                        )
+                                                                                                                                                                        success= bool,
+                                                                                                                                                                        message= str,
+                                                                                                                                                                        text= str
+                                                                                                                                        )
         """
         self.click = click
         self.scroll = scroll
@@ -159,7 +158,7 @@ class OCREngine:
 
         # self.verify.simulate_mouse(region.center_x, region.center_y, mouse_click=False, mouse_clicks=0)
         if self.scroll:
-            MouseControllerMixin(x, y, mouse_click=False).simulate_mouse()
+            self.simulate_mouse(x, y, mouse_click=False)
             self.get_mouse().scroll(dx=0, dy=20)
         attempts = 0
         max_attempts = 9
@@ -242,9 +241,7 @@ class OCREngine:
 
                         # self.verify.simulate_mouse(center_x, center_y, mouse_click=False, mouse_clicks=0)
                         if self.click:
-                            MouseControllerMixin(
-                                center_x, center_y, mouse_click=True
-                            ).simulate_mouse()
+                            self.simulate_mouse(center_x, center_y, mouse_click=True)
                         # pyautogui.click(center_x, center_y, interval=0.2)
                         self.coords = center_x, center_y
 
@@ -254,9 +251,9 @@ class OCREngine:
                         return {"success": True, "message": "TEXT_FOUND", "text": text}
 
                 if self.scroll:
-                    MouseControllerMixin(
+                    self.simulate_mouse(
                         region.center_x, region.center_y, mouse_click=False
-                    ).simulate_mouse()
+                    )
                     self.get_mouse().scroll(dx=0, dy=-2)
                     continue
 

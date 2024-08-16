@@ -1,4 +1,3 @@
-import abc
 import random
 from dataclasses import dataclass
 from time import sleep
@@ -26,7 +25,7 @@ class ImageNotFound(Exception):
 
 
 @dataclass
-class VerifyScreenMixin:
+class VerifyScreenMixin(MouseControllerMixin):
     screen_name: Optional[ImageLocation | str]
     image_to_compare: str
     confidence: float = 0.8
@@ -43,9 +42,6 @@ class VerifyScreenMixin:
     def __post_init__(self):
         if self.skip_sleep:
             self.minSearchTime = 3
-
-    def simulate_mouse(self, *args, **kwargs):
-        pass
 
     def screen(self):
         # read the image by name
@@ -88,11 +84,11 @@ class VerifyScreenMixin:
             if self.mouse_click and not self.esc:
                 if not self.skip_sleep:
                     # self.handle_mouse_click(x, y)
-                    MouseControllerMixin.simulate_mouse(x, y)
+                    self.simulate_mouse(x, y)
                 else:
                     # if skip_sleep is True, handle it here
                     # self.handle_mouse_click(x, y)
-                    MouseControllerMixin.simulate_mouse(x, y)
+                    self.simulate_mouse(x, y)
                     pydirectinput.press("esc")
             elif self.skip_sleep:
                 if self.esc:

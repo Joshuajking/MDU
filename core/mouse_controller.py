@@ -1,4 +1,3 @@
-import abc
 import random
 
 import pyautogui
@@ -8,18 +7,13 @@ from loguru import logger
 
 
 class MouseControllerMixin:
-    def __init__(self, dest_x, dest_y, mouse_click=False, mouse_clicks=0):
-        self.dest_x = dest_x
-        self.dest_y = dest_y
-        self.mouse_click = mouse_click
-        self.mouse_clicks = mouse_clicks
-        if self.mouse_click is True and self.mouse_clicks == 0:
+    @staticmethod
+    def simulate_mouse(dest_x, dest_y, mouse_click=False, mouse_clicks=0):
+        if mouse_click is True and mouse_clicks == 0:
             logger.debug(
                 f"Did you mean to have mouse_clicks = 0: defaulting to mouse_clicks = 1"
             )
-            self.mouse_clicks = 1
-
-    def simulate_mouse(self):
+            mouse_clicks = 1
         EASING_FUNCTIONS = {
             # "linear": pytweening.linear,
             "easeInQuad": pytweening.easeInQuad,
@@ -52,10 +46,10 @@ class MouseControllerMixin:
         selected_easing_function = EASING_FUNCTIONS[easing_key]
 
         x = random.randint(-23, 27)
-        x += self.dest_x
+        x += dest_x
 
         y = random.randint(-32, 44)
-        y += self.dest_y
+        y += dest_y
 
         pyautogui.moveTo(
             x,
@@ -67,13 +61,12 @@ class MouseControllerMixin:
 
         # Use the selected easing function in pyautogui.moveTo
         pyautogui.moveTo(
-            self.dest_x,
-            self.dest_y,
+            dest_x,
+            dest_y,
             duration=random.uniform(0.1, 1.2),
             tween=selected_easing_function,
             _pause=True,
         )
-        if self.mouse_click:
+        if mouse_click:
             # pyautogui.click(clicks=mouse_clicks, duration=random.uniform(0.2, 0.4))
-            pydirectinput.click(clicks=self.mouse_clicks, interval=0.2)
-        return
+            pydirectinput.click(clicks=mouse_clicks, interval=0.2)
