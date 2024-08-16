@@ -44,6 +44,9 @@ class VerifyScreenMixin:
         if self.skip_sleep:
             self.minSearchTime = 3
 
+    def simulate_mouse(self, *args, **kwargs):
+        pass
+
     def screen(self):
         # read the image by name
         image_data = ImageQuerySet.read_image_by_name(
