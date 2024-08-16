@@ -4,18 +4,22 @@ import random
 import pyautogui
 import pydirectinput
 import pytweening
+from loguru import logger
 
 
-class MouseController(metaclass=abc.ABCMeta):
-    @abc.abstractmethod
-    def simulate_mouse(self, *args, **kwargs):
-        pass
+class MouseControllerMixin:
+    def __init__(self, dest_x, dest_y, mouse_click=False, mouse_clicks=0):
+        self.dest_x = dest_x
+        self.dest_y = dest_y
+        self.mouse_click = mouse_click
+        self.mouse_clicks = mouse_clicks
+        if self.mouse_click is True and self.mouse_clicks == 0:
+            logger.debug(
+                f"Did you mean to have mouse_clicks = 0: defaulting to mouse_clicks = 1"
+            )
+            self.mouse_clicks = 1
 
-
-class MouseControllerMixin(MouseController):
-    def simulate_mouse(self, dest_x, dest_y, mouse_click=False, mouse_clicks=1):
-        # Get screen size
-        screen_width, screen_height = pyautogui.size()
+    def simulate_mouse(self):
         EASING_FUNCTIONS = {
             # "linear": pytweening.linear,
             "easeInQuad": pytweening.easeInQuad,
@@ -48,10 +52,10 @@ class MouseControllerMixin(MouseController):
         selected_easing_function = EASING_FUNCTIONS[easing_key]
 
         x = random.randint(-23, 27)
-        x += dest_x
+        x += self.dest_x
 
         y = random.randint(-32, 44)
-        y += dest_y
+        y += self.dest_y
 
         pyautogui.moveTo(
             x,
@@ -63,13 +67,13 @@ class MouseControllerMixin(MouseController):
 
         # Use the selected easing function in pyautogui.moveTo
         pyautogui.moveTo(
-            dest_x,
-            dest_y,
+            self.dest_x,
+            self.dest_y,
             duration=random.uniform(0.1, 1.2),
             tween=selected_easing_function,
             _pause=True,
         )
-        if mouse_click:
+        if self.mouse_click:
             # pyautogui.click(clicks=mouse_clicks, duration=random.uniform(0.2, 0.4))
-            pydirectinput.click(clicks=mouse_clicks, interval=0.2)
+            pydirectinput.click(clicks=self.mouse_clicks, interval=0.2)
         return

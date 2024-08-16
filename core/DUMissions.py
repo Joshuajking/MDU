@@ -9,7 +9,7 @@ from logs.logging_config import logger
 from models.models import SearchAreaLocation, ImageLocation
 from querysets.querysets import CharacterQuerySet, SearchAreaQuerySet
 from utils.special_mission_ocr import OCREngine
-from utils.verify_screen import VerifyScreenMixin
+from core.verify_screen import VerifyScreenMixin
 
 
 class DUMissions:

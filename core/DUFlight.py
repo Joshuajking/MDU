@@ -1,7 +1,6 @@
-import multiprocessing
 import os.path
 import time
-from time import sleep, perf_counter
+from time import sleep
 
 import pyautogui
 import pydirectinput
@@ -9,11 +8,11 @@ import pydirectinput
 from config.config_manager import ConfigManager, timing_decorator
 from config.db_setup import DbConfig
 from logs.logging_config import logger
-from models.models import ImageLocation, SearchAreaLocation
+from models.models import ImageLocation
 from path_router import DirectoryPaths
 from querysets.querysets import ImageQuerySet, CharacterQuerySet
 from utils.special_mission_ocr import OCREngine
-from utils.verify_screen import VerifyScreenMixin
+from core.verify_screen import VerifyScreenMixin
 
 
 class PilotSeatNotFoundError(Exception):
