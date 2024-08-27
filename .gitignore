@@ -2,8 +2,8 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,venv,pycharm+all
 
 ### Custom Exclusions
-data/json/*
-utils/**/image_cache/
+dual_universe/data/json/*
+dual_universe/src/utils/**/image_cache/
 temp/*
 templates/invalid_images/*
 *.db
@@ -170,7 +170,7 @@ instance/
 .scrapy
 
 # Sphinx documentation
-docs/_build/
+dual_universe/docs/_build/
 
 # PyBuilder
 .pybuilder/
@@ -221,7 +221,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+dual_universe/.env
 .venv
 env/
 venv/
@@ -286,14 +286,14 @@ pip-selfcheck.json
 /du.db
 /file_structure.txt
 /du-missions.db
-/models/du-missions.db
-/models/missions.db
-/models/missions.db-journal
+/dual_universe/src/models/du-missions.db
+/dual_universe/src/models/missions.db
+/dual_universe/src/models/missions.db-journal
 /db_backup/*
-/models/missions.sqbpro
+/dual_universe/src/models/missions.sqbpro
 /alembic/versions/
 /alembic/
-/models/test.db
-/models/missions.db
+/dual_universe/src/models/test.db
+/dual_universe/src/models/missions.db
 /missions.db
-/data/config.json
+/dual_universe/config.json

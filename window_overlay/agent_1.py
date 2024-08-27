@@ -1,6 +1,6 @@
 import cv2
 
-from querysets.querysets import ImageQuerySet
+from dual_universe.src.querysets import ImageQuerySet
 
 
 class ActiveTakenMissionAgent:

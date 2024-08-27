@@ -1,0 +1,33 @@
+from enum import Enum
+from typing import Optional
+
+from sqlmodel import SQLModel, Field
+
+from dual_universe.src.models.base_model_mixin import BaseModelMixin
+
+
+class ImageLocation(str, Enum):
+    ACTIVE_TAKEN_MISSIONS_SCREEN = "active_taken_missions_screen"
+    FLIGHT_SCREEN = "flight_screen"
+    CONFIRMATION_SCREEN = "confirmation_screen"
+    IN_GAME_SCREEN = "in_game_screen"
+    LOGIN_SCREEN = "login_screen"
+    LOGOUT_SCREEN = "logout_screen"
+    MAP_SCREEN = "map_screen"
+    MISSION_DETAILS_SCREEN = "mission_details_screen"
+    RETRIEVE_DELIVER_DETAILS_SCREEN = "retrieve_deliver_mission_details_screen"
+    NOTIFICATIONS_SCREEN = "notifications_screen"
+    SEARCH_FOR_MISSIONS_SCREEN = "search_for_missions_screen"
+
+
+class Image(SQLModel, BaseModelMixin, table=True):
+    image_name: str = Field(nullable=False)
+    image_location: Optional[ImageLocation] = None
+    image_url: str = Field(nullable=False)
+    left: int = Field(default=None, nullable=True)
+    top: int = Field(default=None, nullable=True)
+    right: int = Field(default=None, nullable=True)
+    bottom: int = Field(default=None, nullable=True)
+    region: str = Field(default=None, nullable=True)
+    center_x: int = Field(default=None, nullable=True)
+    center_y: int = Field(default=None, nullable=True)
