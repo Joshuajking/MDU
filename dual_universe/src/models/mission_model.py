@@ -1,3 +1,5 @@
+from typing import Dict, Type
+
 from sqlmodel import SQLModel, Field
 
 from dual_universe.src.models.base_model_mixin import BaseModelMixin
@@ -22,3 +24,9 @@ class Mission(SQLModel, BaseModelMixin, table=True):
     origin_pos: str = Field(default=None, nullable=True)
     destination_pos: str = Field(default=None, nullable=True)
     character_id: str = Field(default=None, foreign_key="character.id")
+
+
+model_mapping: Dict[str, Type[SQLModel]] = {
+    "mission": Mission,
+    "mission_metadata": MissionMetadata,
+}

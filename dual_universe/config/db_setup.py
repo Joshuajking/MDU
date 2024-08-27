@@ -16,6 +16,7 @@ from dual_universe.src.models.image_model import Image
 from dual_universe.src.models.mission_model import Mission, MissionMetadata
 from dual_universe.src.models.search_area_model import SearchArea
 from dual_universe.src.querysets.search_area_queryset import SearchAreaQuerySet
+from dual_universe.src.utils.find_existing_item import find_existing_item
 
 
 class DbChecker:
@@ -64,31 +65,37 @@ class DbChecker:
         # Load the JSON data from the file
         file_path = os.path.join(ASSETS_DIR, f"{table_name}_table.json")
 
-        with open(file_path, "r") as json_file:
-            json_data = json.load(json_file)
+        try:
+            with open(file_path, "r") as json_file:
+                json_data = json.load(json_file)
 
-        with Session(self.db_engine) as session:
-            for item in json_data:
-                # TODO: need to generalise this to work for all tables
-                # Check if an Image instance with the same data already exists
-                existing_mission = session.exec(
-                    select(Mission).filter_by(**item)
-                ).first()
-                if existing_mission:
-                    logger.info(f"Image already exists: {existing_mission}")
-                else:
-                    # Create a new Image instance with the data from the JSON
-                    mission = Mission(**item)
-                    mission.id = str(uuid.uuid4())
-                    mission.created_at = datetime.now()
-                    mission.updated_at = datetime.now()
-                    # Insert the Image instance into the table
-                    session.add(mission)
+            with Session(self.db_engine) as session:
+                for item in json_data:
+                    existing_item, model_class = find_existing_item(
+                        session, self.table_data, **item
+                    )
+                    if existing_item:
+                        logger.info(
+                            f"{model_class.__name__} already exists: {existing_item}"
+                        )
+                    else:
+                        # Create a new instance of the model class with the data from the JSON
+                        new_record = model_class(**item)
+                        new_record.id = str(uuid.uuid4())
+                        new_record.created_at = datetime.now()
+                        new_record.updated_at = datetime.now()
+                        session.add(new_record)
+                        logger.info(
+                            f"Inserted new record into {table_name}: {new_record}"
+                        )
 
-        # Commit the transaction
-        logger.debug(f"Mission table loaded")
-        session.commit()
-        pass
+                session.commit()
+                logger.debug(f"{table_name} table loaded")
+            return True
+        except Exception as exc:
+            logger.error(f"Error processing data for {table_name}: {exc}")
+            self.errors.append(f"Error processing data for {table_name}: {exc}")
+            return False
 
     def is_valid(self):
         self.errors.clear()

@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Optional
+from typing import Optional, Dict, Type
 
 from sqlmodel import SQLModel, Field
 
@@ -31,3 +31,8 @@ class Image(SQLModel, BaseModelMixin, table=True):
     region: str = Field(default=None, nullable=True)
     center_x: int = Field(default=None, nullable=True)
     center_y: int = Field(default=None, nullable=True)
+
+
+model_mapping: Dict[str, Type[SQLModel]] = {
+    "image": Image,
+}

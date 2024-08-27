@@ -1,8 +1,16 @@
 import os
 from pathlib import Path
+from typing import Dict, Type
 
 from sqlalchemy import create_engine
+from sqlmodel import SQLModel
 
+from dual_universe.src.models.character_model import Character
+
+# from dual_universe.src.models.game_model import Game
+from dual_universe.src.models.image_model import Image
+from dual_universe.src.models.mission_model import Mission, MissionMetadata
+from dual_universe.src.models.search_area_model import SearchArea
 
 ROOT_DIR = Path(__file__).resolve().parent
 
@@ -24,6 +32,15 @@ TESTS_DIR = ROOT_DIR / "tests"
 UTILS_DIR = ROOT_DIR / "utils"
 DU_IMAGES_DIR = ASSETS_DIR / "images"
 SEARCH_AREA_DIR = ASSETS_DIR / "search_areas"
+
+model_mapping: Dict[str, Type[SQLModel]] = {
+    "image": Image,
+    "character": Character,
+    # "game": Game,
+    "mission": Mission,
+    "mission_metadata": MissionMetadata,
+    "searcharea": SearchArea,
+}
 
 # Example of creating the directories if they don't exist
 # for directory in [
