@@ -112,7 +112,7 @@ class DbChecker:
 
 
 class DbConfig(ConfigMixin, DbChecker):
-    def __init__(self, db_engine=db_engine):
+    def __init__(self):
         super().__init__()
         self.db_engine = db_engine
         self.images_dir = os.path.join(ASSETS_DIR)
