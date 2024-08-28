@@ -9,7 +9,8 @@ from loguru import logger
 from sqlmodel import SQLModel, Session, select
 
 from dual_universe.config.config_manager import ConfigMixin
-from dual_universe.settings import ASSETS_DIR
+from dual_universe.config.db_dump import DumpDataBase
+from dual_universe.settings import ASSETS_DIR, CONFIG_DIR
 from dual_universe.settings import db_engine
 from dual_universe.src.models.character_model import Character
 from dual_universe.src.models.image_model import Image
@@ -43,11 +44,11 @@ class DbChecker:
         # Implement your second check logic here
         table_name = self.table_data.__tablename__
         # Load the JSON data from the file
-        file_path = os.path.join(ASSETS_DIR, f"{table_name}_table.json")
+        file_path = os.path.join(CONFIG_DIR, f"{table_name}_table.json")
 
         if not os.path.exists(file_path):
-            with open(file_path, "w") as file:
-                pass
+            with open(file_path, "w") as json_file:
+                json_data = json.load(json_file)
             return False
         if os.path.getsize(file_path) > 0:
             try:
@@ -59,15 +60,16 @@ class DbChecker:
         else:
             return False  # File is empty
 
-    def is_data_valid(self):
+    def load_db_record(self):
         # Implement your third check logic here
         table_name = self.table_data.__tablename__
         # Load the JSON data from the file
-        file_path = os.path.join(ASSETS_DIR, f"{table_name}_table.json")
+        file_path = os.path.join(CONFIG_DIR, f"{table_name}_table.json")
 
         try:
-            with open(file_path, "r") as json_file:
-                json_data = json.load(json_file)
+            if os.path.getsize(file_path) > 0:
+                with open(file_path, "r") as json_file:
+                    json_data = json.load(json_file)
 
             with Session(self.db_engine) as session:
                 for item in json_data:
@@ -91,6 +93,9 @@ class DbChecker:
 
                 session.commit()
                 logger.debug(f"{table_name} table loaded")
+                # TODO: maybe this should be a backup instead of dumping
+                db_dump = DumpDataBase()
+                db_dump.process_model(table_name)
             return True
         except Exception as exc:
             logger.error(f"Error processing data for {table_name}: {exc}")
@@ -102,13 +107,13 @@ class DbChecker:
 
         # Call each check method sequentially
         if self.is_table_valid():
-            return True
-        if not self.is_file_valid():
-            return False
-        if self.is_data_valid():
-            return True
+            pass
+        if self.is_file_valid():
+            pass
+        if self.load_db_record():
+            pass
 
-        return False
+        return
 
 
 class DbConfig(ConfigMixin, DbChecker):
@@ -365,46 +370,16 @@ class DbConfig(ConfigMixin, DbChecker):
         pass
 
     def main(self):
-        db_table = DbChecker(Image)
-        if db_table.is_valid():
-            print("Good")
-        else:
-            print("Bad")
-        try:
-
-            _Image = select(Image)
-            results = session.exec(_Image).first()
-            if isinstance(results, Image):
-                logger.success(f"Image_table - OK")
-            else:
-                self.load_Image_table()
-
-            _Mission = select(Mission)
-            results = session.exec(_Mission).first()
-            if isinstance(results, Mission):
-                logger.success("Mission_table - OK")
-            else:
-                self.load_Mission_table()
-
-            _MissionMetadata = select(MissionMetadata)
-            results = session.exec(_MissionMetadata).first()
-            if isinstance(results, MissionMetadata):
-                logger.success("MissionMetadata_table - OK")
-            else:
-                self.load_MissionMetadata_table()
-
-            _SearchArea = select(SearchArea)
-            results = session.exec(_SearchArea).first()
-            if isinstance(results, SearchArea):
-                logger.success("SearchArea_table - OK")
-            else:
-                self.load_SearchArea_table()
-
-        except Exception as e:
-            logger.error(f"Error loading table: {e}")
-            raise e
-        else:
-            self.load_image_entries_to_db()
+        if DbChecker(Image).is_valid():
+            pass
+        if DbChecker(Character).is_valid():
+            pass
+        if DbChecker(MissionMetadata).is_valid():
+            pass
+        if DbChecker(SearchArea).is_valid():
+            pass
+        if DbChecker(Mission).is_valid():
+            pass
 
 
 if __name__ == "__main__":

@@ -10,6 +10,7 @@ class SearchAreaLocation(str, Enum):
     ACTIVE_TAKEN_MISSIONS = "activeTakenMissions"
     AVAILABLE_MISSIONS = "availableMissions"
     RETRIEVE_DELIVERY_STATUS = "retrieveDeliveryStatus"
+    FULL_ACTIVEMISSION_AREA = "fullActiveMissionArea"
 
     WARP_TARGET_DEST = "warpTargetDestination"
     GAME_CONSOLE_WINDOW = "gameConsoleWindow"
