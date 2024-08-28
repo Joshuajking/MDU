@@ -10,7 +10,7 @@ from sqlmodel import SQLModel, Session, select
 
 from dual_universe.config.config_manager import ConfigMixin
 from dual_universe.settings import ASSETS_DIR
-from dual_universe.settings import engine
+from dual_universe.settings import db_engine
 from dual_universe.src.models.character_model import Character
 from dual_universe.src.models.image_model import Image
 from dual_universe.src.models.mission_model import Mission, MissionMetadata
@@ -20,7 +20,7 @@ from dual_universe.src.utils.find_existing_item import find_existing_item
 
 
 class DbChecker:
-    def __init__(self, db_engine, table_data):
+    def __init__(self, table_data):
         self.db_engine = db_engine
         self.table_data = table_data
         # self.table_name = table_name
@@ -112,7 +112,7 @@ class DbChecker:
 
 
 class DbConfig(ConfigMixin, DbChecker):
-    def __init__(self, db_engine=engine):
+    def __init__(self, db_engine=db_engine):
         super().__init__()
         self.db_engine = db_engine
         self.images_dir = os.path.join(ASSETS_DIR)
@@ -365,7 +365,7 @@ class DbConfig(ConfigMixin, DbChecker):
         pass
 
     def main(self):
-        db_table = DbChecker(engine, Image)
+        db_table = DbChecker(Image)
         if db_table.is_valid():
             print("Good")
         else:

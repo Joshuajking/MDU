@@ -4,7 +4,7 @@ from typing import Optional, Dict, Tuple
 from loguru import logger
 from sqlmodel import Session, select
 
-from dual_universe.settings import engine
+from dual_universe.settings import db_engine
 from dual_universe.src.models.search_area_model import SearchArea
 
 
@@ -12,12 +12,12 @@ class SearchAreaQuerySet:
 
     @classmethod
     def select_searcharea(cls):
-        with Session(engine) as session:
+        with Session(db_engine) as session:
             return session.exec(select(SearchArea)).all()
 
     @classmethod
     def get_searcharea_by_name(cls, name: str):
-        with Session(engine) as session:
+        with Session(db_engine) as session:
             searcharea = session.exec(
                 select(SearchArea).where(SearchArea.region_name == name)
             ).first()
@@ -27,7 +27,7 @@ class SearchAreaQuerySet:
     @classmethod
     def create_or_update_search_area(cls, region_name: str, updates: Dict[str, int]):
         try:
-            with Session(engine) as session:
+            with Session(db_engine) as session:
                 search_area = (
                     session.query(SearchArea).filter_by(region_name=region_name).first()
                 )
@@ -63,7 +63,7 @@ class SearchAreaQuerySet:
     def create_search_area(
         cls, region_name: str, region_bbox: Tuple[int, int, int, int]
     ):
-        with Session(engine) as session:
+        with Session(db_engine) as session:
             new_search_area = SearchArea(
                 region_name=region_name,
                 region_bbox_left=region_bbox[0],
@@ -78,7 +78,7 @@ class SearchAreaQuerySet:
 
     @classmethod
     def read_search_area_by_name(cls, region_name: str) -> Optional["SearchArea"]:
-        with Session(engine) as session:
+        with Session(db_engine) as session:
             search_area = (
                 session.query(SearchArea).filter_by(region_name=region_name).first()
             )
@@ -92,7 +92,7 @@ class SearchAreaQuerySet:
     def update_search_area(
         cls, region_name: str, region_bbox: Tuple[int, int, int, int]
     ):
-        with Session(engine) as session:
+        with Session(db_engine) as session:
             search_area = (
                 session.query(SearchArea).filter_by(region_name=region_name).first()
             )
@@ -106,7 +106,7 @@ class SearchAreaQuerySet:
 
     @classmethod
     def delete_search_area_by_name(cls, region_name: str):
-        with Session(engine) as session:
+        with Session(db_engine) as session:
             search_area = (
                 session.query(SearchArea).filter_by(region_name=region_name).first()
             )

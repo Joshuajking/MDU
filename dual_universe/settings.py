@@ -61,8 +61,8 @@ model_mapping: Dict[str, Type[SQLModel]] = {
 # ]:
 #     directory.mkdir(parents=True, exist_ok=True)
 
+root_dir = os.path.dirname(os.path.abspath(__file__))
+db_name = "dual_universe.db"
+db_path = os.path.join(root_dir, db_name)
 
-engine = create_engine(
-    f"sqlite:///dual_universe.db",
-    echo=True,
-)
+db_engine = create_engine(f"sqlite:///{db_path}", echo=True)
