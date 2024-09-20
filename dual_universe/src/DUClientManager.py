@@ -6,7 +6,7 @@ import pynput
 
 from dual_universe.config.config_manager import ConfigMixin, timing_decorator
 from dual_universe.logs.logging_config import logger
-from models.models import ImageLocation
+from models.image_model import ImageLocation
 from dual_universe.src.verify_screen import VerifyScreenMixin
 
 
@@ -15,7 +15,6 @@ class DUClientManager(VerifyScreenMixin):
         self.config_manager = ConfigMixin()
         self.game_client = self.config_manager.get_value("config.game_client")
         self.app_path = self.config_manager.get_value("config.app_path")
-        self.DEBUG_MODE = self.is_debugging()
         self.mouse_listener = pynput.mouse.Listener(suppress=True)
         self.keyboard_listener = pynput.keyboard.Listener(suppress=True)
 
