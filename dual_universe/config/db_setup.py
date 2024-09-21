@@ -17,7 +17,7 @@ from dual_universe.src.models.image_model import Image
 from dual_universe.src.models.mission_model import Mission, MissionMetadata
 from dual_universe.src.models.search_area_model import SearchArea
 from dual_universe.src.querysets.search_area_queryset import SearchAreaQuerySet
-from dual_universe.src.utils.find_existing_item import find_existing_item
+from dual_universe.util.find_existing_item import find_existing_item
 
 
 class DbChecker:

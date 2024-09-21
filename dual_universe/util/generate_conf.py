@@ -8,7 +8,7 @@ from dual_universe.logs.logging_config import logger
 from config import config_manager
 from dual_universe.path_router import DirectoryPaths
 from dual_universe.settings import IMAGES_DIR, ASSETS_DATA
-from dual_universe.src.utils.read_json import read_json
+from dual_universe.util.read_json import read_json
 
 
 def conf_startup():
@@ -439,7 +439,7 @@ def modify_assets_json_path():
         data["images"][key] = value.replace(
             old_dir_value,
             new_dir_value,
-            # r'C:\Repositories\Dual Universe\Missions Dual Universe\utils\..\images', new_dir
+            # r'C:\Repositories\Dual Universe\Missions Dual Universe\util\..\images', new_dir
         )
 
     # Save the updated JSON data back to the file

@@ -7,8 +7,8 @@ import pydirectinput
 
 from dual_universe.config.config_manager import timing_decorator
 from dual_universe.logs.logging_config import logger
-from models.models import ImageLocation
-from dual_universe.src.querysets import CharacterQuerySet
+from models.image_model import ImageLocation
+from querysets.character_queryset import CharacterQuerySet
 from dual_universe.src.verify_screen import VerifyScreenMixin
 
 
@@ -19,48 +19,47 @@ class DUCharacters(VerifyScreenMixin):
 
     @timing_decorator
     def login(self, character):
-
-        response_du_login_screen_label = VerifyScreenMixin(
-            screen_name=ImageLocation.LOGIN_SCREEN,
-            image_to_compare="du_login_screen_label",
-            skip_sleep=True,
-        )
-        if not response_du_login_screen_label["success"]:
+        response_du_login_screen_label = True
+        while response_du_login_screen_label:
+            response_du_login_screen_label = VerifyScreenMixin(
+                screen_name=ImageLocation.LOGIN_SCREEN,
+                image_to_compare="du_login_screen_label",
+                skip_sleep=True,
+            )
+            if response_du_login_screen_label.request.data["success"]:
+                break
             self.logout()
-        response_du_login_screen_label = VerifyScreenMixin(
-            screen_name=ImageLocation.LOGIN_SCREEN,
-            image_to_compare="du_login_screen_label",
-            # mouse_click=True,
-            # mouse_clicks=2
-        )
-        if not response_du_login_screen_label["success"]:
-            raise Exception(f"screen not found")
+
         attempts = 3
         count = 0
         while count <= attempts:
             logger.info(f"logging into {character.username}")
 
-            pydirectinput.press("tab")
-            pydirectinput.press("backspace")
-            pydirectinput.press("tab")
-            pydirectinput.press("backspace")
+            keyboard.press("tab")
+            sleep(0.75)
+            keyboard.press("backspace")
+            sleep(0.75)
+            keyboard.press("tab")
+            sleep(0.75)
+            keyboard.press("backspace")
 
             response_email_login = VerifyScreenMixin(
                 screen_name=ImageLocation.LOGIN_SCREEN,
                 image_to_compare="email_login",
                 mouse_click=True,
-                mouse_clicks=2,
+                mouse_clicks=4,
             )
 
+            sleep(0.75)
             keyboard.write(character.email)
-            sleep(0.2)
+            sleep(0.75)
             pydirectinput.press("tab")
 
             response_password_login = VerifyScreenMixin(
                 screen_name=ImageLocation.LOGIN_SCREEN,
                 image_to_compare="password_login",
                 mouse_click=True,
-                mouse_clicks=2,
+                mouse_clicks=4,
             )
 
             keyboard.write(character.password)
@@ -71,18 +70,21 @@ class DUCharacters(VerifyScreenMixin):
                 screen_name=ImageLocation.LOGIN_SCREEN,
                 image_to_compare="internal_error",
                 confidence=0.8,
-                minSearchTime=2,
+                minSearchTime=3,
                 skip_sleep=True,
             )
             response_email_login = VerifyScreenMixin(
                 screen_name=ImageLocation.LOGIN_SCREEN,
                 image_to_compare="email_login",
                 mouse_click=True,
-                minSearchTime=2,
+                minSearchTime=3,
                 skip_sleep=True,
             )
 
-            if internal_error["success"] and not response_email_login["success"]:
+            if (
+                internal_error.request.data["success"]
+                and not response_email_login.request.data["success"]
+            ):
                 logger.warning({"success": False, "status": "email_field: failed"})
                 continue
 
@@ -92,7 +94,7 @@ class DUCharacters(VerifyScreenMixin):
                 skip_sleep=True,
             )
 
-            if response_gametime_error_lable["success"]:
+            if response_gametime_error_lable.request.data["success"]:
                 logger.debug(f"No game time: {character.username}")
                 CharacterQuerySet.update_character(
                     character, {"has_gametime": False, "active": False}
@@ -119,7 +121,7 @@ class DUCharacters(VerifyScreenMixin):
             image_to_compare="loading_complete",
             skip_sleep=True,
         )
-        if not loading_complete_response["success"]:
+        if not loading_complete_response.request.data["success"]:
             return
 
         count = 0
@@ -221,4 +223,9 @@ class DUCharacters(VerifyScreenMixin):
 
 if __name__ == "__main__":
     obj = DUCharacters()
+    obj.login(
+        character={
+            "barron",
+        }
+    )
     obj.logout(respawn=False)

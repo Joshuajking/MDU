@@ -1,12 +1,16 @@
 import os
 import random
+import time
 from dataclasses import dataclass
 from time import sleep
-from typing import Optional
+from typing import Optional, Dict
 from pathlib import Path
 import pyautogui
 import pydirectinput
 
+from dual_universe.config.config_manager import timing_decorator
+from dual_universe.logs.logging_config import logger
+from dual_universe.util.response import Response
 from models.image_model import ImageLocation
 from querysets.image_queryset import ImageQuerySet
 from dual_universe.src.mouse_controller import MouseControllerMixin
@@ -47,7 +51,7 @@ class VerifyScreenMixin(MouseControllerMixin):
     def __post_init__(self):
         if self.skip_sleep:
             self.minSearchTime = 3
-        self.screen()
+        self.request = self.screen()
 
     def screen(self):
         # read the image by name
@@ -65,20 +69,33 @@ class VerifyScreenMixin(MouseControllerMixin):
                 f"Error: image_to_compare={self.image_to_compare} not found on screen_name={self.screen_name}"
             )
         try:
+            start_time = time.time()
             screen_coords = pyautogui.locateOnScreen(
                 image=str(image_path),
                 minSearchTime=self.minSearchTime,
                 confidence=self.confidence,
             )
+            end_time = time.time()
+            time_taken = end_time - start_time
         except Exception as e:
             print(e)
         if screen_coords is None:
             # TODO: add a screenshot here to capture the error with details
-            return {
+            logger.debug(
+                {
+                    "success": False,
+                    "screen_coords": None,
+                    "minSearchTime": self.minSearchTime,
+                    "actual_time_taken": time_taken,
+                }
+            )
+            response_data = {
                 "success": False,
                 "screen_coords": screen_coords,
                 "minSearchTime": self.minSearchTime,
+                "actual_time_taken": time_taken,
             }
+            return Response(status_code=400, response_data=response_data)
         # raise ImageNotFound("Image not found")
         else:
             left, top, width, height = screen_coords
@@ -98,23 +115,42 @@ class VerifyScreenMixin(MouseControllerMixin):
             if self.mouse_click and not self.esc:
                 if not self.skip_sleep:
                     # self.handle_mouse_click(x, y)
-                    self.simulate_mouse(x, y)
+                    self.simulate_mouse(
+                        x,
+                        y,
+                        mouse_click=self.mouse_click,
+                        mouse_clicks=self.mouse_clicks,
+                    )
                 else:
                     # if skip_sleep is True, handle it here
                     # self.handle_mouse_click(x, y)
-                    self.simulate_mouse(x, y)
+                    self.simulate_mouse(
+                        x,
+                        y,
+                        mouse_click=self.mouse_click,
+                        mouse_clicks=self.mouse_clicks,
+                    )
                     pydirectinput.press("esc")
             elif self.skip_sleep:
                 if self.esc:
                     pydirectinput.press("esc")
 
-            sleep(random.uniform(0.10, 1.0))
-
-            return {
+                sleep(random.uniform(0.10, 1.0))
+            logger.debug(
+                {
+                    "success": True,
+                    "screen_coords": _screen_coords,
+                    "minSearchTime": self.minSearchTime,
+                    "actual_time_taken": time_taken,
+                }
+            )
+            response_data = {
                 "success": True,
                 "screen_coords": _screen_coords,
                 "minSearchTime": self.minSearchTime,
+                "actual_time_taken": time_taken,
             }
+            return Response(status_code=200, response_data=response_data)
 
 
 if __name__ == "__main__":

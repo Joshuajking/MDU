@@ -1,13 +1,12 @@
 import random
 from time import perf_counter, sleep
 
-from ..config.config_manager import ConfigMixin
-from ..config.db_setup import DbConfig
+from dual_universe.config.config_manager import ConfigMixin
 from DUCharacters import DUCharacters
 from DUClientManager import DUClientManager
 from DUFlight import DUFlight
 from DUMissions import DUMissions
-from ..logs.logging_config import logger
+from dual_universe.logs.logging_config import logger
 from querysets.character_queryset import CharacterQuerySet
 
 
@@ -99,8 +98,8 @@ class EngineLoop(DUCharacters, DUFlight, DUMissions):
 if __name__ == "__main__":
     # from querysets.querysets import MissionMetaQuerySet
 
-    pre_load = DbConfig()
-    pre_load.load_image_entries_to_db()
+    # pre_load = DbConfig()
+    # pre_load.load_image_entries_to_db()
     client_limit = 43200
     client_run = 0
     bulk_trip = 0

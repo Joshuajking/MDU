@@ -3,7 +3,7 @@
 
 ### Custom Exclusions
 dual_universe/data/json/*
-dual_universe/src/utils/**/image_cache/
+dual_universe/util/**/image_cache/
 temp/*
 templates/invalid_images/*
 *.db
@@ -297,3 +297,4 @@ pip-selfcheck.json
 /dual_universe/src/models/missions.db
 /missions.db
 /dual_universe/config.json
+/dual_universe/dual_universe.sqbpro

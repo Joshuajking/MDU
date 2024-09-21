@@ -13,8 +13,11 @@ class BaseModelMixin(BaseModel):
     id: str = Field(
         default_factory=lambda: format_uuid(uuid.uuid4()), primary_key=True, index=True
     )
-    created_at: datetime = Field(default=datetime.utcnow(), nullable=False)
+    created_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
     updated_at: datetime = Field(default_factory=datetime.utcnow, nullable=False)
 
     class Config:
         from_attributes = True
+
+    def update_timestamp(self):
+        self.updated_at = datetime.utcnow()

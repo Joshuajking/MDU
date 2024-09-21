@@ -40,10 +40,6 @@ class DUClientManager(VerifyScreenMixin):
         if not isinstance(pid, int):
             logger.debug(f"{self.game_client} not running, pid:{pid}")
 
-        if not self.DEBUG_MODE:
-            self.mouse_listener.stop()
-            self.keyboard_listener.stop()
-
         return pid
 
     @timing_decorator

@@ -10,10 +10,10 @@ from pynput.mouse import Controller
 
 from dual_universe.src.mouse_controller import MouseControllerMixin
 from dual_universe.logs.logging_config import logger
-from config.config_manager import ConfigMixin
-from models.models import SearchAreaLocation
-from dual_universe.path_router import DirectoryPaths
-from dual_universe.src.querysets import SearchAreaQuerySet
+from dual_universe.config.config_manager import ConfigMixin
+from dual_universe.src.models.search_area_model import SearchAreaLocation
+from dual_universe.settings import TEMP_DIR
+from dual_universe.src.querysets.search_area_queryset import SearchAreaQuerySet
 
 
 class OCREngine(MouseControllerMixin):
@@ -95,7 +95,7 @@ class OCREngine(MouseControllerMixin):
 
     def convert_screenshot_to_32bit(self, area_screenshot):
         cell_screenshot = area_screenshot.convert("RGBA")
-        screenshot = os.path.join(DirectoryPaths.TEMP_DIR, "ocr_screenshot.png")
+        screenshot = os.path.join(TEMP_DIR, "ocr_screenshot.png")
         cell_screenshot.save(screenshot)
         cell_screenshot.close()
 
