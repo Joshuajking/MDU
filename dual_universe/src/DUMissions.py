@@ -6,9 +6,11 @@ import pyperclip
 
 from dual_universe.config.config_manager import ConfigMixin, timing_decorator
 from dual_universe.logs.logging_config import logger
-from models.models import SearchAreaLocation, ImageLocation
-from dual_universe.src.querysets import CharacterQuerySet, SearchAreaQuerySet
-from dual_universe.src.utils.special_mission_ocr import OCREngine
+from models.image_model import ImageLocation
+from models.search_area_model import SearchAreaLocation
+from dual_universe.src.querysets.character_queryset import CharacterQuerySet
+from dual_universe.src.querysets.search_area_queryset import SearchAreaQuerySet
+from dual_universe.util.special_mission_ocr import OCREngine
 from dual_universe.src.verify_screen import VerifyScreenMixin
 
 

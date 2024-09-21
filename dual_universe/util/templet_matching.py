@@ -6,7 +6,7 @@ from PIL import ImageGrab, Image
 
 from config.config_manager import ConfigMixin
 from dual_universe.src.querysets import ImageQuerySet
-from dual_universe.src.utils.read_json import read_json
+from dual_universe.util.read_json import read_json
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 config_json = os.path.join(script_dir, "..", "json/config.json")

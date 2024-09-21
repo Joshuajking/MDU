@@ -8,10 +8,11 @@ import pydirectinput
 from dual_universe.config.config_manager import ConfigMixin, timing_decorator
 from dual_universe.config.db_setup import DbConfig
 from dual_universe.logs.logging_config import logger
-from models.models import ImageLocation
-from dual_universe.path_router import DirectoryPaths
-from dual_universe.src.querysets import ImageQuerySet, CharacterQuerySet
-from dual_universe.src.utils.special_mission_ocr import OCREngine
+from models.image_model import ImageLocation
+from dual_universe.settings import SEARCH_AREA_DIR
+from dual_universe.src.querysets.image_queryset import ImageQuerySet
+from dual_universe.src.querysets.character_queryset import CharacterQuerySet
+from dual_universe.util.special_mission_ocr import OCREngine
 from dual_universe.src.verify_screen import VerifyScreenMixin
 
 
@@ -117,7 +118,7 @@ class DUFlight:
 
     def check_ship_landed(
         self,
-        img=(os.path.join(DirectoryPaths.SEARCH_AREA_DIR, "ORBITAL_HUD_LANDED.png")),
+        img=(os.path.join(SEARCH_AREA_DIR, "ORBITAL_HUD_LANDED.png")),
     ):
         return pyautogui.locateCenterOnScreen(
             image=img,

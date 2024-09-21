@@ -12,9 +12,9 @@ class TestProcessPackage(unittest.TestCase):
     def test_retrieve_package(self):
         # Patch the functions with specific return values
         with patch(
-            "utils.special_mission_ocr.OCREngine.ocr_missions"
+            "util.special_mission_ocr.OCREngine.ocr_missions"
         ) as mock_ocr_missions, patch(
-            "utils.verify_screen.VerifyScreen.screen"
+            "util.verify_screen.VerifyScreen.screen"
         ) as mock_screen, patch(
             "core.DUMissions.ocr.OCREngine.ocr_missions"
         ) as mock_active_taken_missions:

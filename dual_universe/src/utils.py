@@ -105,4 +105,4 @@ class ClientManager:
 if __name__ == "__main__":
     obj = ClientManager()
     obj.start_application()
-    obj.stop_application()
+    # obj.stop_application()

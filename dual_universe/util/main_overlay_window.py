@@ -3,7 +3,7 @@ from time import time
 import cv2 as cv
 
 from config.config_manager import ConfigMixin
-from dual_universe.src.utils.read_json import read_json
+from dual_universe.util.read_json import read_json
 from vision import Vision
 from windowcapture import WindowCapture
 

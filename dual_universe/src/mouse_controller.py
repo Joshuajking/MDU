@@ -4,6 +4,9 @@ import pyautogui
 import pydirectinput
 import pytweening
 from loguru import logger
+from pynput import mouse
+from pynput.mouse import Controller
+from skimage.future.manual_segmentation import LEFT_CLICK
 
 
 class MouseControllerMixin:
@@ -68,5 +71,5 @@ class MouseControllerMixin:
             _pause=True,
         )
         if mouse_click:
-            # pyautogui.click(clicks=mouse_clicks, duration=random.uniform(0.2, 0.4))
+            # pyautogui.click(clic ks=mouse_clicks, duration=random.uniform(0.2, 0.4))
             pydirectinput.click(clicks=mouse_clicks, interval=0.2)

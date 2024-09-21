@@ -3,7 +3,7 @@ import os
 from PIL import Image
 
 from config.config_manager import ConfigMixin
-from dual_universe.src.utils.read_json import read_json
+from dual_universe.util.read_json import read_json
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 json_dir = os.path.join(script_dir, "..", "json/config.json")

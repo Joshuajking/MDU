@@ -29,7 +29,7 @@ TEMPLATES_DIR = ROOT_DIR / "templates"
 INVALID_IMAGES_DIR = TEMPLATES_DIR / "invalid_images"
 TESTS_DIR = ROOT_DIR / "tests"
 # UI_DIR = ROOT_DIR / "ui"
-UTILS_DIR = ROOT_DIR / "utils"
+UTILS_DIR = ROOT_DIR / "util"
 DU_IMAGES_DIR = ASSETS_DIR / "images"
 SEARCH_AREA_DIR = ASSETS_DIR / "search_areas"
 
