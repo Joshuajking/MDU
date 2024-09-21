@@ -1,14 +1,19 @@
+import os
 import random
 from dataclasses import dataclass
 from time import sleep
 from typing import Optional
-
+from pathlib import Path
 import pyautogui
 import pydirectinput
 
-from models.models import ImageLocation
-from dual_universe.src.querysets import ImageQuerySet
+from models.image_model import ImageLocation
+from querysets.image_queryset import ImageQuerySet
 from dual_universe.src.mouse_controller import MouseControllerMixin
+
+# Define a base directory for all images
+# base_image_dir = Path(__file__).parent.parent / "data" / "images"
+base_image_dir = Path(__file__).parent.parent
 
 
 class ImageNotFound(Exception):
@@ -42,22 +47,31 @@ class VerifyScreenMixin(MouseControllerMixin):
     def __post_init__(self):
         if self.skip_sleep:
             self.minSearchTime = 3
+        self.screen()
 
     def screen(self):
         # read the image by name
         image_data = ImageQuerySet.read_image_by_name(
             image_name=self.image_to_compare, image_location=self.screen_name
         )
+        # Assuming image_data.image_url contains the relative path or just the image name
+        image_path = base_image_dir / image_data.image_url
+
+        # Convert the path to an absolute path
+        image_path = image_path.resolve()
+
         if image_data is None:
             raise AttributeError(
                 f"Error: image_to_compare={self.image_to_compare} not found on screen_name={self.screen_name}"
             )
-
-        screen_coords = pyautogui.locateOnScreen(
-            image=image_data.image_url,
-            minSearchTime=self.minSearchTime,
-            confidence=self.confidence,
-        )
+        try:
+            screen_coords = pyautogui.locateOnScreen(
+                image=str(image_path),
+                minSearchTime=self.minSearchTime,
+                confidence=self.confidence,
+            )
+        except Exception as e:
+            print(e)
         if screen_coords is None:
             # TODO: add a screenshot here to capture the error with details
             return {

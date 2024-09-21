@@ -15,7 +15,7 @@ from dual_universe.src.models.search_area_model import SearchArea
 ROOT_DIR = Path(__file__).resolve().parent
 
 CONFIG_DIR = ROOT_DIR / "config"
-ASSETS_DIR = ROOT_DIR / "assets"
+ASSETS_DIR = ROOT_DIR / "data"
 # JSON_DIR = DATA_DIR / "json"
 LOGS_DIR = ROOT_DIR / "logs"
 CORES_DIR = ROOT_DIR / "src"

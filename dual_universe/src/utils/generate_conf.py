@@ -404,7 +404,7 @@ def assets_json_structure():
     if os.path.exists(output_json_path):
         json_modification_time = os.path.getmtime(output_json_path)
         if last_modification_time <= json_modification_time:
-            logger.info("No modifications in assets directory. Skipping JSON update.")
+            logger.info("No modifications in data directory. Skipping JSON update.")
             return
     try:
         with open(output_json_path, "w") as json_file:

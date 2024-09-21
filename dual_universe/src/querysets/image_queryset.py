@@ -8,8 +8,9 @@ from typing import Optional, Dict, Any
 from loguru import logger
 from sqlmodel import Session, select
 
-from dual_universe.src.models import Image, ImageLocation
-from dual_universe.settings import engine
+from dual_universe.src.models.image_model import Image, ImageLocation
+
+from dual_universe.settings import db_engine as engine
 
 
 class ImageQuerySet:

@@ -1,9 +1,11 @@
 from enum import Enum
 from typing import Optional, Dict, Type
 
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, MetaData
 
 from dual_universe.src.models.base_model_mixin import BaseModelMixin
+
+metadata = MetaData()
 
 
 class SearchAreaLocation(str, Enum):
@@ -36,6 +38,8 @@ class SearchAreaLocation(str, Enum):
 
 
 class SearchArea(BaseModelMixin, SQLModel, table=True):
+    __table_args__ = {"extend_existing": True}
+
     region_name: Optional[SearchAreaLocation] = None
     left: int = Field(default=None, nullable=False)
     top: int = Field(default=None, nullable=False)

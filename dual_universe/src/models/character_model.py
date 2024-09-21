@@ -1,11 +1,15 @@
 from typing import Dict, Type
 
-from sqlmodel import SQLModel, Field
 
 from dual_universe.src.models.base_model_mixin import BaseModelMixin
+from sqlmodel import SQLModel, Field, MetaData
+
+metadata = MetaData()
 
 
 class Character(SQLModel, BaseModelMixin, table=True):
+    __table_args__ = {"extend_existing": True}
+
     username: str = Field(nullable=False)
     email: str = Field(nullable=False)
     password: str = Field(nullable=False)

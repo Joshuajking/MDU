@@ -385,3 +385,4 @@ class DbConfig(ConfigMixin, DbChecker):
 if __name__ == "__main__":
     obj = DbConfig()
     obj.main()
+    obj.load_image_entries_to_db()

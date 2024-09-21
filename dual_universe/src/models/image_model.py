@@ -1,9 +1,11 @@
 from enum import Enum
 from typing import Optional, Dict, Type
 
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, MetaData
 
 from dual_universe.src.models.base_model_mixin import BaseModelMixin
+
+metadata = MetaData()
 
 
 class ImageLocation(str, Enum):
@@ -23,6 +25,8 @@ class ImageLocation(str, Enum):
 
 
 class Image(SQLModel, BaseModelMixin, table=True):
+    __table_args__ = {"extend_existing": True}
+
     image_name: str = Field(nullable=False)
     image_location: Optional[ImageLocation] = None
     image_url: str = Field(nullable=False)

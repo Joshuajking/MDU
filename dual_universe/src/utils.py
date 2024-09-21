@@ -2,6 +2,8 @@ import subprocess
 
 import psutil
 
+from dual_universe.src.models.image_model import ImageLocation
+
 
 class SelfHostedClient:
     hosted_client = "Dual.exe"
@@ -74,11 +76,11 @@ class ClientManager:
                 subprocess.Popen(self.path)
             except Exception as e:
                 print(e)
-            VerifyScreenMixin(
-                screen_name="ImageLocation.LOGIN_SCREEN",
-                image_to_compare="du_login_screen_label",
-                verify_screen=True,
-            )
+        VerifyScreenMixin(
+            screen_name=ImageLocation.LOGIN_SCREEN,
+            image_to_compare="du_login_screen_label",
+            verify_screen=True,
+        )
 
     def stop_application(self):
         """Stop the game_client application if running."""
@@ -103,3 +105,4 @@ class ClientManager:
 if __name__ == "__main__":
     obj = ClientManager()
     obj.start_application()
+    obj.stop_application()
