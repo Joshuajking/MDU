@@ -27,6 +27,7 @@ class DUCharacters(VerifyScreenMixin):
         # if not at login screen, logout
         if response_du_login_screen_label.request.status_code == 400:
             self.logout()
+            return
 
         attempts = 4
         count = 0
@@ -114,7 +115,7 @@ class DUCharacters(VerifyScreenMixin):
             image_to_compare="loading_complete",
             skip_sleep=True,
         )
-        if not loading_complete_response.request.status_code == 200:
+        if loading_complete_response.request.status_code == 400:
             return
 
         count = 0

@@ -87,6 +87,7 @@ class VerifyScreenMixin(MouseControllerMixin):
                     "screen_coords": None,
                     "minSearchTime": self.minSearchTime,
                     "actual_time_taken": time_taken,
+                    "image": image_path,
                 }
             )
             response_data = {
@@ -142,6 +143,7 @@ class VerifyScreenMixin(MouseControllerMixin):
                     "screen_coords": _screen_coords,
                     "minSearchTime": self.minSearchTime,
                     "actual_time_taken": time_taken,
+                    "image": image_path,
                 }
             )
             response_data = {
