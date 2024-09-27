@@ -1,17 +1,11 @@
-import random
-import sys
-from time import sleep
-
-import keyboard
 import pyautogui
-import pydirectinput
 
 from dual_universe.config.config_manager import timing_decorator
-from dual_universe.integrations.libs import keyboard_press, keyboard_write
+from dual_universe.integrations.key_board import keyboard_press, keyboard_write
 from dual_universe.logs.logging_config import logger
+from dual_universe.src.verify_screen import VerifyScreenMixin
 from models.image_model import ImageLocation
 from querysets.character_queryset import CharacterQuerySet
-from dual_universe.src.verify_screen import VerifyScreenMixin
 
 
 class DUCharacters(VerifyScreenMixin):

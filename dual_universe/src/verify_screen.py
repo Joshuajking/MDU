@@ -1,19 +1,18 @@
-import os
 import random
 import time
 from dataclasses import dataclass
-from time import sleep
-from typing import Optional, Dict
 from pathlib import Path
+from time import sleep
+from typing import Optional
+
 import pyautogui
 import pydirectinput
 
-from dual_universe.config.config_manager import timing_decorator
 from dual_universe.logs.logging_config import logger
+from dual_universe.src.mouse_controller import MouseControllerMixin
 from dual_universe.util.response import Response
 from models.image_model import ImageLocation
 from querysets.image_queryset import ImageQuerySet
-from dual_universe.src.mouse_controller import MouseControllerMixin
 
 # Define a base directory for all images
 # base_image_dir = Path(__file__).parent.parent / "data" / "images"
