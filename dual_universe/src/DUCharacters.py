@@ -6,6 +6,7 @@ import pyautogui
 import pydirectinput
 
 from dual_universe.config.config_manager import timing_decorator
+from dual_universe.integrations.libs import keyboard_press, keyboard_write
 from dual_universe.logs.logging_config import logger
 from models.image_model import ImageLocation
 from querysets.character_queryset import CharacterQuerySet
@@ -28,20 +29,17 @@ class DUCharacters(VerifyScreenMixin):
             )
             if response_du_login_screen_label.request.data["success"]:
                 break
-            self.logout()
+            else:
+                self.logout()
 
         attempts = 3
         count = 0
         while count <= attempts:
             logger.info(f"logging into {character.username}")
-
-            keyboard.press("tab")
-            sleep(0.75)
-            keyboard.press("backspace")
-            sleep(0.75)
-            keyboard.press("tab")
-            sleep(0.75)
-            keyboard.press("backspace")
+            keyboard_press("tab")
+            keyboard_press("backspace")
+            keyboard_press("tab")
+            keyboard_press("backspace")
 
             response_email_login = VerifyScreenMixin(
                 screen_name=ImageLocation.LOGIN_SCREEN,
@@ -50,10 +48,8 @@ class DUCharacters(VerifyScreenMixin):
                 mouse_clicks=4,
             )
 
-            sleep(0.75)
-            keyboard.write(character.email)
-            sleep(0.75)
-            pydirectinput.press("tab")
+            keyboard_write(character.email)
+            keyboard_press("tab")
 
             response_password_login = VerifyScreenMixin(
                 screen_name=ImageLocation.LOGIN_SCREEN,
@@ -62,9 +58,8 @@ class DUCharacters(VerifyScreenMixin):
                 mouse_clicks=4,
             )
 
-            keyboard.write(character.password)
-            sleep(random.uniform(0.1, 0.4))
-            pydirectinput.press("enter")
+            keyboard_write(character.password)
+            keyboard_press("enter")
 
             internal_error = VerifyScreenMixin(
                 screen_name=ImageLocation.LOGIN_SCREEN,
@@ -157,7 +152,7 @@ class DUCharacters(VerifyScreenMixin):
         """Comes in after welcome back reward"""
         step_scroll = 1000
         # Press F4(map)
-        pydirectinput.press("f4")
+        keyboard_press("f4")
         # wait for map loading
         my_marker = VerifyScreenMixin(
             screen_name=ImageLocation.MAP_SCREEN,
@@ -185,7 +180,7 @@ class DUCharacters(VerifyScreenMixin):
             confidence=0.8,
         )
         # close map (Esc)
-        pydirectinput.press("esc")
+        keyboard_press("esc")
 
     @timing_decorator
     def survey(self):
