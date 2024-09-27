@@ -1,4 +1,5 @@
 import random
+import sys
 from time import sleep
 
 import keyboard
@@ -15,24 +16,19 @@ from dual_universe.src.verify_screen import VerifyScreenMixin
 
 class DUCharacters(VerifyScreenMixin):
     def __init__(self):
-        # self.verify = VerifyScreenMixin()
         pass
 
     @timing_decorator
     def login(self, character):
-        response_du_login_screen_label = True
-        while response_du_login_screen_label:
-            response_du_login_screen_label = VerifyScreenMixin(
-                screen_name=ImageLocation.LOGIN_SCREEN,
-                image_to_compare="du_login_screen_label",
-                skip_sleep=True,
-            )
-            if response_du_login_screen_label.request.data["success"]:
-                break
-            else:
-                self.logout()
+        response_du_login_screen_label = VerifyScreenMixin(
+            screen_name=ImageLocation.LOGIN_SCREEN,
+            image_to_compare="du_login_screen_label",
+        )
+        # if not at login screen, logout
+        if response_du_login_screen_label.request.status_code == 400:
+            self.logout()
 
-        attempts = 3
+        attempts = 4
         count = 0
         while count <= attempts:
             logger.info(f"logging into {character.username}")
@@ -41,66 +37,68 @@ class DUCharacters(VerifyScreenMixin):
             keyboard_press("tab")
             keyboard_press("backspace")
 
-            response_email_login = VerifyScreenMixin(
+            is_email_field_empty = VerifyScreenMixin(
                 screen_name=ImageLocation.LOGIN_SCREEN,
                 image_to_compare="email_login",
                 mouse_click=True,
                 mouse_clicks=4,
             )
+            # checking if email field is empty
+            if is_email_field_empty.request.status_code == 400:
+                count += 1
+                continue
 
             keyboard_write(character.email)
             keyboard_press("tab")
 
-            response_password_login = VerifyScreenMixin(
+            is_password_field_empty = VerifyScreenMixin(
                 screen_name=ImageLocation.LOGIN_SCREEN,
                 image_to_compare="password_login",
                 mouse_click=True,
                 mouse_clicks=4,
+                skip_sleep=True,
             )
+            # checking if password field is empty
+            if is_password_field_empty.request.status_code == 400:
+                count += 1
+                continue
 
             keyboard_write(character.password)
             keyboard_press("enter")
 
-            internal_error = VerifyScreenMixin(
+            is_internal_error = VerifyScreenMixin(
                 screen_name=ImageLocation.LOGIN_SCREEN,
                 image_to_compare="internal_error",
                 confidence=0.8,
-                minSearchTime=3,
                 skip_sleep=True,
             )
-            response_email_login = VerifyScreenMixin(
-                screen_name=ImageLocation.LOGIN_SCREEN,
-                image_to_compare="email_login",
-                mouse_click=True,
-                minSearchTime=3,
-                skip_sleep=True,
-            )
-
-            if (
-                internal_error.request.data["success"]
-                and not response_email_login.request.data["success"]
-            ):
-                logger.warning({"success": False, "status": "email_field: failed"})
+            # checking if there is an internal error (incorrect email or password)
+            if is_internal_error.request.status_code == 400:
+                count += 1
                 continue
 
-            response_gametime_error_lable = VerifyScreenMixin(
+            is_gametime_error = VerifyScreenMixin(
                 screen_name=ImageLocation.LOGIN_SCREEN,
                 image_to_compare="gametime_error_lable",
                 skip_sleep=True,
             )
-
-            if response_gametime_error_lable.request.data["success"]:
+            # checking if character has NO gametime
+            if is_gametime_error.request.status_code == 200:
                 logger.debug(f"No game time: {character.username}")
                 CharacterQuerySet.update_character(
                     character, {"has_gametime": False, "active": False}
                 )
-
                 return False
 
-            response_loading_complete = VerifyScreenMixin(
+            is_loading_complete = VerifyScreenMixin(
                 screen_name=ImageLocation.IN_GAME_SCREEN,
                 image_to_compare="loading_complete",
+                minSearchTime=120,
             )
+            # checking if character loaded in game within minSearchTime
+            if not is_loading_complete.request.status_code == 200:
+                logger.warning("Loading in game failed")
+                raise
 
             logger.success(f"{character.username} Successfully loaded game")
             CharacterQuerySet.update_character(character, {"has_gametime": True})
@@ -116,7 +114,7 @@ class DUCharacters(VerifyScreenMixin):
             image_to_compare="loading_complete",
             skip_sleep=True,
         )
-        if not loading_complete_response.request.data["success"]:
+        if not loading_complete_response.request.status_code == 200:
             return
 
         count = 0
@@ -189,11 +187,10 @@ class DUCharacters(VerifyScreenMixin):
             image_to_compare="survey",
             skip_sleep=True,
         )
-        if survey["screen_coords"] is not None:
+        if survey.request.status_code == 200:
             VerifyScreenMixin(
                 screen_name=ImageLocation.IN_GAME_SCREEN,
                 image_to_compare="survey_skip_btn",
-                skip_sleep=True,
                 mouse_click=True,
             )
         return
@@ -206,11 +203,10 @@ class DUCharacters(VerifyScreenMixin):
             image_to_compare="quanta_lable",
             skip_sleep=True,
         )
-        if welcome_screen["screen_coords"] is not None:
+        if welcome_screen.request.status_code == 200:
             VerifyScreenMixin(
                 screen_name=ImageLocation.IN_GAME_SCREEN,
                 image_to_compare="selected_ok_btn",
-                skip_sleep=True,
                 mouse_click=True,
             )
         return
