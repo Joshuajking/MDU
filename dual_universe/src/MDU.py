@@ -10,16 +10,19 @@ from dual_universe.src.DUMissions import DUMissions
 from dual_universe.src.querysets.character_queryset import CharacterQuerySet
 
 
-class EngineLoop(DUCharacters, DUFlight, DUMissions):
+class EngineLoop:
 
     def __init__(self):
-        super().__init__()
+        self.char = DUCharacters()
+        self.mission = DUMissions()
+        self.flight = DUFlight()
         self.retrieve_mode = True
         self.config_manager = ConfigMixin()
         self.trips = 0
         self.max_trips = 2
         self.all_active_characters = CharacterQuerySet.get_active_characters()
         self.active_character_count = CharacterQuerySet.count_active_characters()
+        self.active_package_count()
 
     def active_package_count(self):
         package_count = CharacterQuerySet.count_has_package_and_active_characters()
@@ -34,12 +37,6 @@ class EngineLoop(DUCharacters, DUFlight, DUMissions):
                 self.retrieve_mode = True
 
     def engine(self):
-        # trips = 0
-        # max_trips = 2
-        # all_active_characters = CharacterQuerySet.get_active_characters()
-        # active_character_count = CharacterQuerySet.count_active_characters()
-        self.active_package_count()
-
         while self.active_character_count > 0 and self.trips < self.max_trips:
             trip_time_start = perf_counter()
             tt_char_time = 0
@@ -50,19 +47,20 @@ class EngineLoop(DUCharacters, DUFlight, DUMissions):
                     continue
 
                 character_time_start = perf_counter()
-                has_gametime = self.login(character)
+
+                has_gametime = self.char.login(character)
                 if not has_gametime:
                     continue
                 sleep(3)
 
-                status = self.process_package(character)
+                status = self.mission.process_package(character)
 
                 logger.info(f"{character.username} package status: {status}")
                 CharacterQuerySet.update_character(
                     character, {"has_package": status["has_package"]}
                 )
 
-                self.logout()
+                self.char.logout()
                 character_time_stop = perf_counter()
                 char_time = character_time_stop - character_time_start
                 tt_char_time += char_time
@@ -84,9 +82,9 @@ class EngineLoop(DUCharacters, DUFlight, DUMissions):
             )
             logger.info(f"Logging into Pilot: {pilot.username}")
 
-            self.login(pilot)
+            self.char.login(pilot)
 
-            self.mission_flight(self.retrieve_mode)
+            self.flight.mission_flight(self.retrieve_mode)
 
             self.trips += 1
             trip_time_stop = perf_counter()

@@ -20,7 +20,6 @@ class DUMissions:
 
     def __init__(self):
         self.config_manager = ConfigMixin()
-        self.verify = VerifyScreenMixin()
         self.ocr = OCREngine()
         self.active_mission_name = self.config_manager.get_value(
             "config.active_mission_name"

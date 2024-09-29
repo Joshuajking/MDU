@@ -130,10 +130,10 @@ class DUCharacters(VerifyScreenMixin):
                 mouse_click=True,
                 mouse_clicks=1,
             )
-            if not logout_btn_response["success"]:
+            if not logout_btn_response.request.status_code == 200:
                 count += 1
                 continue
-            elif logout_btn_response["success"] and respawn:
+            elif logout_btn_response.request.status_code == 200 and respawn:
                 return
             at_esc_menu = True
             # pyautogui.click(logout_btn_response['screen_coords'])
@@ -210,9 +210,9 @@ class DUCharacters(VerifyScreenMixin):
 
 if __name__ == "__main__":
     obj = DUCharacters()
-    obj.login(
-        character={
-            "barron",
-        }
-    )
+    # obj.login(
+    #     character={
+    #         "barron",
+    #     }
+    # )
     obj.logout(respawn=False)

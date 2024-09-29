@@ -110,7 +110,7 @@ class VerifyScreenMixin(MouseControllerMixin):
             # Extract screen coordinates
             x, y = _screen_coords
 
-            # Simplified condition checks
+            # Simplified condition checks  FixMe: This logic needs re-worked
             if self.mouse_click and not self.esc:
                 if not self.skip_sleep:
                     # self.handle_mouse_click(x, y)
