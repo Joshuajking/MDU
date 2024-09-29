@@ -1,9 +1,8 @@
 import json
 import os
 
+from dual_universe.settings import ASSETS_DIR
 from dual_universe.logs.logging_config import logger
-
-from dual_universe.path_router import DirectoryPaths
 
 
 def read_json(json_file) -> json:
@@ -12,7 +11,7 @@ def read_json(json_file) -> json:
     :return:
     """
 
-    read_file_path = os.path.join(DirectoryPaths.ASSETS_DIR, json_file)
+    # read_file_path = os.path.join(ASSETS_DIR, json_file)
     data = None
 
     try:

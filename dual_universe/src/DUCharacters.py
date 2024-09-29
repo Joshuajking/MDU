@@ -1,6 +1,7 @@
 import pyautogui
 
 from dual_universe.config.config_manager import timing_decorator
+from dual_universe.config.db_setup import EncryptPassword
 from dual_universe.integrations.key_board import keyboard_press, keyboard_write
 from dual_universe.logs.logging_config import logger
 from dual_universe.src.verify_screen import VerifyScreenMixin
@@ -57,8 +58,8 @@ class DUCharacters(VerifyScreenMixin):
             if is_password_field_empty.request.status_code == 400:
                 count += 1
                 continue
-
-            keyboard_write(character.password)
+            decrypt = EncryptPassword()
+            keyboard_write(decrypt.decrypt_password(character.password))
             keyboard_press("enter")
 
             is_internal_error = VerifyScreenMixin(

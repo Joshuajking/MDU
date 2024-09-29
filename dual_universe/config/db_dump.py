@@ -99,3 +99,4 @@ class DumpDataBase(ConfigMixin):
 
 if __name__ == "__main__":
     obj = DumpDataBase()
+    obj.dump_table_SearchArea()

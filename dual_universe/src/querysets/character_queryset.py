@@ -140,3 +140,8 @@ class CharacterQuerySet:
                 print(f"Character deleted: {username}")
             else:
                 print("Character not found")
+
+
+if __name__ == "__main__":
+    obj = CharacterQuerySet()
+    obj.delete_character_by_username("barron")

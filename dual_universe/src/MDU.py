@@ -3,10 +3,10 @@ from time import perf_counter, sleep
 
 from dual_universe.config.config_manager import ConfigMixin
 from DUCharacters import DUCharacters
-from DUClientManager import DUClientManager
 from DUFlight import DUFlight
 from DUMissions import DUMissions
 from dual_universe.logs.logging_config import logger
+from dual_universe.src.DUClientManager import ClientManager
 from querysets.character_queryset import CharacterQuerySet
 
 
@@ -104,10 +104,10 @@ if __name__ == "__main__":
     client_run = 0
     bulk_trip = 0
     client_start = perf_counter()
-    client = DUClientManager()
+    client = ClientManager()
     start = EngineLoop()
     while True:
-        # client.start_application()
+        client.start_application()
         try:
             start.engine()
         except Exception as e:

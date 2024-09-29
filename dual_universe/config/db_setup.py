@@ -5,19 +5,39 @@ import uuid
 from datetime import datetime
 
 import pyautogui
+from cryptography.fernet import Fernet
 from loguru import logger
 from sqlmodel import SQLModel, Session, select
 
 from dual_universe.config.config_manager import ConfigMixin
 from dual_universe.config.db_dump import DumpDataBase
-from dual_universe.settings import ASSETS_DIR, CONFIG_DIR
+from dual_universe.settings import CONFIG_DIR, DU_IMAGES_DIR
 from dual_universe.settings import db_engine
 from dual_universe.src.models.character_model import Character
 from dual_universe.src.models.image_model import Image
 from dual_universe.src.models.mission_model import Mission, MissionMetadata
 from dual_universe.src.models.search_area_model import SearchArea
 from dual_universe.src.querysets.search_area_queryset import SearchAreaQuerySet
+from dual_universe.util.data_preprocessor import DataPreprocessor
 from dual_universe.util.find_existing_item import find_existing_item
+from dual_universe.util.key_gen import setup_key
+
+
+class EncryptPassword:
+    def __init__(self):
+        # Retrieve the Fernet key from the environment variable
+        key = setup_key()
+        self.cipher = Fernet(key)
+
+    def encrypt_password(self, plain_password):
+        # Encrypt the plain text password
+        encrypted_password = self.cipher.encrypt(plain_password.encode("utf-8"))
+        return encrypted_password
+
+    def decrypt_password(self, encrypted_password):
+        # Decrypt the encrypted password
+        decrypted_password = self.cipher.decrypt(encrypted_password).decode("utf-8")
+        return decrypted_password
 
 
 class DbChecker:
@@ -120,7 +140,7 @@ class DbConfig(ConfigMixin, DbChecker):
     def __init__(self):
         super().__init__()
         self.db_engine = db_engine
-        self.images_dir = os.path.join(ASSETS_DIR)
+        self.images_dir = os.path.join(DU_IMAGES_DIR)
         self.create_db_and_tables()
 
     def create_db_and_tables(self):
@@ -133,7 +153,7 @@ class DbConfig(ConfigMixin, DbChecker):
     def load_SearchArea_table(self):
         try:
             # Load the JSON data from the file
-            file_path = os.path.join(ASSETS_DIR, "SearchArea_table.json")
+            file_path = os.path.join(CONFIG_DIR, "searcharea_table.json")
             with open(file_path, "r") as json_file:
                 json_data = json.load(json_file)
 
@@ -164,7 +184,7 @@ class DbConfig(ConfigMixin, DbChecker):
     def load_Image_table(self):
         try:
             # Load the JSON data from the file
-            file_path = os.path.join(ASSETS_DIR, "image_table.json")
+            file_path = os.path.join(CONFIG_DIR, "image_table.json")
             with open(file_path, "r") as json_file:
                 json_data = json.load(json_file)
 
@@ -202,7 +222,7 @@ class DbConfig(ConfigMixin, DbChecker):
                 else:
                     self.load_Mission_table()
             # Load the JSON data from the file
-            file_path = os.path.join(ASSETS_DIR, "Mission_table.json")
+            file_path = os.path.join(CONFIG_DIR, "Mission_table.json")
             with open(file_path, "r") as json_file:
                 json_data = json.load(json_file)
 
@@ -362,8 +382,51 @@ class DbConfig(ConfigMixin, DbChecker):
         logger.debug("Character_table - Not Valid")
 
     def load_Character_table(self):
-        logger.debug(f"Loading Character table NotImplemented")
-        pass
+        # Assuming DataPreprocessor processes the CSV into a pandas DataFrame
+        data = DataPreprocessor(
+            r"C:\Users\joshu\Development\MDU\temp_character_csv\Dual Universe - user list.csv"
+        )
+        try:
+            with Session(self.db_engine) as session:
+                # Assuming data.df is a dictionary
+                for index in data.df["email"].keys():
+                    email = data.df["email"][index]
+                    plain_password = data.df["password"][index]
+                    username = data.df["username"][index]
+
+                    # Encrypt the password before storing it in the database
+                    encrypt = EncryptPassword()
+                    encrypted_password = encrypt.encrypt_password(plain_password)
+
+                    # Check if a Character instance with the same email already exists
+                    existing_character = session.exec(
+                        select(Character).where(Character.email == email)
+                    ).first()
+
+                    if existing_character:
+                        logger.info(
+                            f"Character already exists: {existing_character.username}"
+                        )
+                        continue
+                    else:
+                        # Create a new Character instance with the data
+                        character = Character(
+                            id=str(uuid.uuid4()),
+                            created_at=datetime.now(),
+                            updated_at=datetime.now(),
+                            username=username.lower(),
+                            email=email.lower(),
+                            password=encrypted_password,
+                            has_package=0,
+                            has_gametime=1,
+                            active=1,
+                        )
+                        session.add(character)
+
+                session.commit()
+                logger.success("Character table loaded successfully")
+        except Exception as e:
+            logger.error(f"Error loading table: {e}")
 
     def load_MissionMetadata_table(self):
         logger.debug(f"Loading Mission metadata table NotImplemented")
@@ -384,5 +447,6 @@ class DbConfig(ConfigMixin, DbChecker):
 
 if __name__ == "__main__":
     obj = DbConfig()
-    obj.main()
-    obj.load_image_entries_to_db()
+    obj.load_Character_table()
+    # obj.main()
+    # obj.load_image_entries_to_db()

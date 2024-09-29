@@ -39,7 +39,6 @@ class VerifyScreenMixin(MouseControllerMixin):
     confidence: float = 0.8
     minSearchTime: float = 60
     mouse_clicks: int = 0
-    verify_screen: bool = False
     skip_sleep: bool = False
     mouse_click: bool = False
     # region: Union[tuple, int] = None

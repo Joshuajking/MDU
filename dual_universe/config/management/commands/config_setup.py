@@ -68,7 +68,7 @@ def update_config_file(file_path):
     }
 
     # Pre-defined options for game_client, active_mission_name, and active_characters
-    game_client_options = ["GeForceNOW", "Steam", "Desktop Client"]
+    game_client_options = ["GeForceNOW", "Steam", "Desktop Client", "MyDU"]
     mission_name_options = [
         "Pure Sulfur Shipment",
         "Iron Ore Delivery",

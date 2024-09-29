@@ -1,67 +1,137 @@
 import subprocess
-import time
 
 import psutil
-import pynput
 
-from dual_universe.config.config_manager import ConfigMixin, timing_decorator
-from dual_universe.logs.logging_config import logger
-from models.image_model import ImageLocation
+from dual_universe.config.config_manager import ConfigMixin
+from dual_universe.src.models.image_model import ImageLocation
 from dual_universe.src.verify_screen import VerifyScreenMixin
 
 
-class DUClientManager(VerifyScreenMixin):
+class SelfHostedClient:
+
     def __init__(self):
-        self.config_manager = ConfigMixin()
-        self.game_client = self.config_manager.get_value("config.game_client")
-        self.app_path = self.config_manager.get_value("config.app_path")
-        self.mouse_listener = pynput.mouse.Listener(suppress=True)
-        self.keyboard_listener = pynput.keyboard.Listener(suppress=True)
+        hosted_client = "Dual.exe"
+        self.path = "C:\ProgramData\My Dual Universe\dual-launcher.exe"
+
+    def run(self):
+        return self.path
+
+
+class GeForceNowClient:
+
+    def __init__(self):
+        geforce_client = "GeForceNOW.exe"
+
+    def run(self):
+        pass
+
+
+class DualUniverseDesktopClient:
+
+    def __init__(self):
+        self.du_client = "Dual.exe"
+
+    def run(self):
+        pass
+
+
+class DualUniverseMyDuClient:
+    def __init__(self):
+        self.du_client = "dual-launcher.exe"
+        self.path = "C:\ProgramData\My Dual Universe\dual-launcher.exe"
+
+    def run(self):
+        try:
+            # Start the application
+            subprocess.Popen(self.path)
+        except Exception as e:
+            print(e)
+
+        du_launcher_screen = VerifyScreenMixin(
+            screen_name=ImageLocation.LOGIN_SCREEN,
+            image_to_compare="du_launcher_screen",
+        )
+        du_luncher_play_btn = VerifyScreenMixin(
+            screen_name=ImageLocation.LOGIN_SCREEN,
+            image_to_compare="du_luncher_play_btn",
+            mouse_click=True,
+        )
+        my_du_login_screen = VerifyScreenMixin(
+            screen_name=ImageLocation.LOGIN_SCREEN,
+            image_to_compare="my_du_login_screen",
+        )
+
+
+class DualUniverseSteamClient:
+
+    def __init__(self):
+        du_client = "Dual.exe"
+        self.path = "C:\Program Files (x86)\Steam\steamapps\common\Dual Universe\DualUniverse.exe"
+
+    def run(self):
+        return self.path
+
+
+def run_client_class(result):
+    class_map = {
+        "geforcenow": GeForceNowClient,
+        "steam": DualUniverseSteamClient,
+        "desktop client": DualUniverseDesktopClient,
+        "mydu": DualUniverseMyDuClient,
+    }
+    cls = class_map.get(result)
+    if cls:
+        instance = cls()
+        return instance.run()
+    else:
+        return "No class found for given result"
+
+
+class ClientManager:
+
+    def __init__(self):
+        pass
 
     def is_client_running(self) -> int:
-        """Check if the game_client is running."""
-        # TODO: Need to find an alternative to setting window to focus Windows has made to many restrictions on this
-        # One thought would be to freeze mouse and keyboard control and then move the mouse to the client/game by image capture
-
-        # self.mouse_listener.start()
-        # self.keyboard_listener.start()
-
         pid = None
-        list_of_processes = []
-        geforce_client = "GeForceNOW.exe"
-        du_client = "Dual.exe"
+        game_client = ["GeForceNOW.exe", "Dual.exe", "dual-launcher.exe"]
+
+        # Iterate over all running processes with 'pid', 'name', and 'create_time'
         for process in psutil.process_iter(["pid", "name", "create_time"]):
-            list_of_processes.append(process)
-            if process.info["name"] == self.game_client:
-                pid = process.info["pid"]
-                _start_time = process.info["create_time"]
-                logger.debug(f"{self.game_client}: {process}, started at {_start_time}")
-                break
-        if not isinstance(pid, int):
-            logger.debug(f"{self.game_client} not running, pid:{pid}")
+            try:
+                # Check if the process name is in the game_client list
+                if process.info["name"] in game_client:
+                    pid = process.info["pid"]
+                    client_name = process.info["name"]
+                    _start_time = process.info["create_time"]
+                    print(
+                        f"Game client running: {process.info['name']}, PID: {pid}, Start time: {_start_time}"
+                    )
+                    return pid  # Return the PID if a matching process is found
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+                # Handle processes that no longer exist or are inaccessible
+                continue
 
-        return pid
+        return pid  # Return None if no matching process is found
 
-    @timing_decorator
     def start_application(self):
         """Start the game_client application if not already running."""
+        from verify_screen import VerifyScreenMixin
+
         client_pid = self.is_client_running()
         if not isinstance(client_pid, int):
+            config_manager = ConfigMixin()
+            game_client = config_manager.get_value("config.game_client")
+            path = run_client_class(game_client)
             try:
                 # Start the application
-                subprocess.Popen(self.app_path)
-                logger.debug(f"Started game client: {self.app_path}")
+                subprocess.Popen(path)
             except Exception as e:
-                logger.error(
-                    f"Error while starting the application: {e}, {self.app_path}"
-                )
-
-            VerifyScreenMixin(
-                screen_name=ImageLocation.LOGIN_SCREEN,
-                image_to_compare="du_login_screen_label",
-                verify_screen=True,
-            )
-            logger.success(f"game client started: {self.app_path}")
+                print(e)
+        VerifyScreenMixin(
+            screen_name=ImageLocation.LOGIN_SCREEN,
+            image_to_compare="du_login_screen_label",
+        )
 
     def stop_application(self):
         """Stop the game_client application if running."""
@@ -70,7 +140,6 @@ class DUClientManager(VerifyScreenMixin):
             client_pid = self.is_client_running()
             if isinstance(client_pid, int):
                 client_running = True
-                logger.info("Client is running. Stopping...")
                 try:
                     process = psutil.Process(client_pid)
                     process.terminate()
@@ -80,18 +149,11 @@ class DUClientManager(VerifyScreenMixin):
                     process.kill()
                     continue
                 except Exception as e:
-                    logger.error(f"Error while stopping the application: {e}")
                     raise EnvironmentError(f"Error while stopping the application:")
             client_running = False
-            logger.success(f"Client shutdown successfully")
 
 
 if __name__ == "__main__":
-    start_time = time.perf_counter()
-    du_client = DUClientManager()
-    du_client.start_application()
-    du_client.stop_application()
-    end_time = time.perf_counter()
-    elapsed_time = end_time - start_time
-    print(f"Elapsed time: {elapsed_time}")
-    pass
+    obj = ClientManager()
+    obj.start_application()
+    # obj.stop_application()
