@@ -6,8 +6,8 @@ import pyperclip
 
 from dual_universe.config.config_manager import ConfigMixin, timing_decorator
 from dual_universe.logs.logging_config import logger
-from models.image_model import ImageLocation
-from models.search_area_model import SearchAreaLocation
+from dual_universe.src.models.image_model import ImageLocation
+from dual_universe.src.models.search_area_model import SearchAreaLocation
 from dual_universe.src.querysets.character_queryset import CharacterQuerySet
 from dual_universe.src.querysets.search_area_queryset import SearchAreaQuerySet
 from dual_universe.util.special_mission_ocr import OCREngine
@@ -32,7 +32,7 @@ class DUMissions:
             name=SearchAreaLocation.ORIGIN_POS
         )
 
-        origin_coords = self.verify.screen(
+        origin_coords = VerifyScreenMixin(
             screen_name=ImageLocation.MISSION_DETAILS_SCREEN,
             image_to_compare="copy_coords",
             confidence=0.8,
@@ -42,7 +42,7 @@ class DUMissions:
         origin_pos = pyperclip.paste()
         print(origin_pos)
 
-        dest_coords = self.verify.screen(
+        dest_coords = VerifyScreenMixin(
             screen_name=ImageLocation.MISSION_DETAILS_SCREEN,
             image_to_compare="copy_coords",
             confidence=0.8,
@@ -92,14 +92,14 @@ class DUMissions:
     @timing_decorator
     def get_package(self):
         for image_name in self.image_list:
-            result = self.verify.screen(
+            result = VerifyScreenMixin(
                 screen_name=ImageLocation.RETRIEVE_DELIVER_DETAILS_SCREEN,
                 image_to_compare=image_name,
                 mouse_click=True,
                 mouse_clicks=2,
                 skip_sleep=True,
             )
-            if result.get("success"):
+            if result.request.status_code == 200:
                 if image_name == "selected_deliver_pkg_btn":
                     logger.debug(f"Package delivered")
                     return {"has_package": False}
@@ -110,12 +110,12 @@ class DUMissions:
 
     @timing_decorator
     def select_package(self):
-        unselected_search_btn = self.verify.screen(
+        unselected_search_btn = VerifyScreenMixin(
             screen_name=ImageLocation.ACTIVE_TAKEN_MISSIONS_SCREEN,
             image_to_compare="unselected_search_btn",
             mouse_click=True,
         )
-        reward_unsorted = self.verify.screen(
+        reward_unsorted = VerifyScreenMixin(
             screen_name=ImageLocation.SEARCH_FOR_MISSIONS_SCREEN,
             image_to_compare="reward_unsorted",
             mouse_click=True,
@@ -127,23 +127,23 @@ class DUMissions:
             scroll=True,
             click=True,
         )
-        take_mission_details_btn = self.verify.screen(
+        take_mission_details_btn = VerifyScreenMixin(
             screen_name=ImageLocation.MISSION_DETAILS_SCREEN,
             image_to_compare="take_mission_details_btn",
             mouse_click=True,
         )
-        take_mission_confirm_btn = self.verify.screen(
+        take_mission_confirm_btn = VerifyScreenMixin(
             screen_name=ImageLocation.CONFIRMATION_SCREEN,
             image_to_compare="take_mission_confirm_btn",
             mouse_click=True,
         )
-        result = self.verify.screen(
+        result = VerifyScreenMixin(
             screen_name=ImageLocation.RETRIEVE_DELIVER_DETAILS_SCREEN,
             image_to_compare="selected_retrieve_pkg_btn",
             mouse_click=True,
             skip_sleep=True,
         )
-        if result.get("success"):
+        if result.request.status_code == 200:
             logger.debug(f"Package retrieved")
             return {"has_package": True}
         return self.ocr_RETRIEVE_DELIVERY_STATUS()

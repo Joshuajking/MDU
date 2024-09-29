@@ -4,9 +4,9 @@ from dual_universe.config.config_manager import timing_decorator
 from dual_universe.config.db_setup import EncryptPassword
 from dual_universe.integrations.key_board import keyboard_press, keyboard_write
 from dual_universe.logs.logging_config import logger
+from dual_universe.src.models.image_model import ImageLocation
+from dual_universe.src.querysets.character_queryset import CharacterQuerySet
 from dual_universe.src.verify_screen import VerifyScreenMixin
-from models.image_model import ImageLocation
-from querysets.character_queryset import CharacterQuerySet
 
 
 class DUCharacters(VerifyScreenMixin):

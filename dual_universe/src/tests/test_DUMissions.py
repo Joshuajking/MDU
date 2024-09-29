@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch, Mock
 
-from models.models import SearchAreaLocation
+from dual_universe.src.models.search_area_model import SearchAreaLocation
 
 
 class TestProcessPackage(unittest.TestCase):
@@ -12,11 +12,11 @@ class TestProcessPackage(unittest.TestCase):
     def test_retrieve_package(self):
         # Patch the functions with specific return values
         with patch(
-            "util.special_mission_ocr.OCREngine.ocr_missions"
+            "dual_universe.util.special_mission_ocr.OCREngine.ocr_missions"
         ) as mock_ocr_missions, patch(
-            "util.verify_screen.VerifyScreen.screen"
+            "dual_universe.src.verify_screen.VerifyScreenMixin"
         ) as mock_screen, patch(
-            "core.DUMissions.ocr.OCREngine.ocr_missions"
+            "dual_universe.src.DUMissions.ocr.OCREngine.ocr_missions"
         ) as mock_active_taken_missions:
             # Set the return value for each function
             mock_ocr_missions.return_value = {

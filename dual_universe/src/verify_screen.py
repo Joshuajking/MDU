@@ -9,10 +9,10 @@ import pyautogui
 import pydirectinput
 
 from dual_universe.logs.logging_config import logger
+from dual_universe.src.models.image_model import ImageLocation
 from dual_universe.src.mouse_controller import MouseControllerMixin
 from dual_universe.util.response import Response
-from models.image_model import ImageLocation
-from querysets.image_queryset import ImageQuerySet
+from dual_universe.src.querysets.image_queryset import ImageQuerySet
 
 # Define a base directory for all images
 # base_image_dir = Path(__file__).parent.parent / "data" / "images"

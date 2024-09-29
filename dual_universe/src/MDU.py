@@ -2,12 +2,12 @@ import random
 from time import perf_counter, sleep
 
 from dual_universe.config.config_manager import ConfigMixin
-from DUCharacters import DUCharacters
-from DUFlight import DUFlight
-from DUMissions import DUMissions
 from dual_universe.logs.logging_config import logger
+from dual_universe.src.DUCharacters import DUCharacters
 from dual_universe.src.DUClientManager import ClientManager
-from querysets.character_queryset import CharacterQuerySet
+from dual_universe.src.DUFlight import DUFlight
+from dual_universe.src.DUMissions import DUMissions
+from dual_universe.src.querysets.character_queryset import CharacterQuerySet
 
 
 class EngineLoop(DUCharacters, DUFlight, DUMissions):

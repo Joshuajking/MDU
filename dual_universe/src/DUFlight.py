@@ -8,8 +8,8 @@ import pydirectinput
 from dual_universe.config.config_manager import ConfigMixin, timing_decorator
 from dual_universe.config.db_setup import DbConfig
 from dual_universe.logs.logging_config import logger
-from models.image_model import ImageLocation
 from dual_universe.settings import SEARCH_AREA_DIR
+from dual_universe.src.models.image_model import ImageLocation
 from dual_universe.src.querysets.image_queryset import ImageQuerySet
 from dual_universe.src.querysets.character_queryset import CharacterQuerySet
 from dual_universe.util.special_mission_ocr import OCREngine
@@ -27,7 +27,6 @@ class DUFlight:
 
     def __init__(self):
         self.config_manager = ConfigMixin()
-        self.verify = VerifyScreenMixin()
         self.ocr = OCREngine()
         self.character = CharacterQuerySet.read_character_by_username(
             self.config_manager.get_value("config.pilot")
@@ -89,12 +88,12 @@ class DUFlight:
             count = 0
             while count < attempts:
                 logger.info(f"Looking for image {image}")
-                response_image_to_compare = self.verify.screen(
+                response_image_to_compare = VerifyScreenMixin(
                     screen_name=ImageLocation.FLIGHT_SCREEN,
                     image_to_compare=image,
                     skip_sleep=True,
                 )
-                if response_image_to_compare["screen_coords"] is not None:
+                if response_image_to_compare.request.data["screen_coords"] is not None:
                     logger.info(f"Procceding to {image} location")
                     pydirectinput.keyDown("alt")
                     pydirectinput.press("4")
@@ -151,7 +150,7 @@ class DUFlight:
         logger.info(f"Sleeping for 30 seconds while game loads before respawn")
         sleep(30)
         pydirectinput.press("esc")
-        respawn_btn = self.verify.screen(
+        respawn_btn = VerifyScreenMixin(
             screen_name=ImageLocation.LOGOUT_SCREEN,
             image_to_compare="respawn_btn",
             skip_sleep=True,
@@ -159,12 +158,12 @@ class DUFlight:
             mouse_click=True,
         )
 
-        respawn_yes_btn = self.verify.screen(
+        respawn_yes_btn = VerifyScreenMixin(
             screen_name=ImageLocation.LOGOUT_SCREEN,
             image_to_compare="respawn_confirmation_btn",
             mouse_click=True,
         )
-        respawn_ok = self.verify.screen(
+        respawn_ok = VerifyScreenMixin(
             screen_name=ImageLocation.IN_GAME_SCREEN,
             image_to_compare="selected_ok_btn",
             mouse_click=True,
