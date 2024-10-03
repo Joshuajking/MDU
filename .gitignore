@@ -299,3 +299,4 @@ pip-selfcheck.json
 /dual_universe/config.json
 /dual_universe/dual_universe.sqbpro
 /temp_character_csv/*
+/dual_universe/local_dev.py
