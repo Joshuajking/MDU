@@ -6,14 +6,13 @@ import pyautogui
 import pydirectinput
 
 from dual_universe.config.config_manager import ConfigMixin, timing_decorator
-from dual_universe.config.db_setup import DbConfig
 from dual_universe.logs.logging_config import logger
 from dual_universe.settings import SEARCH_AREA_DIR
 from dual_universe.src.models.image_model import ImageLocation
-from dual_universe.src.querysets.image_queryset import ImageQuerySet
 from dual_universe.src.querysets.character_queryset import CharacterQuerySet
-from dual_universe.util.special_mission_ocr import OCREngine
+from dual_universe.src.querysets.image_queryset import ImageQuerySet
 from dual_universe.src.verify_screen import VerifyScreenMixin
+from dual_universe.util.special_mission_ocr import OCREngine
 
 
 class PilotSeatNotFoundError(Exception):
@@ -172,8 +171,4 @@ class DUFlight:
 
 
 if __name__ == "__main__":
-    pre_load = DbConfig()
-    pre_load.load_image_entries_to_db()
-    obj = DUFlight()
-    var = obj.check_ship_landed()
-    print(var)
+    pass

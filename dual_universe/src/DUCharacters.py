@@ -358,20 +358,4 @@ class DUCharacters:
 
 
 if __name__ == "__main__":
-    obj_char = CharacterQuerySet()
-    user = obj_char.read_character_by_username("barron")
-    obj = DUCharacters()
-    # retry_until_success(
-    #     lambda: obj.screen_mixin("ImageLocation.LOGIN_SCREEN", "du_login_screen_label")
-    # )
-    # is_loading_complete = VerifyScreenMixin(
-    #     screen_name=ImageLocation.IN_GAME_SCREEN,
-    #     image_to_compare="loading_complete",
-    #     minSearchTime=120,
-    # )
-    # # checking if character loaded in game within minSearchTime
-    # if not is_loading_complete.request.status_code == 200:
-    #     logger.warning("Loading in game failed")
-    # pyautogui.moveTo(is_loading_complete.request.data["screen_coords"])
-    obj.login(user)
-    # obj.logout(respawn=False)
+    pass

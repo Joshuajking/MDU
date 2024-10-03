@@ -152,12 +152,4 @@ class VerifyScreenMixin:
 
 
 if __name__ == "__main__":
-    try:
-        verify = VerifyScreenMixin(
-            screen_name="test1", skip_sleep=True, image_to_compare="testone"
-        )
-        var = verify.screen()
-    except ImageNotFound as e:
-        logger.error(f"Image not found: {e}")
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
+    pass

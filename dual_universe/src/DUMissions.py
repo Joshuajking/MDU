@@ -8,10 +8,9 @@ from dual_universe.config.config_manager import ConfigMixin, timing_decorator
 from dual_universe.logs.logging_config import logger
 from dual_universe.src.models.image_model import ImageLocation
 from dual_universe.src.models.search_area_model import SearchAreaLocation
-from dual_universe.src.querysets.character_queryset import CharacterQuerySet
 from dual_universe.src.querysets.search_area_queryset import SearchAreaQuerySet
-from dual_universe.util.special_mission_ocr import OCREngine
 from dual_universe.src.verify_screen import VerifyScreenMixin
+from dual_universe.util.special_mission_ocr import OCREngine
 
 
 class DUMissions:
@@ -167,16 +166,4 @@ class DUMissions:
 
 
 if __name__ == "__main__":
-    RETRIEVE_PACKAGE = 0
-    DELIVER_PACKAGE = 0
-    retrieve_status = True
-    all_active_characters = CharacterQuerySet.get_active_characters()
-    obj = DUMissions()
-    status, ocr_RETRIEVE_DELIVERY_STATUS = obj.ocr_RETRIEVE_DELIVERY_STATUS()
-    if ocr_RETRIEVE_DELIVERY_STATUS is not None:
-        if ocr_RETRIEVE_DELIVERY_STATUS == "RETRIEVE PACKAGE":
-            RETRIEVE_PACKAGE += 1
-        else:
-            DELIVER_PACKAGE += 1
-        if DELIVER_PACKAGE > RETRIEVE_PACKAGE:
-            print("break")
+    pass
