@@ -8,6 +8,15 @@ from dual_universe.src.models.base_model_mixin import BaseModelMixin
 metadata = MetaData()
 
 
+def get_enum_value(enum_class, enum_string):
+    """Converts string to Enum if the string represents a valid Enum value."""
+    # Extract just the Enum key (e.g., "LOGIN_SCREEN") from "ImageLocation.LOGIN_SCREEN"
+    enum_name = enum_string.split(".")[-1]
+
+    # Use getattr to access the enum value dynamically
+    return getattr(enum_class, enum_name, None)
+
+
 class ImageLocation(str, Enum):
     ACTIVE_TAKEN_MISSIONS_SCREEN = "active_taken_missions_screen"
     FLIGHT_SCREEN = "flight_screen"

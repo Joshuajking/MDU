@@ -8,7 +8,7 @@ from typing import Optional, Dict, Any
 from loguru import logger
 from sqlmodel import Session, select
 
-from dual_universe.src.models.image_model import Image, ImageLocation
+from dual_universe.src.models.image_model import Image, ImageLocation, get_enum_value
 
 from dual_universe.settings import db_engine as engine
 
@@ -100,6 +100,10 @@ class ImageQuerySet:
         cls, image_name: str, image_location: Optional[ImageLocation]
     ) -> Optional["Image"]:
         try:
+            # Convert image_location from string to ImageLocation Enum if it's a string
+            if isinstance(image_location, str):
+                image_location = get_enum_value(ImageLocation, image_location)
+
             parts = image_name.split(".")
             if len(parts) > 1:
                 extension = parts[-1]
