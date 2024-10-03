@@ -8,16 +8,26 @@ from dual_universe.src.DUClientManager import ClientManager
 from dual_universe.src.DUFlight import DUFlight
 from dual_universe.src.DUMissions import DUMissions
 from dual_universe.src.querysets.character_queryset import CharacterQuerySet
+from dual_universe.src.verify_screen import VerifyScreenMixin
+from dual_universe.util.retry_until_successful import retry_until_success
 
 
 class EngineLoop:
 
-    def __init__(self):
-        self.char = DUCharacters()
-        self.mission = DUMissions()
-        self.flight = DUFlight()
+    def __init__(
+        self,
+        screen_mixin=VerifyScreenMixin,
+        char=DUCharacters,
+        mission=DUMissions,
+        flight=DUFlight,
+        config_manager=ConfigMixin,
+    ):
+        self.char = char
+        self.mission = mission
+        self.flight = flight
+        self.screen_mixin = screen_mixin
+        self.config_manager = config_manager
         self.retrieve_mode = True
-        self.config_manager = ConfigMixin()
         self.trips = 0
         self.max_trips = 2
         self.all_active_characters = CharacterQuerySet.get_active_characters()
@@ -48,6 +58,11 @@ class EngineLoop:
 
                 character_time_start = perf_counter()
 
+                retry_until_success(
+                    lambda: self.screen_mixin(
+                        "ImageLocation.LOGIN_SCREEN", "du_login_screen_label"
+                    )
+                )
                 has_gametime = self.char.login(character)
                 if not has_gametime:
                     continue
