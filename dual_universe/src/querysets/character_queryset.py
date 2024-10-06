@@ -1,11 +1,11 @@
 import datetime
 from typing import Optional, Dict, Any
 
-from loguru import logger
 from sqlmodel import Session
 
-from dual_universe.src.models.character_model import Character
+from dual_universe.logs.logging_config import logger
 from dual_universe.settings import db_engine as engine
+from dual_universe.src.models.character_model import Character
 
 
 class CharacterQuerySet:

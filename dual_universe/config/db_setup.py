@@ -6,11 +6,11 @@ from datetime import datetime
 
 import pyautogui
 from cryptography.fernet import Fernet
-from loguru import logger
 from sqlmodel import SQLModel, Session, select
 
 from dual_universe.config.config_manager import ConfigMixin
 from dual_universe.config.db_dump import DumpDataBase
+from dual_universe.logs.logging_config import logger
 from dual_universe.settings import CONFIG_DIR, DU_IMAGES_DIR
 from dual_universe.settings import db_engine
 from dual_universe.src.models.character_model import Character

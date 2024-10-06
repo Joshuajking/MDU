@@ -17,18 +17,20 @@ class DUCharacters:
         self,
         screen_mixin=VerifyScreenMixin,
         batch_validation=BatchErrorValidation,
-        char=CharacterQuerySet,
+        char_query_set=CharacterQuerySet,
         keyboard=keyboard_press,
         write=keyboard_write,
         encrypt=EncryptPassword,
+        email_field_screen_name: str = None,
     ):
         self.screen_mixin = screen_mixin
         self.batch_validation = batch_validation()
         self.keyboard = keyboard
         self.write = write
         self.encrypt = encrypt()
-        self.char = char
+        self.char_query_set = char_query_set
         self.character = None
+        self.email_field_screen_name = email_field_screen_name
 
     @staticmethod
     def _clear_input_login_fields():
@@ -63,8 +65,7 @@ class DUCharacters:
             skip_sleep=True,
         )
         if is_password_field_empty.request.status_code == 200:
-            decrypt = EncryptPassword()
-            keyboard_write(decrypt.decrypt_password(self.character.password))
+            keyboard_write(self.encrypt.decrypt_password(self.character.password))
             keyboard_press("enter")
             ...
         return is_password_field_empty
@@ -100,19 +101,20 @@ class DUCharacters:
 
             results = self.batch_validation.validate_errors()
 
+            code = None
             # Handle results further if needed
             for result, code in results.items():
                 if code == 400:
                     logger.success(f"No {result} found.")
                     if result == "gametime_error":
-                        CharacterQuerySet.update_character(
+                        self.char_query_set.update_character(
                             self.character, {"has_gametime": True}
                         )
                 elif code == 200:
                     logger.warning(f"{result} found.")
                     if result == "gametime_error":
                         logger.debug(f"No game time: {self.character.username}")
-                        CharacterQuerySet.update_character(
+                        self.char_query_set.update_character(
                             self.character, {"has_gametime": False, "active": False}
                         )
                         return
@@ -216,11 +218,13 @@ class DUCharacters:
             skip_sleep=True,
         )
         if welcome_screen.request.status_code == 200:
-            self.screen_mixin(
+            welcome_screen_btn = self.screen_mixin(
                 screen_name="ImageLocation.IN_GAME_SCREEN",
                 image_to_compare="selected_ok_btn",
                 mouse_click=True,
             )
+            if welcome_screen_btn.request.status_code == 200:
+                logger.info(f"Welcome Btn found & press")
         return
 
 

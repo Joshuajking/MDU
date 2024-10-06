@@ -3,10 +3,8 @@ import random
 import pyautogui
 import pydirectinput
 import pytweening
-from loguru import logger
-from pynput import mouse
-from pynput.mouse import Controller
-from skimage.future.manual_segmentation import LEFT_CLICK
+
+from dual_universe.logs.logging_config import logger
 
 
 class MouseControllerMixin:

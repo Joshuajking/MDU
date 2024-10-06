@@ -1,9 +1,9 @@
 import datetime
 from typing import Optional, Dict, Tuple
 
-from loguru import logger
 from sqlmodel import Session, select
 
+from dual_universe.logs.logging_config import logger
 from dual_universe.settings import db_engine
 from dual_universe.src.models.search_area_model import SearchArea
 

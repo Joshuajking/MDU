@@ -2,6 +2,7 @@ import os
 from pathlib import Path
 from typing import Dict, Type
 
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlmodel import SQLModel
 
@@ -10,6 +11,7 @@ from dual_universe.src.models.image_model import Image
 from dual_universe.src.models.mission_model import Mission, MissionMetadata
 from dual_universe.src.models.search_area_model import SearchArea
 
+load_dotenv()
 ROOT_DIR = Path(__file__).resolve().parent
 
 CONFIG_DIR = ROOT_DIR / "config"
@@ -60,7 +62,9 @@ model_mapping: Dict[str, Type[SQLModel]] = {
 #     directory.mkdir(parents=True, exist_ok=True)
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
-db_name = "dual_universe.db"
+db_name = os.getenv("DATABASE_URL")
 db_path = os.path.join(root_dir, db_name)
 
-db_engine = create_engine(f"sqlite:///{db_path}", echo=False)
+db_engine = create_engine(
+    f"sqlite:///{db_path}", echo=os.getenv("DEBUG", "False") == "True"
+)

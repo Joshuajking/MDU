@@ -1,12 +1,11 @@
 import json
 import os
 from collections import OrderedDict
-from typing import Dict, Type, Callable
 
-from loguru import logger
 from sqlmodel import Session, select, SQLModel
 
 from dual_universe.config.config_manager import ConfigMixin
+from dual_universe.logs.logging_config import logger
 from dual_universe.settings import CONFIG_DIR, db_engine
 from dual_universe.src.models.image_model import Image
 from dual_universe.src.models.mission_model import Mission

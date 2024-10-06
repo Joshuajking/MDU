@@ -1,11 +1,9 @@
 import datetime
 from typing import Optional, Dict, Any
 
-from loguru import logger
 from sqlmodel import Session, select
 
-from dual_universe.src.models import MissionMetadata, Mission
-from dual_universe.settings import engine
+from dual_universe.logs.logging_config import logger
 
 
 class MissionMetaQuerySet:

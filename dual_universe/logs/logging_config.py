@@ -18,3 +18,5 @@ logger.add(
     backtrace=True,
     diagnose=True,
 )
+# Export the logger instance
+__all__ = ["logger"]

@@ -5,12 +5,11 @@ import os
 import uuid
 from typing import Optional, Dict, Any
 
-from loguru import logger
 from sqlmodel import Session, select
 
-from dual_universe.src.models.image_model import Image, ImageLocation, get_enum_value
-
+from dual_universe.logs.logging_config import logger
 from dual_universe.settings import db_engine as engine
+from dual_universe.src.models.image_model import Image, ImageLocation, get_enum_value
 
 
 class ImageQuerySet:
