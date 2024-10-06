@@ -129,7 +129,7 @@ class DUCharacters:
         return True
 
     def logout(self, respawn=False):
-        loading_complete_response = VerifyScreenMixin(
+        loading_complete_response = self.screen_mixin(
             screen_name="ImageLocation.IN_GAME_SCREEN",
             image_to_compare="loading_complete",
             skip_sleep=True,
@@ -138,15 +138,14 @@ class DUCharacters:
             return
 
         count = 0
-        max_count = 20
+        max_count = 5
         at_esc_menu = False
         while not at_esc_menu:
             if count >= max_count:
                 break
 
-            # pydirectinput.press("esc")
-            # sleep(random.uniform(0.5, 2.0))
-            logout_btn_response = VerifyScreenMixin(
+            pydirectinput_press("esc")
+            logout_btn_response = self.screen_mixin(
                 screen_name="ImageLocation.LOGOUT_SCREEN",
                 image_to_compare="logout_btn",
                 skip_sleep=True,
@@ -158,9 +157,6 @@ class DUCharacters:
                 pydirectinput_press("esc")
                 continue
             break
-
-        logger.error({"success": False, "message": "ESC Menu Not Found"})
-        raise Exception("ESC Menu Not Found")
 
     def check_location(self):  # TODO: Implement
         """Comes in after welcome back reward"""
