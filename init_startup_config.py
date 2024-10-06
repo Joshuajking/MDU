@@ -12,7 +12,8 @@ def get_user_choice():
 
 
 def dual_universe():
-    from dual_universe.src.querysets import CharacterQuerySet, MissionQuerySet
+    from dual_universe.src.querysets.mission_queryset import MissionQuerySet
+    from dual_universe.src.querysets.character_queryset import CharacterQuerySet
 
     # write to db
     missions = MissionQuerySet.select_all_missions()

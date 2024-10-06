@@ -6,8 +6,6 @@ from sqlalchemy import create_engine
 from sqlmodel import SQLModel
 
 from dual_universe.src.models.character_model import Character
-
-# from dual_universe.src.models.game_model import Game
 from dual_universe.src.models.image_model import Image
 from dual_universe.src.models.mission_model import Mission, MissionMetadata
 from dual_universe.src.models.search_area_model import SearchArea
@@ -65,4 +63,4 @@ root_dir = os.path.dirname(os.path.abspath(__file__))
 db_name = "dual_universe.db"
 db_path = os.path.join(root_dir, db_name)
 
-db_engine = create_engine(f"sqlite:///{db_path}", echo=True)
+db_engine = create_engine(f"sqlite:///{db_path}", echo=False)
